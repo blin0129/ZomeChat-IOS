@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>52F1FCF3-E804-434C-A947-543880E5A11C</string>
+	<key>IDESourceControlProjectName</key>
+	<string>ZomeChat</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>59137852-3871-457D-97B4-F6E47821919A</key>
+		<string>https://github.com/blin0129/ZomeChat-IOS.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>ZomeChat.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>59137852-3871-457D-97B4-F6E47821919A</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/blin0129/ZomeChat-IOS.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>59137852-3871-457D-97B4-F6E47821919A</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>59137852-3871-457D-97B4-F6E47821919A</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ZomeChat</string>
+		</dict>
+	</array>
+</dict>
+</plist>

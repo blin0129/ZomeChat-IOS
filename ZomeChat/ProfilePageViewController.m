@@ -17,6 +17,7 @@
 @synthesize cancelButton;
 @synthesize thumbnail;
 @synthesize changePicButton;
+@synthesize oldImage;
 
 -(id)initWithCoder:(NSCoder *)aDecoder
 {
@@ -83,10 +84,22 @@
         NSData *data = [[NSData alloc] initWithBase64EncodedString:[dic objectForKey:@"photo"] options:NSDataBase64DecodingIgnoreUnknownCharacters];
         UIImage *image = [[UIImage alloc] initWithData:data];
         [thumbnail setImage:image];
+        oldImage = image;
         //        thumbnailView.backgroundColor = [UIColor blueColor];
         //        NSLog(@"photo size width:%f height:%f", image.size.width, image.size.height);
     } else {
         [thumbnail setBackgroundColor:[UIColor lightGrayColor]];
+    }
+}
+
+-(void) receiveProfileUpdateRespond: (SocketIOPacket *)packet
+{
+    NSError *err = nil;
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
+    if([[dic objectForKey:@"respond"] isEqual:@"RESPOND_OKAY"]){
+        oldImage = thumbnail.image;
+    } else {
+        [thumbnail setImage:oldImage];
     }
 }
 

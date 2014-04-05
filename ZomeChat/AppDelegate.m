@@ -24,8 +24,8 @@
     userName = [[NSMutableString alloc] init];
     lng = @"0";
     lat = @"0";
-//    serverURL = @"10.0.0.5";
-    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com";
+    serverURL = @"10.0.0.5";
+//    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com";
 //    serverURL = @"192.168.5.82";
     
     self.window.tintColor = [UIColor whiteColor];

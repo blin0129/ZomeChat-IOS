@@ -16,7 +16,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UIButton *saveButton;
 @property (weak, nonatomic) IBOutlet UIButton *changePicButton;
+@property UIImage *oldImage;
 
 -(void) receiveMyProfile: (SocketIOPacket *)packet;
+-(void) receiveProfileUpdateRespond: (SocketIOPacket *)packet;
 
 @end

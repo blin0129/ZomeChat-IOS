@@ -284,6 +284,11 @@
     [APPDELEGATE.profileVC receiveMyProfile:packet];
 }
 
+-(void) receiveProfileUpdateResponse:(SocketIOPacket *)packet
+{
+    [APPDELEGATE.profileVC receiveProfileUpdateRespond:packet];
+}
+
 - (void) socketIODidConnect:(SocketIO *)socket
 {
     NSLog(@"socket.io connected.");
@@ -311,7 +316,10 @@
         [self receiveAddARoommate:packet];
     }  else if([packet.name isEqual:@"myProfile"]){
         [self receiveMyProfile:packet];
+    }   else if([packet.name isEqual:@"profileUpdateResponse"]){
+        [self receiveProfileUpdateResponse:packet];
     }
+
 }
 
 - (void) socketIO:(SocketIO *)socket onError:(NSError *)error

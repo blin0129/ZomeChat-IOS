@@ -117,21 +117,21 @@
 
 -(void) receiveSignupResponse:(SocketIOPacket *)packet
 {
-    if([[packet.args objectAtIndex:0] isEqual:@"SIGNUP_SUCCESS"]){
+    NSError *err = nil;
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
+    if([[dic objectForKey:@"respond"] isEqual:@"SIGNUP_SUCCESS"]){
         [[NSUserDefaults standardUserDefaults] setObject:requestUserName forKey:@"savedName"];
         [[NSUserDefaults standardUserDefaults] setObject:requestPassword forKey:@"savedPassword"];
         [_toLoginButton sendActionsForControlEvents:UIControlEventTouchUpInside];
         UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:@"Signup succeed"
-                                                                  message:[packet.args objectAtIndex:0]
+                                                                  message:[dic objectForKey:@"displayMessage"]
                                                                  delegate:self
                                                         cancelButtonTitle:@"Okay"
                                                         otherButtonTitles:nil];
         [newMessageAlert show];
     } else{
-//        NSLog(@"textfields name:%@ password:%@",usernameInput.text,passwordInput.text);
-        NSLog(@"signup failed: %@",[packet.args objectAtIndex:0]);
         UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:@"Signup failed"
-                                                                  message:[packet.args objectAtIndex:0]
+                                                                  message:[dic objectForKey:@"displayMessage"]
                                                                  delegate:self
                                                         cancelButtonTitle:@"Okay"
                                                         otherButtonTitles:nil];
