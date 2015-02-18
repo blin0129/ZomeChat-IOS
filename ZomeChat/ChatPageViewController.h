@@ -7,12 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "iCarousel.h"
 #import "Base64.h"
 
 @class Room;
 
-@interface ChatPageViewController : UIViewController <iCarouselDataSource, iCarouselDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>{
+@interface ChatPageViewController : UIViewController <UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>{
     UIImagePickerController *picker;
 }
 
@@ -22,7 +21,6 @@
 @property (nonatomic, strong) IBOutlet UINavigationItem *navItem;
 @property (nonatomic, strong) IBOutlet UIBarItem *orientationBarItem;
 @property (nonatomic, strong) IBOutlet UIBarItem *wrapBarItem;
-@property (nonatomic, strong) IBOutlet iCarousel *carousel;
 @property (weak, nonatomic) IBOutlet UIButton *sendButton;
 @property (weak, nonatomic) IBOutlet UIView *inputBoxView;
 @property (weak, nonatomic) IBOutlet UIButton *addImageButton;

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "User.h"
+#import "ChatViewController.h"
 
 @interface Room : NSObject <UITableViewDataSource, UITableViewDelegate>
 
@@ -18,15 +19,14 @@
 @property NSMutableArray *roommates;
 @property NSMutableString *content;
 @property (strong, nonatomic) UITableView *userTableView;
-@property (strong, nonatomic) UITextView *contentView;
+@property (strong, nonatomic) ChatViewController *contentView;
+//@property (strong, nonatomic) UITextView *contentView;
 @property float nextLineY;
 
 -(id)initWithName:(NSString *)roomName Key:(NSString *)roomKey andUserCount:(NSInteger)roomUserCount;
 -(void)addContent:(NSString *)msg;
--(void)addARoommate:(User *)user;
 -(void)addImage: (UIImage *)image;
 -(void)addImageSender:(NSString *)name;
--(void)removeARoommate:(NSString *)uid;
--(void) cleanRoom;
+-(void)cleanRoom;
 
 @end

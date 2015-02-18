@@ -1,0 +1,384 @@
+//
+//  PostViewController.m
+//  ZomeChat
+//
+//  Created by Brian Lin on 11/24/14.
+//  Copyright (c) 2014 Zome. All rights reserved.
+//
+
+#import "PostViewController.h"
+#import "UIImage+ProportionalFill.h"
+#import "DetailPostTableViewCell.h"
+#import "CommentTableViewCell.h"
+
+@implementation PostViewController{
+    float yBound;
+    UITableViewCell *cellForRowHeightCalculation;
+}
+
+- (id)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if(self){
+        APPDELEGATE.postVC = self;
+    }
+    return self;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    [self initView];
+    [self customNavBar];
+    self.postData = [APPDELEGATE.msglistVC selectedData];
+    self.feedId = [self.postData objectForKey:@"id"];
+    [APPDELEGATE.mainVC requestFeedDetail:self.feedId];
+}
+
+- (void) initView
+{
+    [self.view setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"background-babyblue"]]];
+    self.comments = [[NSMutableArray alloc] init];
+    yBound = self.replyContainer.frame.origin.y;
+    
+    self.commentTable.delegate = self;
+    self.commentTable.dataSource = self;
+    self.commentTable.backgroundColor = [UIColor clearColor];
+    self.commentTable.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [self.commentTable setAllowsSelection:NO];
+    [self.commentTable registerNib:[UINib nibWithNibName:@"DetailPostCell" bundle:nil] forCellReuseIdentifier:@"DetailPostCell"];
+    [self.commentTable registerNib:[UINib nibWithNibName:@"CommentCell" bundle:nil] forCellReuseIdentifier:@"CommentCell"];
+    [self.replyTextField addTarget:self
+                  action:@selector(editingChanged:)
+        forControlEvents:UIControlEventEditingChanged];
+    self.replyBtn.enabled = NO;
+
+    self.replyContainer.layer.shadowOffset = CGSizeMake(-1, -1);
+    self.replyContainer.layer.shadowRadius = 2;
+    self.replyContainer.layer.shadowOpacity = 0.3;
+    
+    UITapGestureRecognizer *tapRec = [[UITapGestureRecognizer alloc]
+                                      initWithTarget:self action:@selector(tap:)];
+    [self.view addGestureRecognizer: tapRec];
+    
+    
+}
+
+-(void)tap:(UITapGestureRecognizer *)tapRec{
+    [[self view] endEditing: YES];
+}
+
+-(void) editingChanged:(id)sender {
+    if (self.replyTextField.text.length == 0) {
+        self.replyBtn.enabled = NO;
+    } else {
+        self.replyBtn.enabled = YES;
+    }
+}
+
+
+
+- (void)customNavBar
+{
+    self.navigationItem.title = @"Feed";
+    UIBarButtonItem * likeBtn= [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"bar_icon_like"] style:UIBarButtonItemStylePlain target:self action:@selector(likeThePost)];
+    
+    UIBarButtonItem *negativeSpacer = [[UIBarButtonItem alloc]
+                                       initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
+                                       target:nil action:nil];
+    negativeSpacer.width = -10;
+  
+    self.navigationItem.rightBarButtonItems =[NSArray arrayWithObjects:negativeSpacer, likeBtn, nil];
+}
+
+- (void) receiveFeedDetail:(SocketIOPacket *)packet
+{
+    NSError *err = nil;
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
+    self.comments = [dic objectForKey:@"comments"];
+    self.likes = [dic objectForKey:@"likes"];
+    [self.commentTable reloadData];
+    [APPDELEGATE.msglistVC updateFeedStatus:[dic objectForKey:@"id"]
+                                  likeCount:[NSNumber numberWithInteger:self.likes.count]
+                               commentCount:[NSNumber numberWithInteger:self.comments.count]];
+}
+
+-(void)showAlertBox:(NSString *)title message:(NSString *)message button:(NSString *)buttonTitle
+{
+    UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:title
+                                                              message:message
+                                                             delegate:self
+                                                    cancelButtonTitle:buttonTitle
+                                                    otherButtonTitles:nil];
+    [newMessageAlert show];
+}
+
+- (IBAction)replayBtnClicked:(id)sender {
+    if(APPDELEGATE.commentPost){
+        NSString *comment = self.replyTextField.text;
+        [APPDELEGATE.mainVC requestPostComment:comment onFeed:self.feedId];
+        self.replyTextField.text = @"";
+    }else{
+        [self showAlertBox:APPDELEGATE.commentPostAlertTitle
+                   message:APPDELEGATE.commentPostAlertMessage
+                    button:@"OK"];
+    }
+    [[self view] endEditing: YES];
+}
+
+- (void)likeThePost
+{
+    if (APPDELEGATE.likePost) {
+        BOOL likedBefore = false;
+        if (self.likes) {
+            for (NSString *userliked in self.likes){
+                if ([userliked isEqualToString:APPDELEGATE.uid] ) {
+                    [self showAlertBox:APPDELEGATE.postDoubleLikedAlertTitle
+                               message:APPDELEGATE.postDoubleLikedAlertMessage
+                                button:@"OK"];
+                    likedBefore = true;
+                    break;
+                }
+            }
+            if (!likedBefore) {
+                [APPDELEGATE.mainVC requestLikeFeed:self.feedId];
+            }
+        }
+    } else {
+        [self showAlertBox:APPDELEGATE.likePostAlertTitle
+                   message:APPDELEGATE.likePostAlertMessage
+                    button:@"OK"];
+    }
+}
+
+
+- (UIImage *) getImageFromURL: (NSString *) imageURL
+{
+    if ([imageURL isEqualToString:@""]) {
+        return nil;
+    }
+    UIImage *img = [APPDELEGATE.imageCache objectForKey:imageURL];
+    if(!img){
+        img = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString: imageURL]]];
+        [APPDELEGATE.imageCache setObject:img forKey:imageURL];
+    }
+    return [self resizeImage:img];
+}
+
+
+- (UIImage *) resizeImage:(UIImage *)originalImage
+{
+    float width = originalImage.size.width;
+    float weidthScale = width/([[UIScreen mainScreen] bounds].size.width - 30);
+    float finalScale = 1;
+    if (weidthScale >= 1) {
+        finalScale = 1 / weidthScale;
+    }
+    CGSize newSize = CGSizeMake(width * finalScale, originalImage.size.height * finalScale);
+    UIImage *newImage =[originalImage imageCroppedToFitSize:newSize];
+    return newImage;
+}
+
+- (UIImage *) resizeImageToThumbnail:(UIImage *)originalImage size:(float) width
+{
+    CGSize newSize = CGSizeMake(width,width);
+    UIImage *newImage =[originalImage imageCroppedToFitSize:newSize];
+    return newImage;
+}
+
+- (void) hashtagColor:(UITextView *)textView{
+    NSMutableAttributedString * string = [[NSMutableAttributedString alloc]initWithString:textView.text];
+    [string addAttribute:NSForegroundColorAttributeName value:[UIColor darkGrayColor] range:NSMakeRange(0,[string length])];
+    [string addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:13.0f] range:NSMakeRange(0,[string length])];
+    NSError *error = nil;
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"#(\\w+)" options:0 error:&error];
+    NSArray *matches = [regex matchesInString:textView.text options:0 range:NSMakeRange(0, textView.text.length)];
+    for (NSTextCheckingResult *match in matches) {
+        NSRange wordRange = [match rangeAtIndex:0];
+        [string addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x5c9fd6) range:wordRange];
+    }
+    [textView setAttributedText:string];
+}
+
+- (void)keyboardWillHide:(NSNotification *)n
+{
+    CGSize keyboardSize = [[[n userInfo] objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    
+    // resize the scrollview
+    CGRect viewFrame = self.replyContainer.frame;
+    viewFrame.origin.y += (keyboardSize.height - self.tabBarController.tabBar.frame.size.height);
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    [self.replyContainer setFrame:viewFrame];
+    [UIView commitAnimations];
+    self.replyContainer.translatesAutoresizingMaskIntoConstraints = YES;
+}
+
+- (void)keyboardWillShow:(NSNotification *)n
+{
+    // get the size of the keyboard
+    CGSize keyboardSize = [[[n userInfo] objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    
+    // resize the noteView
+    CGRect viewFrame = self.replyContainer.frame;
+    viewFrame.origin.y -= (keyboardSize.height - self.tabBarController.tabBar.frame.size.height);
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    [self.replyContainer setFrame:viewFrame];
+    [UIView commitAnimations];
+    self.replyContainer.translatesAutoresizingMaskIntoConstraints = YES;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    // register for keyboard notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillShow:)
+                                                 name:UIKeyboardWillShowNotification
+                                               object:self.view.window];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:self.view.window];
+    
+    if (self.replyTextField.text.length == 0) {
+        self.replyBtn.enabled = NO;
+    } else {
+        self.replyBtn.enabled = YES;
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    // unregister for keyboard notifications while not visible.
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillShowNotification
+                                                  object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillHideNotification
+                                                  object:nil];
+}
+
+#pragma mark - Table view data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return [self.comments count] + 1;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // check the cache first if enabled
+#if PERFORMANCE_ENABLE_HEIGHT_CACHE
+    NSNumber *cachedHeight = self.rowHeightCache[content.uniqueIdentifier];
+    if (cachedHeight != nil) {
+        return [cachedHeight floatValue];
+    }
+#endif
+    NSDictionary *data;
+    float imageHeight = 0;
+    float cellHeight = 0;
+    if(indexPath.row == 0){
+        data = self.postData;
+        cellHeight = 108;
+        NSString *imageURL = [self.postData objectForKey:@"imageURL"];
+        if (![imageURL isEqualToString:@""]){
+            UIImage *image;
+            image = [self getImageFromURL:imageURL];
+            if(image){
+                imageHeight = image.size.height + 5;
+            }
+        }
+    } else {
+        cellHeight = 77;
+        data = [self.comments objectAtIndex:(indexPath.row-1)];
+    }
+    NSMutableAttributedString *content = [[NSMutableAttributedString alloc] initWithString:[data objectForKey:@"content"] attributes:@{NSFontAttributeName:[UIFont fontWithName:@"Helvetica" size:13.0]}];
+    float viewWidth = tableView.frame.size.width - 40;
+    CGRect theSize = [content boundingRectWithSize:CGSizeMake(viewWidth, CGFLOAT_MAX)
+                                           options:(NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading)
+                                           context:nil];
+    
+    cellHeight += theSize.size.height + imageHeight;
+    
+#if PERFORMANCE_ENABLE_HEIGHT_CACHE
+    self.rowHeightCache[message.uniqueIdentifier] = @(cellHeight);
+#endif
+    return cellHeight;
+}
+
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSString *cellIdentifier;
+     if (indexPath.row == 0) {
+         cellIdentifier = @"DetailPostCell";
+         DetailPostTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+        if (!cell){
+            cell = [[DetailPostTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+            cell.backgroundColor = [UIColor clearColor];
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            [cell setUserInteractionEnabled:NO];
+        }
+        cell.usernameLabel.text = [self.postData objectForKey:@"ownerName"];
+         NSString *timeFormat = [NSString stringWithFormat:@"%@/%@/%@ %02d:%02d",
+                                 [self.postData objectForKey:@"month"],
+                                 [self.postData objectForKey:@"date"],
+                                 [self.postData objectForKey:@"year"],
+                                 (int)[[self.postData objectForKey:@"hour"] integerValue],
+                                 (int)[[self.postData objectForKey:@"min"] integerValue]];
+         cell.timeLabel.text = timeFormat;
+         cell.postContent.text = [self.postData objectForKey:@"content"];
+//         [cell.postContent sizeToFit];
+         [self hashtagColor:cell.postContent];
+         
+         UIImage *thumbnail = [self resizeImageToThumbnail:[self getImageFromURL:[self.postData objectForKey:@"ownerImageURL"]] size:70.0f];
+         cell.posterImage.image = thumbnail;
+         
+         NSString *imageURL = [self.postData objectForKey:@"imageURL"];
+         if(![imageURL isEqualToString:@""]){
+             UIImage *img = [self getImageFromURL:imageURL];
+             cell.posterImage.frame = CGRectMake(cell.postImage.frame.origin.x, cell.posterImage.frame.origin.y, img.size.width, img.size.height);
+             cell.postImage.image = img;
+         } else {
+             cell.postImage.hidden = YES;
+         }
+         return cell;
+     } else {
+         cellIdentifier = @"CommentCell";
+         CommentTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+         if (cell == nil){
+            cell = [[CommentTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+             cell.backgroundColor = [UIColor clearColor];
+             cell.selectionStyle = UITableViewCellSelectionStyleNone;
+             [cell setUserInteractionEnabled:NO];
+         }
+         NSDictionary *commentData = [self.comments objectAtIndex:(indexPath.row-1)];
+         cell.usernameLabel.text = [commentData objectForKey:@"ownerName"];
+         NSString *timeFormat = [NSString stringWithFormat:@"%@/%@/%@ %02d:%02d",
+                                 [commentData objectForKey:@"month"],
+                                 [commentData objectForKey:@"date"],
+                                 [commentData objectForKey:@"year"],
+                                 (int)[[commentData objectForKey:@"hour"] integerValue],
+                                 (int)[[commentData objectForKey:@"min"] integerValue]];
+         cell.timeLabel.text = timeFormat;
+         cell.contentTextview.text = [commentData objectForKey:@"content"];
+//         [cell.contentTextview sizeToFit];
+         
+         if([commentData objectForKey:@"ownerImageURL"]){
+             UIImage *thumbnail = [self resizeImageToThumbnail:[self getImageFromURL:[commentData     objectForKey:@"ownerImageURL"]] size:40.0f];
+             cell.userImage.image = thumbnail;
+         }
+         return cell;
+     }
+}
+
+
+@end

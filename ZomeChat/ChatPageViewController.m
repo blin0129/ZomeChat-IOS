@@ -9,6 +9,8 @@
 #import "ChatPageViewController.h"
 #import "MainViewController.h"
 #import "Room.h"
+#import <AudioToolbox/AudioToolbox.h>
+#import "JSQMessagesViewController/JSQMessages.h"
 
 
 @interface ChatPageViewController ()
@@ -24,7 +26,6 @@
 
 @implementation ChatPageViewController
 @synthesize rooms;
-@synthesize carousel;
 @synthesize messageInputField;
 @synthesize inputBoxView;
 @synthesize sendButton;
@@ -40,8 +41,8 @@
 {
     self = [super initWithCoder:aDecoder];
     if(self){
-        APPDELEGATE.chatVC = self;
-        self.rooms = [NSMutableArray array];
+//        APPDELEGATE.chatVC = self;
+//        self.rooms = [NSMutableArray array];
     }
     return self;
 }
@@ -49,33 +50,18 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    NSLog(@"Add image button size width:%f height:%f", addImageButton.frame.size.width, addImageButton.frame.size.height);
+//    NSLog(@"Add image button size width:%f height:%f", addImageButton.frame.size.width, addImageButton.frame.size.height);
     sendButton.userInteractionEnabled = FALSE;
     addImageButton.userInteractionEnabled = FALSE;
 //    addImageButton.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"cam.png"]];
 
-    UIImageView *backgroundIV = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background-lightblue.png"]];
-    backgroundIV.frame = self.view.bounds;
-    [self.view addSubview:backgroundIV];
-    [self.view sendSubviewToBack:backgroundIV];
+//    UIImageView *backgroundIV = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background-lightblue.png"]];
+//    backgroundIV.frame = self.view.bounds;
+//    [self.view addSubview:backgroundIV];
+//    [self.view sendSubviewToBack:backgroundIV];
     
     messageInputField.delegate = self;
-    self.carousel.type = iCarouselTypeCoverFlow2;
     sendImage = false;
-    
-//    iCarouselTypeLinear
-//    iCarouselTypeRotary,
-//    iCarouselTypeInvertedRotary,
-//    iCarouselTypeCylinder,
-//    iCarouselTypeInvertedCylinder,
-//    iCarouselTypeWheel,
-//    iCarouselTypeInvertedWheel,
-//    iCarouselTypeCoverFlow,
-//    iCarouselTypeCoverFlow2,
-//    iCarouselTypeTimeMachine,
-//    iCarouselTypeInvertedTimeMachine,
-//    iCarouselTypeCustom
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
@@ -128,12 +114,9 @@
     NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
     NSString *roomName = [dic objectForKey:@"roomName"];
     NSString *roomKey = [dic objectForKey:@"roomKey"];
-
     NSInteger roomUserCount = [[dic objectForKey:@"userCount"] integerValue];
     Room *newRoom = [[Room alloc] initWithName:roomName Key:roomKey andUserCount:roomUserCount];
-    NSInteger index = MAX(0, carousel.currentItemIndex);
-    [rooms insertObject:newRoom atIndex:index];
-    [carousel insertItemAtIndex:index animated:YES];
+    [rooms insertObject:newRoom atIndex:0];
     if(rooms.count > 0){
         sendButton.userInteractionEnabled = TRUE;
         addImageButton.userInteractionEnabled = TRUE;
@@ -152,24 +135,9 @@
     return nil;
 }
 
-//-(void) loopRooms{
-//    NSLog(@"total object in rooms list: %d",rooms.count);
-//    for(int i = 0; i < rooms.count; i++){
-//        if(rooms[i] != nil){
-//            NSLog(@"%d %@",i, ((Room *)rooms[i]).name);
-//        } else{
-//            NSLog(@"%d is NULL",i);
-//        }
-//    }
-//}
-
 -(void) printMessage:(NSString *)message inRoom:(NSString *)roomKey{
     Room *currentRoom = [self findRoom:roomKey];
     [currentRoom addContent:message];
-    for(NSNumber *index in carousel.indexesForVisibleItems){
-        [carousel reloadItemAtIndex:[index integerValue] animated:FALSE];
-    }
-    //    [carousel reloadItemAtIndex:carousel.currentItemIndex animated:FALSE];
 }
 
 -(void) printImage:(NSString *)imageString inRoom:(NSString *)roomKey fromSender:(NSString *)sender{
@@ -179,11 +147,6 @@
     NSData *data = [[NSData alloc] initWithBase64EncodedString:imageString options:NSDataBase64DecodingIgnoreUnknownCharacters];
     UIImage *image = [[UIImage alloc] initWithData:data];
     [currentRoom addImage:image];
-//    NSString *encodedImage = [imageData base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
-    for(NSNumber *index in carousel.indexesForVisibleItems){
-        [carousel reloadItemAtIndex:[index integerValue] animated:FALSE];
-    }
-//    [carousel reloadItemAtIndex:carousel.currentItemIndex animated:FALSE];
 }
 
 -(void)keyboardWillShow:(NSNotification *)notification
@@ -217,16 +180,6 @@
     }
 }
 
-//-(void)textFieldDidBeginEditing:(UITextField *)sender
-//{
-//    if ([sender isEqual:messageInputField]){
-//        if  (self.view.frame.origin.y >= 0)
-//        {
-//            [self setViewMovedUp:YES withTime:0.4];
-//        }
-//    }
-//}
-
 //method to move the view up/down whenever the keyboard is shown/dismissed
 -(void)setViewMovedUp:(BOOL)up withTime:(float) sec
 {
@@ -244,9 +197,9 @@
 }
 
 
-
 - (IBAction)sendMessage:(id)sender {
-    NSString *roomKey = ((Room *)rooms[carousel.currentItemIndex]).key;
+//    NSString *roomKey = ((Room *)rooms[carousel.currentItemIndex]).key;
+    NSString *roomKey = @"0";
     if(sendImage){
         NSData *imageData = UIImageJPEGRepresentation(imageView.image, 1.0);
         NSString *encodedImage = [imageData base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
@@ -288,9 +241,9 @@
                 UIImage *image = [[UIImage alloc] initWithData:data];
                 [newRoommate addThumbnail:image];
             }
-            [theRoom addARoommate:newRoommate];
+//            [theRoom addARoommate:newRoommate];
         }
-        [carousel reloadItemAtIndex:carousel.currentItemIndex animated:FALSE];
+//        [carousel reloadItemAtIndex:carousel.currentItemIndex animated:FALSE];
     }
 }
 
@@ -314,13 +267,23 @@
         UIImage *image = [[UIImage alloc] initWithData:data];
         [newRoommate addThumbnail:[self squareImage:image]];
     }
-    [theRoom addARoommate:newRoommate];
-    for(NSNumber *index in carousel.indexesForVisibleItems){
-        [carousel reloadItemAtIndex:[index integerValue] animated:FALSE];
-    }
-
+//    [theRoom addARoommate:newRoommate];
+//    for(NSNumber *index in carousel.indexesForVisibleItems){
+//        [carousel reloadItemAtIndex:[index integerValue] animated:FALSE];
+//    }
+    [self playNotificationSound];
     //    [carousel reloadItemAtIndex:carousel.currentItemIndex animated:FALSE];
 }
+
+//Play sound when someone enter room
+-(void) playNotificationSound
+{
+    SystemSoundID soundID;
+    NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/notification_sound.mp3", [[NSBundle mainBundle] resourcePath]]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)url, &soundID);
+    AudioServicesPlaySystemSound (soundID);
+}
+
 
 - (UIImage *)squareImage:(UIImage *)image
 {
@@ -364,10 +327,10 @@
     NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
     NSString *roomKey = [dic objectForKey:@"roomKey"];
     Room *theRoom = [self findRoom:roomKey];
-    [theRoom removeARoommate:[dic objectForKey:@"uid"]];
-    for(NSNumber *index in carousel.indexesForVisibleItems){
-        [carousel reloadItemAtIndex:[index integerValue] animated:FALSE];
-    }
+//    [theRoom removeARoommate:[dic objectForKey:@"uid"]];
+//    for(NSNumber *index in carousel.indexesForVisibleItems){
+//        [carousel reloadItemAtIndex:[index integerValue] animated:FALSE];
+//    }
     //    [carousel reloadItemAtIndex:carousel.currentItemIndex animated:FALSE];
 
 }
@@ -475,122 +438,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 }
 
 
-#pragma mark -
-#pragma mark iCarousel methods
-//Cover Flow Animation
-
-- (NSUInteger)numberOfItemsInCarousel:(iCarousel *)carousel
-{
-    //return the total number of items in the carousel
-    return [rooms count];
-}
-
-- (CGFloat)carousel:(iCarousel *)carousel valueForOption:(iCarouselOption)option withDefault:(CGFloat)value
-{
-    switch (option)
-    {
-        case iCarouselOptionSpacing: {
-            return 0.08;
-        }
-        case iCarouselOptionTilt: {
-            return 1.17;
-        }
-        default:{
-            return value;
-        }
-    }
-}
-
-- (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index reusingView:(UIView *)view
-{
-    UITextField *label = nil;
-    UITableView *tableView = nil;
-    UITextView *textView = nil;
-    UIButton *closeButton = nil;
-    UIButton *userButton = nil;
-    UILabel *roomKey = nil;
-
-    if (view == nil)
-    {
-//        NSLog(@"Float width = %f", self.carousel.contentView.bounds.size.width);
-//        NSLog(@"Float height = %f", self.carousel.contentView.bounds.size.height);
-        view = [[UIView alloc] initWithFrame:self.carousel.contentView.bounds];
-        view.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.35];
-        
-        //Close button
-        closeButton = [[UIButton alloc] init];
-        closeButton.layer.borderWidth = 2;
-        closeButton.layer.borderColor = [UIColor whiteColor].CGColor;
-        closeButton.layer.cornerRadius = 8;        [closeButton setTitle:@"X" forState:UIControlStateNormal];
-        [closeButton addTarget:self
-                        action:@selector(closeCurrentChatBox)
-              forControlEvents:(UIControlEvents)UIControlEventTouchDown];
-        closeButton.tag = 2;
-        
-        //Room Name
-        label = [[UITextField alloc] init];
-        label.textColor = [UIColor whiteColor];
-        label.font = [UIFont systemFontOfSize:24];
-        label.textAlignment = NSTextAlignmentCenter;
-        label.tag = 1;
-        
-        //Users button
-        userButton = [[UIButton alloc] init];
-        userButton.layer.borderWidth = 2;
-        userButton.layer.borderColor = [UIColor whiteColor].CGColor;
-        userButton.layer.cornerRadius = 8;
-        userButton.layer.masksToBounds = YES;
-        [userButton addTarget:self
-                       action:@selector(switchBoxContent)
-             forControlEvents:(UIControlEvents)UIControlEventTouchDown];
-        userButton.tag = 3;
-        
-        //RoomKey (Hidden)
-        roomKey = [[UILabel alloc] init];
-        roomKey.tag = 6;
-
-        [view addSubview:label];
-        [view addSubview:closeButton];
-        [view addSubview:userButton];
-        [view addSubview:roomKey];
-        [roomKey setHidden:TRUE];
-        
-        [textView setHidden:FALSE];
-        [tableView setHidden:TRUE];
-        
-        [label setTranslatesAutoresizingMaskIntoConstraints:NO];
-        [closeButton setTranslatesAutoresizingMaskIntoConstraints:NO];
-        [userButton setTranslatesAutoresizingMaskIntoConstraints:NO];
-
-    } else {
-        //get a reference to the label in the recycled view
-        label = (UITextField *)[view viewWithTag:1];
-        closeButton = (UIButton *) [view viewWithTag:2];
-        userButton = (UIButton *) [view viewWithTag:3];
-//        textView = (UITextView *) [view viewWithTag:4];
-//        tableView = (UITableView *) [view viewWithTag:5];
-        roomKey = (UILabel *) [view viewWithTag:6];
-    }
-    
-    [userButton setTitle:[NSString stringWithFormat:@"%ld", (long)((Room *)rooms[index]).userCount] forState:UIControlStateNormal];
-    
-    tableView = ((Room *)rooms[index]).userTableView;
-    tableView.tag = 5;
-    [view addSubview:tableView];
-    [tableView setTranslatesAutoresizingMaskIntoConstraints:NO];
-
-    textView = ((Room *)rooms[index]).contentView;
-    textView.tag = 4;
-    [view addSubview:textView];
-    [textView setTranslatesAutoresizingMaskIntoConstraints:NO];
-
-    label.text = [self checkRoomnameLength:((Room *)rooms[index]).name];
-    roomKey.text = ((Room *)rooms[index]).key;
-
-    [self chatboxConstrain:view:label:closeButton:userButton:textView:tableView];
-    return view;
-}
-
 -(NSString *) checkRoomnameLength:(NSString *)roomname
 {
     if (roomname.length > 12) {
@@ -603,177 +450,19 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 - (void) switchBoxContent
 {
     //if textview is showing, switching to tableview
-    if ([carousel.currentItemView viewWithTag:5].isHidden) {
-        [[carousel.currentItemView viewWithTag:5] setHidden:FALSE];
-        [[carousel.currentItemView viewWithTag:4] setHidden:TRUE];
-        UIButton *button = (UIButton *) [carousel.currentItemView viewWithTag:3];
-        button.backgroundColor = [UIColor lightGrayColor];
-    } else{
-        [[carousel.currentItemView viewWithTag:4] setHidden:FALSE];
-        [[carousel.currentItemView viewWithTag:5] setHidden:TRUE];
-        UIButton *button = (UIButton *) [carousel.currentItemView viewWithTag:3];
-        button.backgroundColor = [UIColor clearColor];
-    }
+//    if ([carousel.currentItemView viewWithTag:5].isHidden) {
+//        [[carousel.currentItemView viewWithTag:5] setHidden:FALSE];
+//        [[carousel.currentItemView viewWithTag:4] setHidden:TRUE];
+//        UIButton *button = (UIButton *) [carousel.currentItemView viewWithTag:3];
+//        button.backgroundColor = [UIColor lightGrayColor];
+//    } else{
+//        [[carousel.currentItemView viewWithTag:4] setHidden:FALSE];
+//        [[carousel.currentItemView viewWithTag:5] setHidden:TRUE];
+//        UIButton *button = (UIButton *) [carousel.currentItemView viewWithTag:3];
+//        button.backgroundColor = [UIColor clearColor];
+//    }
 }
 
-- (void) closeCurrentChatBox
-{
-    NSString *roomKey = ((UILabel *)[carousel.currentItemView viewWithTag:6]).text;
-    Room *theRoom;
-    for(Room *room in rooms){
-        if (room != nil &&[room.key isEqualToString:roomKey])
-        {
-            if([room.name isEqualToString:self.ownedRoomName]){
-                self.ownedRoomName = nil;
-            }
-            theRoom = room;
-            break;
-        }
-    }
-    [[carousel.currentItemView viewWithTag:4] removeFromSuperview];
-    [[carousel.currentItemView viewWithTag:5] removeFromSuperview];
-    [carousel removeItemAtIndex:[carousel currentItemIndex] animated:YES];
-    [APPDELEGATE.mainVC requestLeaveRoom:theRoom.key];
-    [theRoom cleanRoom];
-    [rooms removeObject:theRoom];
-    if(rooms.count == 0){
-        sendButton.userInteractionEnabled = FALSE;
-        addImageButton.userInteractionEnabled = FALSE;
-        [self.noteOne setHidden:FALSE];
-        [self.noteTwo setHidden:FALSE];
-    }
-}
-
-
-- (void) chatboxConstrain: (UIView *)view :(UITextField *)label :(UIButton *)closeButton :(UIButton *)userButton :(UITextView *)textView :(UITableView *)tableView
-{
-    //closeButton align left of view
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:closeButton
-                                                     attribute:NSLayoutAttributeLeading
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:view
-                                                     attribute:NSLayoutAttributeLeading
-                                                    multiplier:1.0
-                                                      constant:5]];
-    
-    //closeButton align top of view
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:closeButton
-                                                     attribute:NSLayoutAttributeTop
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:view
-                                                     attribute:NSLayoutAttributeTop
-                                                    multiplier:1.0
-                                                      constant:5]];
-    
-    //roomName label align baseline of userButton
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:label
-                                                     attribute:NSLayoutAttributeBaseline
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:userButton
-                                                     attribute:NSLayoutAttributeBaseline
-                                                    multiplier:1
-                                                      constant:0]];
-    
-    //center roomName label horizontally
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:label
-                                                     attribute:NSLayoutAttributeCenterX
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:view
-                                                     attribute:NSLayoutAttributeCenterX
-                                                    multiplier:1
-                                                      constant:0]];
-
-    //userButton align right of view
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:userButton
-                                                     attribute:NSLayoutAttributeTrailing
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:view
-                                                     attribute:NSLayoutAttributeTrailing
-                                                    multiplier:1
-                                                      constant:-5]];
-    //userButton align top of view
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:userButton
-                                                     attribute:NSLayoutAttributeTop
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:view
-                                                     attribute:NSLayoutAttributeTop
-                                                    multiplier:1
-                                                      constant:5]];
-
-    
-    
-    //align top of textView to buttom of label
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:textView
-                                                     attribute:NSLayoutAttributeTop
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:userButton
-                                                     attribute:NSLayoutAttributeBottom
-                                                    multiplier:1
-                                                      constant:5]];
-    
-    //align bottom of textView to buttom of view
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:textView
-                                                     attribute:NSLayoutAttributeBottom
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:view
-                                                     attribute:NSLayoutAttributeBottom
-                                                    multiplier:1
-                                                      constant:-5]];
-    
-    //align bottom of textView to left of view
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:textView
-                                                     attribute:NSLayoutAttributeLeading
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:view
-                                                     attribute:NSLayoutAttributeLeading
-                                                    multiplier:1
-                                                      constant:5]];
-    
-    //align bottom of textView to right of view
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:textView
-                                                     attribute:NSLayoutAttributeTrailing
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:view
-                                                     attribute:NSLayoutAttributeTrailing
-                                                    multiplier:1
-                                                      constant:-5]];
-
-    //align top of tableView to buttom of label
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:tableView
-                                                     attribute:NSLayoutAttributeTop
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:userButton
-                                                     attribute:NSLayoutAttributeBottom
-                                                    multiplier:1
-                                                      constant:5]];
-    
-    //align bottom of tableView to buttom of view
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:tableView
-                                                     attribute:NSLayoutAttributeBottom
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:view
-                                                     attribute:NSLayoutAttributeBottom
-                                                    multiplier:1
-                                                      constant:-5]];
-    
-    //align bottom of tableView to left of view
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:tableView
-                                                     attribute:NSLayoutAttributeLeading
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:view
-                                                     attribute:NSLayoutAttributeLeading
-                                                    multiplier:1
-                                                      constant:5]];
-    
-    //align bottom of tableView to right of view
-    [view addConstraint:[NSLayoutConstraint constraintWithItem:tableView
-                                                     attribute:NSLayoutAttributeTrailing
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:view
-                                                     attribute:NSLayoutAttributeTrailing
-                                                    multiplier:1
-                                                      constant:-5]];
-}
 
 - (void) dealloc
 {

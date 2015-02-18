@@ -28,7 +28,7 @@
 {
     self = [super initWithCoder:aDecoder];
     if(self){
-        APPDELEGATE.landVC = self;
+//        APPDELEGATE.landVC = self;
     }
     return self;
 }
@@ -137,7 +137,7 @@
 
 - (void) requestThemeList
 {
-    [APPDELEGATE.mainVC requestThemeList];
+    [APPDELEGATE.mainVC requestChatroomList];
 
 }
 

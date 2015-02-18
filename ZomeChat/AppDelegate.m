@@ -8,90 +8,233 @@
 
 #import "AppDelegate.h"
 
-@implementation AppDelegate
+@implementation AppDelegate {
+    BOOL manuelLocationUpdate;
+}
 
 @synthesize window = _window;
 @synthesize locationManager=_locationManager;
 @synthesize socketIO = _socketIO;
 @synthesize userName;
+@synthesize uid;
 @synthesize lng;
 @synthesize lat;
 @synthesize serverURL;
 @synthesize backgroundTask;
+@synthesize imageCache;
+@synthesize version;
+@synthesize listeningPort;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    version = @"1.1";
     userName = [[NSMutableString alloc] init];
-    lng = @"0";
-    lat = @"0";
-    serverURL = @"10.0.0.5";
-//    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com";
-//    serverURL = @"192.168.5.82";
+    imageCache = [[NSCache alloc] init];
+    lng = @"-122.408227";
+    lat = @"37.7873589";
+//    serverURL = @"192.168.2.13";
+    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com";
+//    serverURL = @"192.168.2.10";
+    listeningPort = 1442;
     
+    [self initAppSetting];
+    [self initLocationManager];
+    _socketIO = [[SocketIO alloc] init];
+    [GMSServices provideAPIKey:@"AIzaSyD_K5ZnON6GNk1KsNROdG3oI0NpDCj0MRc"];
+    return YES;
+}
+
+- (void) initAppSetting
+{
+    //Navation Bar Style
     self.window.tintColor = [UIColor whiteColor];
     [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
-    
-    if(self.locationManager==nil){
-        _locationManager=[[CLLocationManager alloc] init];
-        //I'm using ARC with this project so no need to release
-        
-        _locationManager.delegate=self;
-        _locationManager.desiredAccuracy=kCLLocationAccuracyBest;
-        _locationManager.distanceFilter=500;
-        self.locationManager=_locationManager;
-    }
-
-    if([CLLocationManager locationServicesEnabled]){
-        [self.locationManager stopUpdatingLocation];
-        [self.locationManager startUpdatingLocation];
-    }
-    
-    if (!_socketIO || ![_socketIO isConnected]) {
-        _socketIO = [[SocketIO alloc] init];
-        //        _socketIO = [[SocketIO alloc] initWithDelegate:self];
-        [_socketIO connectToHost:serverURL onPort:1442];
-        //Local
-        //private String URL = "http://10.0.0.5:1442";
-        //Heroku
-        //    private String URL = "http://pacific-eyrie-2493.herokuapp.com:1442";
-        //Amazon ec2
-        //    private String URL = "http://ec2-54-205-59-87.compute-1.amazonaws.com:1442";
-    }
-    
-    [GMSServices provideAPIKey:@"AIzaSyD_K5ZnON6GNk1KsNROdG3oI0NpDCj0MRc"];
+    [[UINavigationBar appearance] setBarTintColor:[UIColor grayColor]];
+    [[UINavigationBar appearance] setTitleTextAttributes:
+     [NSDictionary dictionaryWithObjectsAndKeys:
+      [UIColor whiteColor],UITextAttributeTextColor,
+      [UIColor whiteColor],UITextAttributeTextShadowColor,
+      nil]];
+    [self setInitialConstraints];
+    [self initAlartMessages];
     
     self.backgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
         [[UIApplication sharedApplication] endBackgroundTask:self.backgroundTask];
         self.backgroundTask = UIBackgroundTaskInvalid;
     }];
-    
-    return YES;
 }
 
-- (void) serverReconnect {
-    if (![_socketIO isConnected]) {
-        [_socketIO connectToHost:serverURL onPort:1442];
+- (void) connectServer
+{
+    if (!_socketIO) {
+        _socketIO = [[SocketIO alloc] init];
+    }
+    if(![_socketIO isConnected]){
+        [_socketIO connectToHost:serverURL onPort:listeningPort];
     }
 }
 
--(void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation{
-//    NSDate* eventDate = newLocation.timestamp;
-//    NSTimeInterval howRecent = [eventDate timeIntervalSinceNow];
-    
-    lng = [NSString stringWithFormat:@"%+.6f", oldLocation.coordinate.longitude];
-    lat = [NSString stringWithFormat:@"%+.6f", oldLocation.coordinate.latitude];
-    
-    if(newLocation.horizontalAccuracy < 35.0){
-        //Location seems pretty accurate, let's use it!
-        NSLog(@"latitude %+.6f, longitude %+.6f\n",
-              newLocation.coordinate.latitude,
-              newLocation.coordinate.longitude);
-        NSLog(@"Horizontal Accuracy:%f", newLocation.horizontalAccuracy);
-        lng = [NSString stringWithFormat:@"%+.6f", newLocation.coordinate.longitude];
-        lat = [NSString stringWithFormat:@"%+.6f", newLocation.coordinate.latitude];
-        //Optional: turn off location services once we've gotten a good location
-        [manager stopUpdatingLocation];
+- (void) disconnectServer
+{
+    if (!_socketIO) {
+        _socketIO = [[SocketIO alloc] init];
     }
+    if([_socketIO isConnected]){
+        [_socketIO disconnect];
+    }
+}
+
+- (void) initLocationManager
+{
+    manuelLocationUpdate = false;
+    if(self.locationManager==nil){
+        _locationManager=[[CLLocationManager alloc] init];
+        //I'm using ARC with this project so no need to release
+        _locationManager.delegate=self;
+        _locationManager.desiredAccuracy=kCLLocationAccuracyBest;
+        _locationManager.distanceFilter=500;
+        self.locationManager=_locationManager;
+    }
+    
+    if([CLLocationManager locationServicesEnabled]){
+        if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
+            [self.locationManager requestWhenInUseAuthorization];
+        }
+        [self.locationManager stopUpdatingLocation];
+        [self.locationManager startUpdatingLocation];
+    }
+}
+
+- (void) updateLocationCalled {
+    manuelLocationUpdate = true;
+    if(self.locationManager==nil){
+        _locationManager=[[CLLocationManager alloc] init];
+        _locationManager.delegate=self;
+        _locationManager.desiredAccuracy=kCLLocationAccuracyBest;
+        _locationManager.distanceFilter=500;
+        self.locationManager=_locationManager;
+    }
+    
+    if([CLLocationManager locationServicesEnabled]){
+        if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
+            [self.locationManager requestWhenInUseAuthorization];
+        }
+        [self.locationManager stopUpdatingLocation];
+        [self.locationManager startUpdatingLocation];
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    CLLocation * currentLocation = (CLLocation *)[locations lastObject];
+    if (currentLocation != nil)
+    {
+        lat = [NSString stringWithFormat:@"%.8f", currentLocation.coordinate.latitude];
+        lng = [NSString stringWithFormat:@"%.8f", currentLocation.coordinate.longitude];
+        if(manuelLocationUpdate){
+            [self.mainVC requestLocationUpdate];
+            [self.mainVC updateLocationOnMap];
+            manuelLocationUpdate = false;
+        }
+    }
+    [manager stopUpdatingLocation];
+}
+
+- (void)initAlartMessages{
+    self.commentPostAlertTitle = @"You are in \"Browse Mode\"";
+    self.commentPostAlertMessage = @"Please log in to comment on the post";
+    
+    self.likePostAlertTitle = @"You are in \"Browse Mode\"";
+    self.likePostAlertMessage = @"Please log in to like this post";
+    
+    self.postFeedAlertTitle = @"You are in \"Browse Mode\"";
+    self.postFeedAlertMessage = @"Please log in to make a new post";
+    
+    self.postImageAlertTitle = @"You are in \"Browse Mode\"";
+    self.postImageAlertMessage = @"Please log in to attach an image to the post";
+    
+    self.createChatroomAlertTitle = @"You are in \"Browse Mode\"";
+    self.createChatroomAlertMessage = @"Please log in to create a custom chatroom";
+    
+    self.chatroomSendImageAlertTitle = @"You are in \"Browse Mode\"";
+    self.chatroomSendImageAlertMessage = @"Please log in to send an image";
+    
+    self.chatroomConversationAlertTitle = @"You are in \"Browse Mode\"";
+    self.chatroomConversationAlertMessage = @"Please log in to chat with others";
+    
+    self.postDoubleLikedAlertTitle = @"";
+    self.postDoubleLikedAlertMessage = @"You've liked this post already";
+    
+    self.firstPostAlertTitle = @"No Posts In Your Area Yet";
+    self.firstPostAlertMessage = nil;
+    
+    self.noTaggedFeedAlertTitle = @"No Match Found";
+    self.noTaggedFeedAlertMessage = @"No tagged post around your area";
+}
+
+- (void)setInitialConstraints{
+    self.changeUserImage = NO;
+    self.commentPost = NO;
+    self.likePost = NO;
+    self.postFeed = NO;
+    self.postFeedImage = NO;
+    self.createChatroom = NO;
+    self.chatroomConversation = NO;
+    self.chatroomSendImage = NO;
+    self.changeUsername = NO;
+    
+    self.postingFeedTimerOffset = 0;
+    self.creatingChatroomTimerOffset = 120;
+}
+
+- (void)setFacebookUserConstrains{
+    self.changeUserImage = YES;
+    self.commentPost = YES;
+    self.likePost = YES;
+    self.postFeed = YES;
+    self.postFeedImage = YES;
+    self.createChatroom = YES;
+    self.chatroomConversation = YES;
+    self.chatroomSendImage = YES;
+    self.changeUsername = YES;
+}
+
+- (void)setRegularUserConstrains{
+    self.changeUserImage = YES;
+    self.commentPost = YES;
+    self.likePost = YES;
+    self.postFeed = YES;
+    self.postFeedImage = YES;
+    self.createChatroom = YES;
+    self.chatroomConversation = YES;
+    self.chatroomSendImage = YES;
+    self.changeUsername = YES;
+}
+
+- (void)setAnonymouseUserConstrains{
+    self.changeUserImage = NO;
+    self.commentPost = NO;
+    self.likePost = NO;
+    self.postFeed = NO;
+    self.postFeedImage = NO;
+    self.createChatroom = NO;
+    self.chatroomConversation = YES;
+    self.chatroomSendImage = NO;
+    self.changeUsername = NO;
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+//    // Call FBAppCall's handleOpenURL:sourceApplication to handle Facebook app responses
+//    BOOL wasHandled = [FBAppCall handleOpenURL:url sourceApplication:sourceApplication];
+//    
+//    // You can add your app-specific url handling code here if needed
+//    return wasHandled;
+//    
+    return [FBAppCall handleOpenURL:url sourceApplication:sourceApplication  fallbackHandler:^(FBAppCall *call)
+            {
+                NSLog(@"Facebook handler");
+            }
+            ];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
@@ -113,11 +256,14 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
+    [FBAppEvents activateApp];
+    [FBAppCall handleDidBecomeActive];
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
+    [FBSession.activeSession close];
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
