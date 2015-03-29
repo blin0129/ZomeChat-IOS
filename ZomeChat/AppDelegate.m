@@ -30,11 +30,12 @@
     version = @"1.1";
     userName = [[NSMutableString alloc] init];
     imageCache = [[NSCache alloc] init];
-    lng = @"-122.408227";
-    lat = @"37.7873589";
-//    serverURL = @"192.168.2.13";
-    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com";
-//    serverURL = @"192.168.2.10";
+    lng = @"-122.260505";
+    lat = @"37.872045";
+//    lng = @"-122.408227";
+//    lat = @"37.7873589";
+//    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com";
+    serverURL = @"192.168.42.74";
     listeningPort = 1442;
     
     [self initAppSetting];
