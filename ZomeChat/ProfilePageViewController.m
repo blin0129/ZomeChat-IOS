@@ -86,12 +86,10 @@
     [super didReceiveMemoryWarning];
 }
 
--(void) receiveMyProfile: (SocketIOPacket *)packet
+-(void) receiveMyProfile: (NSDictionary *)data
 {
-    NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
-    if([dic objectForKey:@"imageURL"] != nil){
-        NSString *imageURL = [dic objectForKey:@"imageURL"];
+    if([data objectForKey:@"imageURL"] != nil){
+        NSString *imageURL = [data objectForKey:@"imageURL"];
         UIImage *image = [self getImageFromURL:imageURL];
         [thumbnail setImage:image];
         oldImage = image;
@@ -100,22 +98,25 @@
     }
 }
 
--(void) receiveProfileUpdateRespond: (SocketIOPacket *)packet
+-(void) receiveProfileUpdateRespond: (NSDictionary *)data
 {
-    NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
-    if([[dic objectForKey:@"respond"] isEqual:@"RESPOND_OKAY"]){
-        APPDELEGATE.userName = [dic objectForKey:@"username"];
-        self.userNameLabel.text = [dic objectForKey:@"username"];
-        thumbnail.image = [self getImageFromURL:[dic objectForKey:@"imageURL"]];
+    if([[data objectForKey:@"respond"] isEqual:@"RESPOND_OKAY"]){
+        NSLog(@"%@",data);
+        APPDELEGATE.userName = [data objectForKey:@"username"];
+        self.userNameLabel.text = [data objectForKey:@"username"];
+        thumbnail.image = [self getImageFromURL:[data objectForKey:@"imageURL"]];
         oldImage = thumbnail.image;
-        NSString *imageURL = [dic objectForKey:@"imageURL"];
-        [APPDELEGATE.imageCache setObject:thumbnail.image forKey:imageURL];
+        if([data objectForKey:@"imageURL"] != nil && ![[data objectForKey:@"imageURL"] isEqualToString:@""]){
+            NSLog(@"inserting imageURL");
+            NSString *imageURL = [data objectForKey:@"imageURL"];
+            [APPDELEGATE.imageCache setObject:thumbnail.image forKey:imageURL];
+        }
     } else {
         [thumbnail setImage:oldImage];
         //TODO: Alart, update faile
     }
 }
+
 - (IBAction)helpBtnClicked:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.zomeapp.com/qa.html"]];
 }

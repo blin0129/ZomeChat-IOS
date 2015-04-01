@@ -7,7 +7,6 @@
 //
 
 #import "BulletinPageViewController.h"
-#import "SocketIOPacket.h"
 #import "UIImage+ProportionalFill.h"
 #import "PostTableViewCell.h"
 
@@ -15,7 +14,9 @@
 
 @end
 
-@implementation BulletinPageViewController
+@implementation BulletinPageViewController{
+    NSDateFormatter *dateFormat;
+}
 @synthesize messageList;
 @synthesize hashTagDictionary;
 @synthesize pictureLoaded;
@@ -48,6 +49,9 @@
     [self.tableView registerNib:[UINib nibWithNibName:@"PostCell" bundle:nil] forCellReuseIdentifier:@"PostCell"];
     [self.view setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"background-babyblue"]]];
     [APPDELEGATE.mainVC requestMsgboardData];
+    
+    dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"yyyy-MM-dd HH:mm"];
 }
 
 - (void)customNavBar
@@ -72,20 +76,19 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void) updateMsgboardMessages:(SocketIOPacket *)packet
+- (void) updateMsgboardMessages:(NSDictionary *)data
 {
     pictureLoaded = false;
-    NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
     [messageList removeAllObjects];
-    NSArray *receiveList = [self sortMessageList:[dic objectForKey:@"messages"]];
+    NSArray *receiveList = [self sortMessageList:[data objectForKey:@"messages"]];
     if([receiveList count] == 0){
         [self emptyPostAlert];
         return;
     }
     hashTagDictionary = [[NSMutableDictionary alloc] init];
     for (NSDictionary *obj in receiveList){
-        [messageList addObject:obj];
+        NSMutableDictionary* mObj = [obj mutableCopy];
+        [messageList addObject:mObj];
         if ([[obj objectForKey:@"tags"] count] != 0) {
             for(NSString *tag in [obj objectForKey:@"tags"]){
                 [self fetchHashTag:tag post:obj];
@@ -109,16 +112,13 @@
 
 - (void) updateFeedStatus:(NSString *)feedId likeCount:(NSNumber *)likesCount commentCount:(NSNumber *) commentsCount
 {
-    BOOL update = NO;
-    for(NSDictionary *feed in messageList){
+    for(NSMutableDictionary *feed in messageList){
         if([[feed objectForKey:@"id"] isEqualToString:feedId]){
             [feed setValue:likesCount forKey:@"likesCount"];
             [feed setValue:commentsCount forKey:@"commentCount"];
-            update = YES;
+            [self.tableView reloadData];
+            return;
         }
-    }
-    if (update){
-        [self.tableView reloadData];
     }
 }
 
@@ -240,6 +240,10 @@
     }
     cell.usernameLabel.text = [[tableData objectAtIndex:indexPath.row] objectForKey:@"ownerName"];
     [cell.usernameLabel sizeToFit];
+    double time =([[[tableData objectAtIndex:indexPath.row] objectForKey:@"time"] doubleValue]/1000);
+    NSString * timeString = [dateFormat stringFromDate:[NSDate dateWithTimeIntervalSince1970:time]];
+    cell.timeLabel.text = timeString;
+    
     NSString *timeFormat = [NSString stringWithFormat:@"%@/%@/%@ %02d:%02d",
                             [[tableData objectAtIndex:indexPath.row] objectForKey:@"month"],
                             [[tableData objectAtIndex:indexPath.row] objectForKey:@"date"],

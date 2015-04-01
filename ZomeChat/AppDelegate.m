@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "ZomeChat-Swift.h"
 
 @implementation AppDelegate {
     BOOL manuelLocationUpdate;
@@ -14,7 +15,7 @@
 
 @synthesize window = _window;
 @synthesize locationManager=_locationManager;
-@synthesize socketIO = _socketIO;
+@synthesize socketIO;
 @synthesize userName;
 @synthesize uid;
 @synthesize lng;
@@ -27,7 +28,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    version = @"1.1";
+    version = @"1.11";
     userName = [[NSMutableString alloc] init];
     imageCache = [[NSCache alloc] init];
     lng = @"-122.260505";
@@ -40,7 +41,7 @@
     
     [self initAppSetting];
     [self initLocationManager];
-    _socketIO = [[SocketIO alloc] init];
+    [self connectServer];
     [GMSServices provideAPIKey:@"AIzaSyD_K5ZnON6GNk1KsNROdG3oI0NpDCj0MRc"];
     return YES;
 }
@@ -67,22 +68,23 @@
 
 - (void) connectServer
 {
-    if (!_socketIO) {
-        _socketIO = [[SocketIO alloc] init];
-    }
-    if(![_socketIO isConnected]){
-        [_socketIO connectToHost:serverURL onPort:listeningPort];
-    }
+    NSString* serverString = @"localhost:1442";
+    socketIO = [[SocketIOClient alloc] initWithSocketURL:serverString options:nil];
+    [socketIO connect];
+    [socketIO on: @"connect" callback: ^(NSArray* data, void (^ack)(NSArray*)) {
+        NSLog(@"Server connected");
+    }];
 }
 
 - (void) disconnectServer
 {
-    if (!_socketIO) {
-        _socketIO = [[SocketIO alloc] init];
-    }
-    if([_socketIO isConnected]){
-        [_socketIO disconnect];
-    }
+    [socketIO closed];
+    //    if (!_socketIO) {
+//        _socketIO = [[SocketIO alloc] init];
+//    }
+//    if([_socketIO isConnected]){
+//        [_socketIO disconnect];
+//    }
 }
 
 - (void) initLocationManager
@@ -219,7 +221,7 @@
     self.postFeed = NO;
     self.postFeedImage = NO;
     self.createChatroom = NO;
-    self.chatroomConversation = YES;
+    self.chatroomConversation = NO;
     self.chatroomSendImage = NO;
     self.changeUsername = NO;
 }

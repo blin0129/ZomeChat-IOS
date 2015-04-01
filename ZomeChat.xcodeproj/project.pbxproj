@@ -105,14 +105,6 @@
 		C64AB146185E93BC009FD17C /* SocketRocket.podspec in Resources */ = {isa = PBXBuildFile; fileRef = C64AB108185E93BC009FD17C /* SocketRocket.podspec */; };
 		C64AB147185E93BC009FD17C /* SocketRocketOSX-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C64AB10D185E93BC009FD17C /* SocketRocketOSX-Info.plist */; };
 		C64AB14D185E93BC009FD17C /* SRWebSocketTests-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C64AB117185E93BC009FD17C /* SRWebSocketTests-Info.plist */; };
-		C64AB192185E93C1009FD17C /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = C64AB16F185E93C1009FD17C /* .gitignore */; };
-		C64AB194185E93C1009FD17C /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = C64AB171185E93C1009FD17C /* CHANGELOG.md */; };
-		C64AB195185E93C1009FD17C /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = C64AB172185E93C1009FD17C /* LICENSE */; };
-		C64AB197185E93C1009FD17C /* SocketIO.m in Sources */ = {isa = PBXBuildFile; fileRef = C64AB175185E93C1009FD17C /* SocketIO.m */; };
-		C64AB198185E93C1009FD17C /* SocketIOJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = C64AB177185E93C1009FD17C /* SocketIOJSONSerialization.m */; };
-		C64AB199185E93C1009FD17C /* SocketIOPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = C64AB179185E93C1009FD17C /* SocketIOPacket.m */; };
-		C64AB19A185E93C1009FD17C /* SocketIOTransportWebsocket.m in Sources */ = {isa = PBXBuildFile; fileRef = C64AB17C185E93C1009FD17C /* SocketIOTransportWebsocket.m */; };
-		C64AB19B185E93C1009FD17C /* SocketIOTransportXHR.m in Sources */ = {isa = PBXBuildFile; fileRef = C64AB17E185E93C1009FD17C /* SocketIOTransportXHR.m */; };
 		C64AB1A9185E95B4009FD17C /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C64AB1A8185E95B4009FD17C /* libicucore.dylib */; };
 		C64AB1AC185E97D0009FD17C /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C64AB1AB185E97D0009FD17C /* MainViewController.m */; };
 		C64AB1AF185EA81A009FD17C /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C64AB1AE185EA81A009FD17C /* LoginViewController.m */; };
@@ -191,13 +183,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = F62417E314D52F3C003CE997;
 			remoteInfo = TestChat;
-		};
-		C64AB1A4185E93C2009FD17C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C64AB18B185E93C1009FD17C /* SocketTesterARC.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4ADCCB9D15790D760022990C;
-			remoteInfo = SocketTesterARC;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -397,33 +382,6 @@
 		C64AB138185E93BC009FD17C /* setup.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = setup.py; sourceTree = "<group>"; };
 		C64AB13A185E93BC009FD17C /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
 		C64AB13B185E93BC009FD17C /* runner.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = runner.py; sourceTree = "<group>"; };
-		C64AB16F185E93C1009FD17C /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		C64AB170185E93C1009FD17C /* .gitmodules */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitmodules; sourceTree = "<group>"; };
-		C64AB171185E93C1009FD17C /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG.md; sourceTree = "<group>"; };
-		C64AB172185E93C1009FD17C /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		C64AB173185E93C1009FD17C /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
-		C64AB174185E93C1009FD17C /* SocketIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIO.h; sourceTree = "<group>"; };
-		C64AB175185E93C1009FD17C /* SocketIO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIO.m; sourceTree = "<group>"; };
-		C64AB176185E93C1009FD17C /* SocketIOJSONSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOJSONSerialization.h; sourceTree = "<group>"; };
-		C64AB177185E93C1009FD17C /* SocketIOJSONSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOJSONSerialization.m; sourceTree = "<group>"; };
-		C64AB178185E93C1009FD17C /* SocketIOPacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOPacket.h; sourceTree = "<group>"; };
-		C64AB179185E93C1009FD17C /* SocketIOPacket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOPacket.m; sourceTree = "<group>"; };
-		C64AB17A185E93C1009FD17C /* SocketIOTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOTransport.h; sourceTree = "<group>"; };
-		C64AB17B185E93C1009FD17C /* SocketIOTransportWebsocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOTransportWebsocket.h; sourceTree = "<group>"; };
-		C64AB17C185E93C1009FD17C /* SocketIOTransportWebsocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOTransportWebsocket.m; sourceTree = "<group>"; };
-		C64AB17D185E93C1009FD17C /* SocketIOTransportXHR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOTransportXHR.h; sourceTree = "<group>"; };
-		C64AB17E185E93C1009FD17C /* SocketIOTransportXHR.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOTransportXHR.m; sourceTree = "<group>"; };
-		C64AB180185E93C1009FD17C /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		C64AB181185E93C1009FD17C /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		C64AB183185E93C1009FD17C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		C64AB185185E93C1009FD17C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
-		C64AB186185E93C1009FD17C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		C64AB187185E93C1009FD17C /* SocketTesterARC-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SocketTesterARC-Info.plist"; sourceTree = "<group>"; };
-		C64AB188185E93C1009FD17C /* SocketTesterARC-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SocketTesterARC-Prefix.pch"; sourceTree = "<group>"; };
-		C64AB189185E93C1009FD17C /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		C64AB18A185E93C1009FD17C /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		C64AB18B185E93C1009FD17C /* SocketTesterARC.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = SocketTesterARC.xcodeproj; sourceTree = "<group>"; };
-		C64AB18F185E93C1009FD17C /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		C64AB1A6185E9422009FD17C /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		C64AB1A8185E95B4009FD17C /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		C64AB1AA185E97D0009FD17C /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
@@ -813,7 +771,6 @@
 				C6F62B7B19E9A77500AC0B05 /* MGImage */,
 				C62151F219E47A7800181380 /* JSQMessagesViewController */,
 				C67B142C1AC88D0400B6FF89 /* SwiftIO */,
-				C64AB16E185E93C1009FD17C /* socket.IO-objc */,
 				C64AB0F5185E93BC009FD17C /* SocketRocket */,
 				C615FCC219467A48006B774D /* DemoAvatars */,
 				C64AB022185E927A009FD17C /* Supporting Files */,
@@ -1032,80 +989,6 @@
 			path = srtestharness;
 			sourceTree = "<group>";
 		};
-		C64AB16E185E93C1009FD17C /* socket.IO-objc */ = {
-			isa = PBXGroup;
-			children = (
-				C64AB16F185E93C1009FD17C /* .gitignore */,
-				C64AB170185E93C1009FD17C /* .gitmodules */,
-				C64AB171185E93C1009FD17C /* CHANGELOG.md */,
-				C64AB172185E93C1009FD17C /* LICENSE */,
-				C64AB173185E93C1009FD17C /* README.md */,
-				C64AB174185E93C1009FD17C /* SocketIO.h */,
-				C64AB175185E93C1009FD17C /* SocketIO.m */,
-				C64AB176185E93C1009FD17C /* SocketIOJSONSerialization.h */,
-				C64AB177185E93C1009FD17C /* SocketIOJSONSerialization.m */,
-				C64AB178185E93C1009FD17C /* SocketIOPacket.h */,
-				C64AB179185E93C1009FD17C /* SocketIOPacket.m */,
-				C64AB17A185E93C1009FD17C /* SocketIOTransport.h */,
-				C64AB17B185E93C1009FD17C /* SocketIOTransportWebsocket.h */,
-				C64AB17C185E93C1009FD17C /* SocketIOTransportWebsocket.m */,
-				C64AB17D185E93C1009FD17C /* SocketIOTransportXHR.h */,
-				C64AB17E185E93C1009FD17C /* SocketIOTransportXHR.m */,
-				C64AB17F185E93C1009FD17C /* SocketTesterARC */,
-				C64AB18B185E93C1009FD17C /* SocketTesterARC.xcodeproj */,
-				C64AB18E185E93C1009FD17C /* submodules */,
-			);
-			path = "socket.IO-objc";
-			sourceTree = SOURCE_ROOT;
-		};
-		C64AB17F185E93C1009FD17C /* SocketTesterARC */ = {
-			isa = PBXGroup;
-			children = (
-				C64AB180185E93C1009FD17C /* AppDelegate.h */,
-				C64AB181185E93C1009FD17C /* AppDelegate.m */,
-				C64AB182185E93C1009FD17C /* InfoPlist.strings */,
-				C64AB184185E93C1009FD17C /* ViewController.xib */,
-				C64AB186185E93C1009FD17C /* main.m */,
-				C64AB187185E93C1009FD17C /* SocketTesterARC-Info.plist */,
-				C64AB188185E93C1009FD17C /* SocketTesterARC-Prefix.pch */,
-				C64AB189185E93C1009FD17C /* ViewController.h */,
-				C64AB18A185E93C1009FD17C /* ViewController.m */,
-			);
-			path = SocketTesterARC;
-			sourceTree = "<group>";
-		};
-		C64AB18C185E93C1009FD17C /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				C64AB1A5185E93C2009FD17C /* SocketTesterARC.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		C64AB18E185E93C1009FD17C /* submodules */ = {
-			isa = PBXGroup;
-			children = (
-				C64AB18F185E93C1009FD17C /* .gitignore */,
-				C64AB190185E93C1009FD17C /* json-framework */,
-				C64AB191185E93C1009FD17C /* socket-rocket */,
-			);
-			path = submodules;
-			sourceTree = "<group>";
-		};
-		C64AB190185E93C1009FD17C /* json-framework */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "json-framework";
-			sourceTree = "<group>";
-		};
-		C64AB191185E93C1009FD17C /* socket-rocket */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "socket-rocket";
-			sourceTree = "<group>";
-		};
 		C67B142C1AC88D0400B6FF89 /* SwiftIO */ = {
 			isa = PBXGroup;
 			children = (
@@ -1278,10 +1161,6 @@
 					ProductGroup = C64AB10A185E93BC009FD17C /* Products */;
 					ProjectRef = C64AB109185E93BC009FD17C /* SocketRocket.xcodeproj */;
 				},
-				{
-					ProductGroup = C64AB18C185E93C1009FD17C /* Products */;
-					ProjectRef = C64AB18B185E93C1009FD17C /* SocketTesterARC.xcodeproj */;
-				},
 			);
 			projectRoot = "";
 			targets = (
@@ -1320,13 +1199,6 @@
 			remoteRef = C64AB16C185E93BC009FD17C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		C64AB1A5185E93C2009FD17C /* SocketTesterARC.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = SocketTesterARC.app;
-			remoteRef = C64AB1A4185E93C2009FD17C /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -1340,7 +1212,6 @@
 				C621526719E47A7800181380 /* message_received.aiff in Resources */,
 				C615FCD619467A48006B774D /* demo_avatar_woz.png in Resources */,
 				C615FCD219467A48006B774D /* Contents.json in Resources */,
-				C64AB192185E93C1009FD17C /* .gitignore in Resources */,
 				C621526219E47A7800181380 /* clip@2x.png in Resources */,
 				C615FCD419467A48006B774D /* demo_avatar_jobs@2x.png in Resources */,
 				C621525A19E47A7800181380 /* bubble@2x.png in Resources */,
@@ -1349,8 +1220,6 @@
 				C615FCD519467A48006B774D /* Contents.json in Resources */,
 				C621528E19E47A7800181380 /* JSQMessagesTypingIndicatorFooterView.xib in Resources */,
 				C621526319E47A7800181380 /* clip@3x.png in Resources */,
-				C64AB194185E93C1009FD17C /* CHANGELOG.md in Resources */,
-				C64AB195185E93C1009FD17C /* LICENSE in Resources */,
 				C621526619E47A7800181380 /* typing@3x.png in Resources */,
 				C621528C19E47A7800181380 /* JSQMessagesToolbarContentView.xib in Resources */,
 				C621525E19E47A7800181380 /* bubble_min_tailless@2x.png in Resources */,
@@ -1424,7 +1293,6 @@
 				C67B143D1AC88D0400B6FF89 /* SocketFixUTF8.swift in Sources */,
 				C67B14381AC88D0400B6FF89 /* SocketAckHandler.swift in Sources */,
 				C6AEACA71A1C088200399A1A /* ChatImageViewController.m in Sources */,
-				C64AB19A185E93C1009FD17C /* SocketIOTransportWebsocket.m in Sources */,
 				C629E10319E718850008A889 /* ChatroomData.m in Sources */,
 				C6D2AF251A33E74400C5708F /* PostTableViewCell.m in Sources */,
 				C67B143E1AC88D0400B6FF89 /* SocketIOClient.swift in Sources */,
@@ -1450,14 +1318,10 @@
 				C64AB145185E93BC009FD17C /* SRWebSocket.m in Sources */,
 				C621527919E47A7800181380 /* JSQMediaMessage.m in Sources */,
 				C6F62B8419E9A77600AC0B05 /* UIImage+Tint.m in Sources */,
-				C64AB19B185E93C1009FD17C /* SocketIOTransportXHR.m in Sources */,
 				C621528D19E47A7800181380 /* JSQMessagesTypingIndicatorFooterView.m in Sources */,
 				C621527C19E47A7800181380 /* JSQMessagesBubbleImage.m in Sources */,
 				C621527819E47A7800181380 /* JSQLocationMediaItem.m in Sources */,
-				C64AB199185E93C1009FD17C /* SocketIOPacket.m in Sources */,
 				C621528519E47A7800181380 /* JSQMessagesComposerTextView.m in Sources */,
-				C64AB197185E93C1009FD17C /* SocketIO.m in Sources */,
-				C64AB198185E93C1009FD17C /* SocketIOJSONSerialization.m in Sources */,
 				C645A710187CAB4700DEDEB5 /* ChatroomListViewController.m in Sources */,
 				C621527719E47A7800181380 /* JSQMessagesCollectionViewLayoutAttributes.m in Sources */,
 				C64AB1AC185E97D0009FD17C /* MainViewController.m in Sources */,
@@ -1552,22 +1416,6 @@
 			name = MainStoryboard.storyboard;
 			sourceTree = "<group>";
 		};
-		C64AB182185E93C1009FD17C /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				C64AB183185E93C1009FD17C /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		C64AB184185E93C1009FD17C /* ViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				C64AB185185E93C1009FD17C /* en */,
-			);
-			name = ViewController.xib;
-			sourceTree = "<group>";
-		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -1655,6 +1503,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				DEFINES_MODULE = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -1664,6 +1514,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ZomeChat/ZomeChat-Prefix.pch";
 				INFOPLIST_FILE = "ZomeChat/ZomeChat-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "9d8aeea4-59d6-4bd6-9394-f311e0749cc6";
@@ -1679,6 +1530,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				DEFINES_MODULE = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -1688,6 +1541,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ZomeChat/ZomeChat-Prefix.pch";
 				INFOPLIST_FILE = "ZomeChat/ZomeChat-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "9d8aeea4-59d6-4bd6-9394-f311e0749cc6";

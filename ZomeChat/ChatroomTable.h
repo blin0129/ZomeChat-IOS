@@ -11,6 +11,6 @@
 
 @interface ChatroomTable : UITableViewController
 
--(void) updateThemeList:(SocketIOPacket *)packet;
+//-(void) updateThemeList:(SocketIOPacket *)packet;
 
 @end

@@ -14,6 +14,7 @@
 @implementation PostViewController{
     float yBound;
     UITableViewCell *cellForRowHeightCalculation;
+    NSDateFormatter *dateFormat;
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder
@@ -37,6 +38,9 @@
 
 - (void) initView
 {
+    dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"yyyy-MM-dd HH:mm"];
+    
     [self.view setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"background-babyblue"]]];
     self.comments = [[NSMutableArray alloc] init];
     yBound = self.replyContainer.frame.origin.y;
@@ -91,14 +95,12 @@
     self.navigationItem.rightBarButtonItems =[NSArray arrayWithObjects:negativeSpacer, likeBtn, nil];
 }
 
-- (void) receiveFeedDetail:(SocketIOPacket *)packet
+- (void) receiveFeedDetail:(NSDictionary *)data
 {
-    NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
-    self.comments = [dic objectForKey:@"comments"];
-    self.likes = [dic objectForKey:@"likes"];
+    self.comments = [[data objectForKey:@"comments"] copy];
+    self.likes = [[data objectForKey:@"likes"] copy];
     [self.commentTable reloadData];
-    [APPDELEGATE.msglistVC updateFeedStatus:[dic objectForKey:@"id"]
+    [APPDELEGATE.msglistVC updateFeedStatus:[data objectForKey:@"id"]
                                   likeCount:[NSNumber numberWithInteger:self.likes.count]
                                commentCount:[NSNumber numberWithInteger:self.comments.count]];
 }
@@ -154,7 +156,7 @@
 
 - (UIImage *) getImageFromURL: (NSString *) imageURL
 {
-    if ([imageURL isEqualToString:@""]) {
+    if(imageURL != NULL || [imageURL isEqualToString:@""]){
         return nil;
     }
     UIImage *img = [APPDELEGATE.imageCache objectForKey:imageURL];
@@ -328,27 +330,28 @@
             [cell setUserInteractionEnabled:NO];
         }
         cell.usernameLabel.text = [self.postData objectForKey:@"ownerName"];
-         NSString *timeFormat = [NSString stringWithFormat:@"%@/%@/%@ %02d:%02d",
-                                 [self.postData objectForKey:@"month"],
-                                 [self.postData objectForKey:@"date"],
-                                 [self.postData objectForKey:@"year"],
-                                 (int)[[self.postData objectForKey:@"hour"] integerValue],
-                                 (int)[[self.postData objectForKey:@"min"] integerValue]];
-         cell.timeLabel.text = timeFormat;
+         double time =([[self.postData objectForKey:@"time"] doubleValue]/1000);
+         NSString * timeString = [dateFormat stringFromDate:[NSDate dateWithTimeIntervalSince1970:time]];
+         cell.timeLabel.text = timeString;
          cell.postContent.text = [self.postData objectForKey:@"content"];
 //         [cell.postContent sizeToFit];
          [self hashtagColor:cell.postContent];
          
-         UIImage *thumbnail = [self resizeImageToThumbnail:[self getImageFromURL:[self.postData objectForKey:@"ownerImageURL"]] size:70.0f];
-         cell.posterImage.image = thumbnail;
+         NSString *thumbnailURL =[self.postData objectForKey:@"ownerImageURL"];
+         if(![thumbnailURL isEqual:[NSNull null]] && thumbnailURL != nil){
+             if(![thumbnailURL isEqualToString:@""]){
+                 UIImage *thumbnail = [self resizeImageToThumbnail:[self getImageFromURL:thumbnailURL] size:70.0f];
+                 cell.posterImage.image = thumbnail;
+             }
+         }
          
          NSString *imageURL = [self.postData objectForKey:@"imageURL"];
-         if(![imageURL isEqualToString:@""]){
-             UIImage *img = [self getImageFromURL:imageURL];
-             cell.posterImage.frame = CGRectMake(cell.postImage.frame.origin.x, cell.posterImage.frame.origin.y, img.size.width, img.size.height);
-             cell.postImage.image = img;
-         } else {
-             cell.postImage.hidden = YES;
+         if(![imageURL isEqual:[NSNull null]] && imageURL != nil){
+             if(![imageURL isEqualToString:@""]){
+                 UIImage *img = [self getImageFromURL:imageURL];
+                 cell.posterImage.frame = CGRectMake(cell.postImage.frame.origin.x, cell.posterImage.frame.origin.y, img.size.width, img.size.height);
+                 cell.postImage.image = img;
+             }
          }
          return cell;
      } else {
@@ -362,19 +365,18 @@
          }
          NSDictionary *commentData = [self.comments objectAtIndex:(indexPath.row-1)];
          cell.usernameLabel.text = [commentData objectForKey:@"ownerName"];
-         NSString *timeFormat = [NSString stringWithFormat:@"%@/%@/%@ %02d:%02d",
-                                 [commentData objectForKey:@"month"],
-                                 [commentData objectForKey:@"date"],
-                                 [commentData objectForKey:@"year"],
-                                 (int)[[commentData objectForKey:@"hour"] integerValue],
-                                 (int)[[commentData objectForKey:@"min"] integerValue]];
-         cell.timeLabel.text = timeFormat;
+         double time =([[commentData objectForKey:@"time"] doubleValue]/1000);
+         NSString * timeString = [dateFormat stringFromDate:[NSDate dateWithTimeIntervalSince1970:time]];
+         cell.timeLabel.text = timeString;
          cell.contentTextview.text = [commentData objectForKey:@"content"];
 //         [cell.contentTextview sizeToFit];
          
-         if([commentData objectForKey:@"ownerImageURL"]){
-             UIImage *thumbnail = [self resizeImageToThumbnail:[self getImageFromURL:[commentData     objectForKey:@"ownerImageURL"]] size:40.0f];
-             cell.userImage.image = thumbnail;
+         NSString *thumbnailURL = [commentData objectForKey:@"ownerImageURL"];
+         if(![thumbnailURL isEqual:[NSNull null]] && thumbnailURL != nil){
+             if(![thumbnailURL isEqualToString:@""]){
+                 UIImage *thumbnail = [self resizeImageToThumbnail:[self getImageFromURL:[commentData     objectForKey:@"ownerImageURL"]] size:40.0f];
+                 cell.userImage.image = thumbnail;
+             }
          }
          return cell;
      }

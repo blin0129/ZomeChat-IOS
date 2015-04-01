@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SocketIOPacket.h"
+#import "ZomeChat-Swift.h"
 
 @interface PostTable : UITableViewController
 
@@ -15,7 +15,7 @@
 @property NSMutableArray *cellHeight;
 @property float tableWidth;
 
--(void) updateMsgboardMessages:(SocketIOPacket *)packet;
+//-(void) updateMsgboardMessages:(SocketIOPacket *)packet;
 
 @end
 

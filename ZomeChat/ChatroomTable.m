@@ -8,7 +8,6 @@
 
 #import "ChatroomTable.h"
 #import "ChatPageViewController.h"
-#import "SocketIOPacket.h"
 
 @interface ChatroomTable ()
 
@@ -49,33 +48,33 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void) updateThemeList:(SocketIOPacket *)packet
-{
-    NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
-    APPDELEGATE.mainVC.defaultRoomList = [[NSMutableArray alloc] initWithObjects: nil];
-
-    NSDictionary *popRoom = @{@"roomName":@"Popular Room",
-                              @"userCount":[dic objectForKey:@"popRoomUsers"],
-                              @"distance":@"0"
-                              };
-    NSDictionary *locRoom = @{@"roomName":@"Local Room",
-                              @"userCount":[dic objectForKey:@"locRoomUsers"],
-                              @"distance":@"0"
-                              };
-    
-    [APPDELEGATE.mainVC.defaultRoomList addObject:popRoom];
-    [APPDELEGATE.mainVC.defaultRoomList addObject:locRoom];
-
-    NSArray *receiveList = [self sortThemeList:[dic objectForKey:@"choices"]];
-    for(int i=0;i<receiveList.count;i++)
-    {
-        NSLog(@"%@",[[receiveList objectAtIndex:i] objectForKey:@"distance"]);
-        [APPDELEGATE.mainVC.defaultRoomList addObject:[receiveList objectAtIndex:i]];
-    }
-//    [APPDELEGATE.landVC updateRoomCount:[NSString stringWithFormat:@"%lu",(unsigned long)APPDELEGATE.mainVC.defaultRoomList.count]];
-    [self.tableView reloadData];
-}
+//- (void) updateThemeList:(SocketIOPacket *)packet
+//{
+//    NSError *err = nil;
+//    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
+//    APPDELEGATE.mainVC.defaultRoomList = [[NSMutableArray alloc] initWithObjects: nil];
+//
+//    NSDictionary *popRoom = @{@"roomName":@"Popular Room",
+//                              @"userCount":[dic objectForKey:@"popRoomUsers"],
+//                              @"distance":@"0"
+//                              };
+//    NSDictionary *locRoom = @{@"roomName":@"Local Room",
+//                              @"userCount":[dic objectForKey:@"locRoomUsers"],
+//                              @"distance":@"0"
+//                              };
+//    
+//    [APPDELEGATE.mainVC.defaultRoomList addObject:popRoom];
+//    [APPDELEGATE.mainVC.defaultRoomList addObject:locRoom];
+//
+//    NSArray *receiveList = [self sortThemeList:[dic objectForKey:@"choices"]];
+//    for(int i=0;i<receiveList.count;i++)
+//    {
+//        NSLog(@"%@",[[receiveList objectAtIndex:i] objectForKey:@"distance"]);
+//        [APPDELEGATE.mainVC.defaultRoomList addObject:[receiveList objectAtIndex:i]];
+//    }
+////    [APPDELEGATE.landVC updateRoomCount:[NSString stringWithFormat:@"%lu",(unsigned long)APPDELEGATE.mainVC.defaultRoomList.count]];
+//    [self.tableView reloadData];
+//}
 
 -(NSArray *) sortThemeList:(NSArray *)receiveList
 {

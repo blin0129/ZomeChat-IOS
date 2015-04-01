@@ -14,10 +14,10 @@
 @property (strong, nonatomic) NSMutableArray *messageList;
 @property (strong, nonatomic) NSMutableDictionary *hashTagDictionary;
 @property (strong , nonatomic) NSMutableArray *tableData;
-@property (strong, nonatomic) NSDictionary *selectedData;
+@property (strong, nonatomic) NSMutableDictionary *selectedData;
 @property BOOL pictureLoaded;
 
-- (void) updateMsgboardMessages:(SocketIOPacket *)packet;
+- (void) updateMsgboardMessages:(NSDictionary *)packet;
 - (void) updateFeedStatus:(NSString *)feedId likeCount:(NSNumber *)likesCount commentCount:(NSNumber *) commentsCount;
 
 @end

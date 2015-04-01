@@ -7,16 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SocketIO.h"
-#import "SocketIOPacket.h"
+#import "ZomeChat-Swift.h"
 #import "LoginViewController.h"
 
-@interface MainViewController : UITabBarController<SocketIODelegate>
-{
-    SocketIO *socketIO;
-}
+@interface MainViewController : UITabBarController
 
-@property (atomic) SocketIO *socketIO;
 @property NSNumber *themeCount;
 @property NSNumber *postCount;
 @property NSNumber *userCount;
@@ -26,6 +21,7 @@
 @property (strong, nonatomic) NSMutableArray *customRoomList;
 @property (strong, nonatomic) GMSMapView *mapView;
 @property (strong, nonatomic) GMSMarker *myLocationMarker;
+@property (nonatomic, strong) SocketIOClient *socketIO;
 
 
 - (float) getLatitude;

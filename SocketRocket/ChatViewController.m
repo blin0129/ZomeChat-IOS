@@ -90,19 +90,27 @@
     [[self view] endEditing: YES];
 }
 
--(void) initRoom:(SocketIOPacket *)packet
+-(void) receiveMessage:(NSDictionary *)data
 {
-    NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
-    
-    self.roomKey = [dic objectForKey:@"roomKey"];
-    self.roomName = [dic objectForKey:@"roomName"];
-    self.chatroomUsers = [dic objectForKey:@"chatroomUsers"];
-    [self fetchUserAvatar:[dic objectForKey:@"chatroomUsers"]];
-    
-    self.userCount = [[dic objectForKey:@"userCount"] integerValue];
+    [self fetchMessage:data];
+    [self finishReceivingMessage];
+}
 
-    [self fetchMessageHistory:[dic objectForKey:@"messageHistory"]];
+-(void) updateChatroomUserList:(NSDictionary *)data
+{
+    self.chatroomUsers = [data objectForKey:@"users"];
+    [self fetchUserAvatar:self.chatroomUsers];
+}
+
+-(void) initRoom:(NSDictionary *)data
+{
+    self.roomKey = [data objectForKey:@"roomKey"];
+    self.roomName = [data objectForKey:@"roomName"];
+    self.chatroomUsers = [data objectForKey:@"chatroomUsers"];
+    [self fetchUserAvatar:[data objectForKey:@"chatroomUsers"]];
+    self.userCount = [[data objectForKey:@"userCount"] integerValue];
+
+    [self fetchMessageHistory:[data objectForKey:@"messageHistory"]];
     [self finishReceivingMessage];
     self.title = self.roomName;
 
@@ -160,27 +168,13 @@
     }
 }
 
--(void) receiveMessage:(SocketIOPacket *)packet
-{
-    NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
-    [self fetchMessage:dic];
-    [self finishReceivingMessage];
-}
 
--(void) updateChatroomUserList:(SocketIOPacket *)packet
-{
-    NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
-    self.chatroomUsers = [dic objectForKey:@"users"];
-    [self fetchUserAvatar:self.chatroomUsers];
-}
 
--(void) fetchUserAvatar:(NSDictionary *)userList
+-(void) fetchUserAvatar:(NSArray *)userList
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         for (NSDictionary *obj in userList){
-            NSString *userName = [obj objectForKey:@"userName"];
+            NSString *userName = [obj objectForKey:@"username"];
             NSString *photoLink = [obj objectForKey:@"imageURL"];
             if (photoLink != nil) {
                 [userImageDictionary setObject:photoLink forKey:self.senderId];

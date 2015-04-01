@@ -99,7 +99,7 @@
         cell.textLabel.font = [UIFont systemFontOfSize:17];
         
     }
-    cell.textLabel.text = [[self.chatroomUsers objectAtIndex:indexPath.row] objectForKey:@"userName"];
+    cell.textLabel.text = [[self.chatroomUsers objectAtIndex:indexPath.row] objectForKey:@"username"];
     UIImage *profilePicture = [self getImageFromURL:[[self.chatroomUsers objectAtIndex:indexPath.row] objectForKey:@"imageURL"]];
     if(profilePicture == nil){
         profilePicture = [UIImage imageNamed:@"anonymous"];

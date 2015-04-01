@@ -22,7 +22,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *LogoutBtn;
 @property UIImage *oldImage;
 
--(void) receiveMyProfile: (SocketIOPacket *)packet;
--(void) receiveProfileUpdateRespond: (SocketIOPacket *)packet;
+-(void) receiveMyProfile: (NSDictionary *)packet;
+-(void) receiveProfileUpdateRespond: (NSDictionary *)packet;
 -(void) updateProfileImage: (NSString *)imageURL;
 @end

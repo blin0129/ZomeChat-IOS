@@ -28,12 +28,12 @@
 @property (nonatomic, strong) NSMutableArray *rooms;
 @property NSString *ownedRoomName;
 
--(void) addARoom:(SocketIOPacket *)packet;
 -(void) printMessage:(NSString *)message inRoom:(NSString *)roomKey;
--(void) initRoommate:(SocketIOPacket *)packet;
 -(void) printImage:(NSString *)imageString inRoom:(NSString *)roomKey fromSender:(NSString *)sender;
--(void) removeARoommate:(SocketIOPacket *)packet;
--(void) addARoommate:(SocketIOPacket *)packet;
+//-(void) removeARoommate:(SocketIOPacket *)packet;
+//-(void) addARoommate:(SocketIOPacket *)packet;
+//-(void) initRoommate:(SocketIOPacket *)packet;
+//-(void) addARoom:(SocketIOPacket *)packet;
 
 - (IBAction)selectImageButtonClick:(id)sender;
 

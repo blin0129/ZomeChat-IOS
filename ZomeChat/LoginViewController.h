@@ -9,16 +9,14 @@
 #import <UIKit/UIKit.h>
 #import <FacebookSDK/FacebookSDK.h>
 
-#import "SocketIO.h"
-#import "SocketIOPacket.h"
+#import "ZomeChat-Swift.h"
 #import "AppDelegate.h"
 
-@interface LoginViewController : UIViewController<SocketIODelegate,UITextFieldDelegate,FBLoginViewDelegate>
-{
-    SocketIO *socketIO;
-}
+@interface LoginViewController : UIViewController<UITextFieldDelegate,FBLoginViewDelegate>
+
 @property (retain, nonatomic) IBOutlet UITextField *emailInput;
 @property (retain, nonatomic) IBOutlet UITextField *passwordInput;
+@property (nonatomic, strong) SocketIOClient *socketIO;
 
 @property (weak, nonatomic) IBOutlet UITextField *signupPassword;
 @property (weak, nonatomic) IBOutlet UITextField *signupPasswordC;

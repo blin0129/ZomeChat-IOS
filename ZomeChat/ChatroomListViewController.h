@@ -15,6 +15,6 @@
 @property NSString *choosedRoomKey;
 @property (weak, nonatomic) IBOutlet UIView *mapContainer;
 
--(void) updateChatroomList:(SocketIOPacket *)packet;
+-(void) updateChatroomList:(NSDictionary *)packet;
 
 @end

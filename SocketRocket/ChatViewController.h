@@ -28,7 +28,7 @@
 
 @property (strong, nonatomic) NSString *roomKey;
 @property (strong, nonatomic) NSString *roomName;
-@property (strong, nonatomic) NSMutableDictionary *chatroomUsers;
+@property (strong, nonatomic) NSMutableArray *chatroomUsers;
 @property (strong, nonatomic) NSMutableDictionary *userImageDictionary;
 //@property (strong, nonatomic) NSMutableArray *messages;
 @property (strong, nonatomic) ChatroomData *chatData;
@@ -40,9 +40,9 @@
 - (void)receiveMessagePressed:(UIBarButtonItem *)sender;
 - (void)closePressed:(UIBarButtonItem *)sender;
 
--(void) initRoom:(SocketIOPacket *)packet;
--(void) receiveMessage:(SocketIOPacket *)packet;
--(void) updateChatroomUserList:(SocketIOPacket *)packet;
+-(void) initRoom:(NSDictionary *)packet;
+-(void) receiveMessage:(NSDictionary *)packet;
+-(void) updateChatroomUserList:(NSDictionary *)packet;
 
 //-(void) receivedImage:(NSString *)imageString inRoom:(NSString *)roomKey fromSender:(NSString *)sender;
 

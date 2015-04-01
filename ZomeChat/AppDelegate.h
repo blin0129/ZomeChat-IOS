@@ -7,9 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SocketIO.h"
-#import "SocketIOPacket.h"
-//#import "SwiftIO/"
+#import "ZomeChat-Swift.h"
 #import <GoogleMaps/GoogleMaps.h>
 #import <CoreLocation/CoreLocation.h>
 #import "MainViewController.h"
@@ -27,7 +25,7 @@
 }
 
 @property (strong, nonatomic) NSString *version;
-@property (nonatomic, strong) SocketIO *socketIO;
+@property (nonatomic, strong) SocketIOClient *socketIO;
 @property (strong, nonatomic) MainViewController *mainVC;
 @property (strong, nonatomic) ChatroomListViewController *chatroomListVC;
 @property (strong, nonatomic) ChatViewController *chatVC;

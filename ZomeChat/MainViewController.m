@@ -40,8 +40,7 @@
     [super viewDidLoad];
     [self loadMap];
     socketIO = APPDELEGATE.socketIO;
-    socketIO.delegate = self;
-    
+    [self socketOnRecievedData];
     if([CLLocationManager locationServicesEnabled]){
         _currentLocation = APPDELEGATE.locationManager.location;
     }
@@ -129,7 +128,7 @@
     NSDictionary* requestEnterRoomData = @{@"uid" : APPDELEGATE.uid,
                                            @"roomKey" : roomKey,
                                            };
-        [socketIO sendEvent:@"requestEnterChatroom" withData:requestEnterRoomData];
+    [socketIO emitObjc:@"requestEnterChatroom" withItems:@[requestEnterRoomData]];
 }
 
 -(void) requestCreateNewMessage: (NSString *) messageContent withImage:(NSString *)imageString
@@ -141,7 +140,7 @@
                                               @"image" : imageString
                                               };
     [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"lastMessageCreatedTime"];
-    [socketIO sendEvent:@"requestCreateMessage" withData:requestCreatingMessageData];
+    [socketIO emitObjc:@"requestCreateMessage" withItems:@[requestCreatingMessageData]];
 }
 
 -(void) requestMsgboardData
@@ -150,7 +149,7 @@
                                               @"lng" : APPDELEGATE.lng,
                                               @"lat" : APPDELEGATE.lat
                                               };
-    [socketIO sendEvent:@"requestMessageboard" withData:requestMessageboardData];
+    [socketIO emitObjc:@"requestMessageboard" withItems:@[requestMessageboardData]];
 }
 
 
@@ -160,19 +159,19 @@
                                            @"roomName" : roomName
                                            };
     [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"lastRoomCreatedTime"];
-    [socketIO sendEvent:@"requestCreateNewRoom" withData:requestCreatingRoomData];
+    [socketIO emitObjc:@"requestCreateNewRoom" withItems:@[requestCreatingRoomData]];
 }
 
 - (void) requestChatroomList
 {
     NSDictionary* requestThemeListData = @{@"uid" : APPDELEGATE.uid};
-    [socketIO sendEvent:@"requestChatroomList" withData:requestThemeListData];
+    [socketIO emitObjc:@"requestChatroomList" withItems:@[requestThemeListData]];
 }
 
 - (void) requestProfile
 {
     NSDictionary* requestProfileData = @{@"uid" : APPDELEGATE.uid};
-    [socketIO sendEvent:@"requestProfile" withData:requestProfileData];
+    [socketIO emitObjc:@"requestProfile" withItems:@[requestProfileData]];
 }
 
 - (void) requestUsernameChange: (NSString *)newName
@@ -180,7 +179,7 @@
     NSDictionary* requestUsernameChangeData = @{@"uid" : APPDELEGATE.uid,
                                               @"username" : newName
                                               };
-    [socketIO sendEvent:@"requestUsernameChange" withData:requestUsernameChangeData];
+    [socketIO emitObjc:@"requestUsernameChange" withItems:@[requestUsernameChangeData]];
 }
 
 - (void) requestLocationUpdate
@@ -189,7 +188,7 @@
                                                @"lat" : APPDELEGATE.lat,
                                                @"lng" : APPDELEGATE.lng
                                                };
-    [socketIO sendEvent:@"requestLocationUpdate" withData:requestLocationUpdateData];
+    [socketIO emitObjc:@"requestLocationUpdate" withItems:@[requestLocationUpdateData]];
 }
 
 - (void) requestSendMessage: (NSString *)message inRoom: (NSString *)roomKey
@@ -198,7 +197,7 @@
                                              @"message" : message,
                                              @"roomKey" : roomKey
                                              };
-    [socketIO sendEvent:@"sendChatroomMessage" withData:requestSendMessageData];
+    [socketIO emitObjc:@"sendChatroomMessage" withItems:@[requestSendMessageData]];
 }
 
 - (void) requestSendImage: (NSString *)image inRoom:(NSString *)roomKey
@@ -207,7 +206,7 @@
                                               @"image" : image,
                                               @"roomKey" : roomKey
                                               };
-    [socketIO sendEvent:@"chatImage" withData:requestSendImageData];
+    [socketIO emitObjc:@"chatImage" withItems:@[requestSendImageData]];
 }
 
 - (void) requestProfileUpdate: (NSString *)image
@@ -215,7 +214,7 @@
     NSDictionary* requestProfileUpdateData = @{@"uid" : APPDELEGATE.uid,
                                            @"image" : image,
                                            };
-    [socketIO sendEvent:@"profileUpdate" withData:requestProfileUpdateData];
+    [socketIO emitObjc:@"profileUpdate" withItems:@[requestProfileUpdateData]];
 }
 
 - (void) requestLeaveChatroom: (NSString *)roomKey
@@ -223,7 +222,7 @@
     NSDictionary* requestLeaveRoomData = @{@"uid" : APPDELEGATE.uid,
                                              @"roomKey" : roomKey
                                              };
-    [socketIO sendEvent:@"requestLeaveChatroom" withData:requestLeaveRoomData];
+    [socketIO emitObjc:@"requestLeaveChatroom" withItems:@[requestLeaveRoomData]];
 }
 
 - (void) requestPostComment: (NSString *)comment onFeed: (NSString *)feedId
@@ -232,7 +231,7 @@
                                                @"feedId" : feedId,
                                                @"content" : comment
                                                };
-    [socketIO sendEvent:@"requestPostComment" withData:requestCommentOnPostData];
+    [socketIO emitObjc:@"requestPostComment" withItems:@[requestCommentOnPostData]];
 }
 
 - (void) requestLikeFeed: (NSString *)feedId
@@ -240,7 +239,7 @@
     NSDictionary* requestLikePostData = @{@"uid" : APPDELEGATE.uid,
                                           @"feedId" : feedId
                                           };
-    [socketIO sendEvent:@"requestLikeFeed" withData:requestLikePostData];
+    [socketIO emitObjc:@"requestLikeFeed" withItems:@[requestLikePostData]];
 }
 
 - (void) requestFeedDetail: (NSString *)feedId
@@ -248,31 +247,31 @@
     NSDictionary* requestFeedDetailData = @{@"uid" : APPDELEGATE.uid,
                                           @"feedId" : feedId
                                           };
-    [socketIO sendEvent:@"requestFeedDetail" withData:requestFeedDetailData];
+    [socketIO emitObjc:@"requestFeedDetail" withItems:@[requestFeedDetailData]];
 }
 
 
 
 //** Chatroom Received Methods **//
 
--(void) receiveChatroomList:(SocketIOPacket *)packet
+-(void) receiveChatroomList:(NSDictionary *)packet
 {
     [APPDELEGATE.chatroomListVC updateChatroomList:packet];
 }
 
-- (void) receiveAssignChatroom:(SocketIOPacket *)packet
+- (void) receiveAssignChatroom:(NSDictionary *)packet
 {
     [APPDELEGATE.chatVC initRoom:packet];
 }
 
--(void) receiveChatroomUserList:(SocketIOPacket *)packet
+-(void) receiveChatroomUserList:(NSDictionary *)packet
 {
     if(APPDELEGATE.chatVC != nil){
         [APPDELEGATE.chatVC updateChatroomUserList:packet];
     }
 }
 
-- (void) receivedChatroomMessage: (SocketIOPacket *)packet
+- (void) receivedChatroomMessage: (NSDictionary *)packet
 {
     [APPDELEGATE.chatVC receiveMessage:packet];
 }
@@ -280,87 +279,93 @@
 
 //** Bulletin Board Received Methods **//
 
-- (void) updateMsgboardMessages: (SocketIOPacket *)packet
+- (void) updateMsgboardMessages: (NSDictionary *)packet
 {
     [APPDELEGATE.msglistVC updateMsgboardMessages:packet];
 }
 
--(void) receiveMyProfile:(SocketIOPacket *)packet
+-(void) receiveMyProfile:(NSDictionary *)packet
 {
     [APPDELEGATE.profileVC receiveMyProfile:packet];
 }
 
--(void) receiveUpdateProfileResponse:(SocketIOPacket *)packet
+-(void) receiveUpdateProfileResponse:(NSDictionary *)packet
 {
     [APPDELEGATE.profileVC receiveProfileUpdateRespond:packet];
 }
 
--(void) receiveFeedDetail:(SocketIOPacket *)packet
+-(void) receiveFeedDetail:(NSDictionary *)packet
 {
     [APPDELEGATE.postVC receiveFeedDetail:packet];
 }
 
 
 
-//** Other Received Methods **//
-
-- (void) socketIODidConnect:(SocketIO *)socket
+- (void) socketOnRecievedData
 {
-    NSLog(@"socket.io connected.");
+    [socketIO onAny:^(SocketAnyEvent* respond) {
+        NSLog(@"socket recieved evet: %@",respond.event);
+        NSString *event = respond.event;
+        NSDictionary *data = [respond.items objectAtIndex:0];
+        if([[data objectForKey:@"resopnd"] isEqualToString:@"RESPOND_FAIL"]){
+            [self showDefaultServerErrorAlert];
+            
+        } else if([event isEqual:@"chatroomList"]){
+            [self receiveChatroomList:data];
+            
+        } else if([event isEqual:@"assignChatroom"]){
+            [self receiveAssignChatroom:data];
+            
+        } else if([event isEqual:@"chatroomMessage"]){
+            [self receivedChatroomMessage:data];
+            
+        } else if([event isEqual:@"messageboardMessages"]){
+            [self updateMsgboardMessages:data];
+            
+        } else if([event isEqual:@"updateChatroomUserList"]){
+            [self receiveChatroomUserList:data];
+            
+        } else if([event isEqual:@"myProfile"]){
+            [self receiveMyProfile:data];
+            
+        } else if([event isEqual:@"profileUpdateResponse"]){
+            [self receiveUpdateProfileResponse:data];
+            
+        } else if([event isEqual:@"feedDetail"]){
+            [self receiveFeedDetail:data];
+            
+        } else if([event isEqual:@"error"]){
+            [self showAlertWithTitle:@"Server Error" message:[data objectForKey:@"message"]];
+        }
+    }];
 }
 
-//- (void) receiveLocalStats:(SocketIOPacket *)packet
+- (void)showDefaultServerErrorAlert{
+    [self showAlertWithTitle:@"Server Error" message:@"Woop, something is wrong with our server"];
+}
+
+- (void)showAlertWithTitle:(NSString*) title message:(NSString*) message
+{
+    UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:title
+                                                              message:message
+                                                             delegate:self
+                                                    cancelButtonTitle:@"Okay"
+                                                    otherButtonTitles:nil];
+    [newMessageAlert show];
+}
+
+//- (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error
 //{
-//    //    NSLog(@"Receive landing Pageinfo");
-//    NSError *err = nil;
-//    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
+////    NSLog(@"socket.io disconnected. did error occur? %@", error);
+//        UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:@"Server Disconnected"
+//                                                                  message:@"Plase signin again"
+//                                                                 delegate:self
+//                                                        cancelButtonTitle:@"Okay"
+//                                                        otherButtonTitles:nil];
+//        [newMessageAlert show];
+//    LoginViewController *loginView = [self.storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
+//    [self presentViewController:loginView  animated:YES completion:NULL];
 //    
-//    NSString *userCountString = [NSString stringWithFormat:@"%@ nearby users", [dic objectForKey:@"nearbyUserCount"]];
-//    NSString *msgCountString = [NSString stringWithFormat:@"%@ msgs", [dic objectForKey:@"messageCount"]];
-//    NSString *roomCountString = [NSString stringWithFormat:@"%@ rooms", [dic objectForKey:@"themeRoomsCount"]];
-//    [APPDELEGATE.landVC setUserCount:userCountString msgCount:msgCountString andRoomCount:roomCountString];
 //}
-
-
-- (void) socketIO:(SocketIO *)socket didReceiveEvent:(SocketIOPacket *)packet
-{
-    if([packet.name isEqual: @"chatroomList"]){
-        [self receiveChatroomList:packet];
-    } else if([packet.name isEqual: @"assignChatroom"]){
-        [self receiveAssignChatroom:packet];
-    } else if([packet.name isEqual: @"chatroomMessage"]){
-        [self receivedChatroomMessage:packet];
-    } else if([packet.name isEqual: @"messageboardMessages"]){
-        [self updateMsgboardMessages:packet];
-    } else if([packet.name isEqual:@"updateChatroomUserList"]){
-        [self receiveChatroomUserList:packet];
-    }  else if([packet.name isEqual:@"myProfile"]){
-        [self receiveMyProfile:packet];
-    }   else if([packet.name isEqual:@"profileUpdateResponse"]){
-        [self receiveUpdateProfileResponse:packet];
-    }   else if([packet.name isEqual:@"feedDetail"]){
-        [self receiveFeedDetail:packet];
-    }
-
-}
-
-- (void) socketIO:(SocketIO *)socket onError:(NSError *)error
-{
-    NSLog(@"onError() %@", error);
-}
-
-- (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error
-{
-//    NSLog(@"socket.io disconnected. did error occur? %@", error);
-        UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:@"Server Disconnected"
-                                                                  message:@"Plase signin again"
-                                                                 delegate:self
-                                                        cancelButtonTitle:@"Okay"
-                                                        otherButtonTitles:nil];
-        [newMessageAlert show];
-    LoginViewController *loginView = [self.storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
-    [self presentViewController:loginView  animated:YES completion:NULL];
-    
-}
 
 @end

@@ -71,23 +71,21 @@
     [APPDELEGATE.mainVC requestChatroomList];
 }
 
-- (void) updateChatroomList:(SocketIOPacket *)packet
+- (void) updateChatroomList:(NSDictionary *)data
 {
-    NSError *err = nil;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[[packet.args objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&err];
     APPDELEGATE.mainVC.defaultRoomList = [[NSMutableArray alloc] initWithObjects: nil];
     APPDELEGATE.mainVC.customRoomList = [[NSMutableArray alloc] initWithObjects: nil];
 
-    NSArray *receiveList = [dic objectForKey:@"chatrooms"];
+    NSArray *receiveList = [data objectForKey:@"chatrooms"];
     
     [APPDELEGATE.mainVC cleanAllMarkerFromMap];
     for(int i=0;i<receiveList.count;i++)
     {
         NSDictionary *roomInfo = [receiveList objectAtIndex:i];
         NSString *roomType = [roomInfo objectForKey:@"roomType"];
-        if ([roomType isEqualToString:@"default"]){
+        if ([roomType isEqualToString:@"default"] || [roomType isEqualToString:@"DEFAULT"]){
             [APPDELEGATE.mainVC.defaultRoomList addObject:roomInfo];
-        } else if([roomType isEqualToString:@"custom"]){
+        } else if([roomType isEqualToString:@"custom"] || [roomType isEqualToString:@"CUSTOM"]){
             [APPDELEGATE.mainVC.customRoomList addObject:roomInfo];
         }
         

@@ -21,6 +21,6 @@
 @property (strong, nonatomic) NSMutableArray *likes;
 @property (strong, nonatomic) NSString *feedId;
 
-- (void) receiveFeedDetail:(SocketIOPacket *)packet;
+- (void) receiveFeedDetail:(NSDictionary *)packet;
 
 @end
