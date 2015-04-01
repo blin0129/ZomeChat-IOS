@@ -243,14 +243,6 @@
     double time =([[[tableData objectAtIndex:indexPath.row] objectForKey:@"time"] doubleValue]/1000);
     NSString * timeString = [dateFormat stringFromDate:[NSDate dateWithTimeIntervalSince1970:time]];
     cell.timeLabel.text = timeString;
-    
-    NSString *timeFormat = [NSString stringWithFormat:@"%@/%@/%@ %02d:%02d",
-                            [[tableData objectAtIndex:indexPath.row] objectForKey:@"month"],
-                            [[tableData objectAtIndex:indexPath.row] objectForKey:@"date"],
-                            [[tableData objectAtIndex:indexPath.row] objectForKey:@"year"],
-                            (int)[[[tableData objectAtIndex:indexPath.row] objectForKey:@"hour"] integerValue],
-                            (int)[[[tableData objectAtIndex:indexPath.row] objectForKey:@"min"] integerValue]];
-    cell.timeLabel.text = timeFormat;
     cell.contentTextview.text = [[tableData objectAtIndex:indexPath.row] objectForKey:@"content"];
 //    [cell.contentTextview sizeToFit];
     [self hashtagColor:cell.contentTextview];

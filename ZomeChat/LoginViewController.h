@@ -7,12 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <FacebookSDK/FacebookSDK.h>
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+#import <FBSDKLoginKit/FBSDKLoginKit.h>
 
 #import "ZomeChat-Swift.h"
 #import "AppDelegate.h"
 
-@interface LoginViewController : UIViewController<UITextFieldDelegate,FBLoginViewDelegate>
+@interface LoginViewController : UIViewController<UITextFieldDelegate>
 
 @property (retain, nonatomic) IBOutlet UITextField *emailInput;
 @property (retain, nonatomic) IBOutlet UITextField *passwordInput;
@@ -26,8 +27,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *anonLoginButton;
 @property (nonatomic) CLLocation *currentLocation;
 
-@property (strong, nonatomic) IBOutlet FBLoginView *fbLoginView;
-@property (strong, nonatomic) FBProfilePictureView *profilePictureView;
 @property (strong, nonatomic) UILabel *nameLabel;
 @property (strong, nonatomic) UILabel *statusLabel;
 

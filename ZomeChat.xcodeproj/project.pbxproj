@@ -110,6 +110,8 @@
 		C64AB1AF185EA81A009FD17C /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C64AB1AE185EA81A009FD17C /* LoginViewController.m */; };
 		C64AB1B1185FE007009FD17C /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C64AB1B0185FE007009FD17C /* CoreLocation.framework */; };
 		C64AB1C41864E10F009FD17C /* ChatroomTable.m in Sources */ = {isa = PBXBuildFile; fileRef = C64AB1C31864E10F009FD17C /* ChatroomTable.m */; };
+		C67A8AA91ACB84BA00A32F8A /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C67A8AA81ACB84BA00A32F8A /* FBSDKCoreKit.framework */; };
+		C67A8AAB1ACB881100A32F8A /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C67A8AAA1ACB881100A32F8A /* FBSDKLoginKit.framework */; };
 		C67B14381AC88D0400B6FF89 /* SocketAckHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67B142D1AC88D0400B6FF89 /* SocketAckHandler.swift */; };
 		C67B14391AC88D0400B6FF89 /* SocketAnyEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67B142E1AC88D0400B6FF89 /* SocketAnyEvent.swift */; };
 		C67B143A1AC88D0400B6FF89 /* SocketEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67B142F1AC88D0400B6FF89 /* SocketEngine.swift */; };
@@ -142,7 +144,6 @@
 		C6D90D961880A90C00BFB039 /* GoogleMaps.bundle in Resources */ = {isa = PBXBuildFile; fileRef = C6D90D951880A90C00BFB039 /* GoogleMaps.bundle */; };
 		C6D90DB01883830700BFB039 /* LandingPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D90DAF1883830700BFB039 /* LandingPageViewController.m */; };
 		C6D90DBC1884FDD100BFB039 /* ProfilePageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6D90DBB1884FDD100BFB039 /* ProfilePageViewController.m */; };
-		C6E7F5371A4A234700DBF30A /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6E7F5361A4A234700DBF30A /* FacebookSDK.framework */; };
 		C6F62B8319E9A77600AC0B05 /* UIImage+ProportionalFill.m in Sources */ = {isa = PBXBuildFile; fileRef = C6F62B7F19E9A77600AC0B05 /* UIImage+ProportionalFill.m */; };
 		C6F62B8419E9A77600AC0B05 /* UIImage+Tint.m in Sources */ = {isa = PBXBuildFile; fileRef = C6F62B8119E9A77600AC0B05 /* UIImage+Tint.m */; };
 		C6F62B9519E9CAD700AC0B05 /* NewPostViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6F62B9419E9CAD700AC0B05 /* NewPostViewController.m */; };
@@ -392,6 +393,8 @@
 		C64AB1BC1862CC0D009FD17C /* LandingPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LandingPageViewController.h; sourceTree = "<group>"; };
 		C64AB1C21864E10F009FD17C /* ChatroomTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatroomTable.h; sourceTree = "<group>"; };
 		C64AB1C31864E10F009FD17C /* ChatroomTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatroomTable.m; sourceTree = "<group>"; };
+		C67A8AA81ACB84BA00A32F8A /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = "<group>"; };
+		C67A8AAA1ACB881100A32F8A /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
 		C67B142D1AC88D0400B6FF89 /* SocketAckHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketAckHandler.swift; sourceTree = "<group>"; };
 		C67B142E1AC88D0400B6FF89 /* SocketAnyEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketAnyEvent.swift; sourceTree = "<group>"; };
 		C67B142F1AC88D0400B6FF89 /* SocketEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketEngine.swift; sourceTree = "<group>"; };
@@ -429,7 +432,6 @@
 		C6D90DAF1883830700BFB039 /* LandingPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LandingPageViewController.m; sourceTree = "<group>"; };
 		C6D90DBA1884FDD100BFB039 /* ProfilePageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfilePageViewController.h; sourceTree = "<group>"; };
 		C6D90DBB1884FDD100BFB039 /* ProfilePageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfilePageViewController.m; sourceTree = "<group>"; };
-		C6E7F5361A4A234700DBF30A /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FacebookSDK.framework; sourceTree = "<group>"; };
 		C6F62B7E19E9A77600AC0B05 /* UIImage+ProportionalFill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ProportionalFill.h"; sourceTree = "<group>"; };
 		C6F62B7F19E9A77600AC0B05 /* UIImage+ProportionalFill.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ProportionalFill.m"; sourceTree = "<group>"; };
 		C6F62B8019E9A77600AC0B05 /* UIImage+Tint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Tint.h"; sourceTree = "<group>"; };
@@ -444,16 +446,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				C615FCBB1943E74A006B774D /* AudioToolbox.framework in Frameworks */,
-				C6E7F5371A4A234700DBF30A /* FacebookSDK.framework in Frameworks */,
 				C6D90D941880A8BB00BFB039 /* GoogleMaps.framework in Frameworks */,
 				C6D90D901880A2A300BFB039 /* SystemConfiguration.framework in Frameworks */,
 				C6D90D8E1880A28E00BFB039 /* OpenGLES.framework in Frameworks */,
 				C6D90D8C1880A28400BFB039 /* libz.dylib in Frameworks */,
+				C67A8AA91ACB84BA00A32F8A /* FBSDKCoreKit.framework in Frameworks */,
 				C6D90D8A1880A27300BFB039 /* libc++.dylib in Frameworks */,
 				C6D90D881880A26700BFB039 /* ImageIO.framework in Frameworks */,
 				C6D90D861880A25F00BFB039 /* GLKit.framework in Frameworks */,
 				C6D90D841880A25500BFB039 /* CoreText.framework in Frameworks */,
 				C6D90D821880A24400BFB039 /* CoreData.framework in Frameworks */,
+				C67A8AAB1ACB881100A32F8A /* FBSDKLoginKit.framework in Frameworks */,
 				C6D90D7B1880A23A00BFB039 /* AVFoundation.framework in Frameworks */,
 				C61544AE186DFD5500155267 /* QuartzCore.framework in Frameworks */,
 				C64AB1B1185FE007009FD17C /* CoreLocation.framework in Frameworks */,
@@ -733,7 +736,8 @@
 		C64AB01A185E927A009FD17C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C6E7F5361A4A234700DBF30A /* FacebookSDK.framework */,
+				C67A8AAA1ACB881100A32F8A /* FBSDKLoginKit.framework */,
+				C67A8AA81ACB84BA00A32F8A /* FBSDKCoreKit.framework */,
 				C615FCBA1943E749006B774D /* AudioToolbox.framework */,
 				C6D90D931880A8BB00BFB039 /* GoogleMaps.framework */,
 				C6D90D8F1880A2A300BFB039 /* SystemConfiguration.framework */,

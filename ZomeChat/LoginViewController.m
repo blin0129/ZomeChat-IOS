@@ -8,12 +8,12 @@
 
 #import "LoginViewController.h"
 #import "MainViewController.h"
-#import <FacebookSDK/FacebookSDK.h>
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+#import <FBSDKLoginKit/FBSDKLoginKit.h>
 
 @interface LoginViewController (){
     NSString *loginEmail;
     NSString *loginPassword;
-    id<FBGraphUser> facebookUser;
     UIImageView *backgroundIV;
 }
 
@@ -22,12 +22,14 @@
 @implementation LoginViewController
 @synthesize passwordInput;
 @synthesize emailInput;
-@synthesize fbLoginView;
 @synthesize socketIO;
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    //Set socketIO listener
+    socketIO = APPDELEGATE.socketIO;
+    [self socketOnRecievedData];
     
     //Background
     backgroundIV = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background-darkblue@x2.png"]];
@@ -45,20 +47,16 @@
     NSString *previousLogin = [[NSUserDefaults standardUserDefaults] objectForKey:@"loginType"];
     if(previousLogin != nil){
         if ([previousLogin isEqualToString:@"REGISTER"]){
-            [self requestRegisterLoginWithEmail:savedEmail password:savedPassword];
-            //        [self.view bringSubviewToFront:backgroundIV];
-            [self performSelector:@selector(loginFail) withObject:nil afterDelay:3.0];
+            if(![savedEmail isEqual:[NSNull null]] && [savedPassword isEqual:[NSNull null]]){
+                [self requestRegisterLoginWithEmail:savedEmail password:savedPassword];
+                //        [self.view bringSubviewToFront:backgroundIV];
+                [self performSelector:@selector(loginFail) withObject:nil afterDelay:3.0];
+            }
         } else if([previousLogin isEqualToString:@"FACEBOOK"]){
-            fbLoginView = [[FBLoginView alloc] initWithReadPermissions: @[@"public_profile", @"email", @"user_friends"]];
-            fbLoginView.delegate = self;
             [self.view bringSubviewToFront:backgroundIV];
             [self performSelector:@selector(loginFail) withObject:nil afterDelay:3.0];
         }
     }
-    
-    //Set socketIO listener
-    socketIO = APPDELEGATE.socketIO;
-    [self socketOnRecievedData];
 }
 
 - (void) initLoginView{
@@ -101,16 +99,6 @@
     }
 }
 
-- (void) initFacebookLogin{
-    for (UIButton *view in fbLoginView.subviews) {
-        if ([view respondsToSelector:@selector(addTarget:action:forControlEvents:)]) {
-            fbLoginView = [[FBLoginView alloc] initWithReadPermissions: @[@"public_profile", @"email", @"user_friends"]];
-            fbLoginView.delegate = self;
-        }
-    }
-}
-
-
 - (void) viewDidAppear:(BOOL)animated{
     //Auto fillin name and password
     NSString *savedEmail = [[NSUserDefaults standardUserDefaults] objectForKey:@"savedEmail"];
@@ -122,18 +110,8 @@
 }
 
 - (void) viewDidDisappear:(BOOL)animated{
-    fbLoginView.delegate = Nil;
+//    fbLoginView.delegate = Nil;
 }
-
-- (void) backgroundTouched:(id)sender
-{
-    //    [_passwordInput resignFirstResponder];
-}
-
-//- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-//{
-//    [_singupUsername resignFirstResponder];
-//}
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
@@ -143,10 +121,46 @@
     return NO;
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
+- (IBAction)facebookLogin:(id)sender {
+    NSString* fbid = [[NSUserDefaults standardUserDefaults] objectForKey:@"FBid"];
+    NSLog(@"facebookLogin clicked %@",fbid);
+    if(fbid == nil){
+        NSLog(@"access facebook info");
+        [self accessFacebookInfo];
+    }else{
+        NSLog(@"request facebook login");
+        [self requestFacebookLogin];
+    }
 }
+
+- (void) accessFacebookInfo{
+    FBSDKLoginManager *login = [[FBSDKLoginManager alloc] init];
+    [login logInWithReadPermissions:@[@"public_profile", @"email", @"user_friends"] handler:^(FBSDKLoginManagerLoginResult *result, NSError *error) {
+        if (error) {
+            [self showAlertWithTitle:@"Facebook Login Fail" message:[error localizedDescription]];
+        } else if (result.isCancelled) {
+            [self showAlertWithTitle:@"Facebook Login Fail" message:@"Request canceled"];
+        } else {
+            if ([result.grantedPermissions containsObject:@"email"] && [result.grantedPermissions containsObject:@"public_profile"]) {
+                [[[FBSDKGraphRequest alloc] initWithGraphPath:@"me" parameters:nil]
+                startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error){
+                    if (error) {
+                        [self showAlertWithTitle:@"Facebook Login Fail" message:[error localizedDescription]];
+                    } else{
+                        NSString *fbThumbnailURL = [NSString stringWithFormat:@"https://graph.facebook.com/%@/picture?type=large&return_ssl_resources=1", result[@"id"]];
+                        [[NSUserDefaults standardUserDefaults] setObject:fbThumbnailURL forKey:@"FBthumbnailURL"];
+                        [[NSUserDefaults standardUserDefaults] setObject:result[@"id"] forKey:@"FBid"];
+                        [[NSUserDefaults standardUserDefaults] setObject:result[@"email"] forKey:@"FBemail"];
+                        [[NSUserDefaults standardUserDefaults] setObject:result[@"link"] forKey:@"FBlink"];
+                        [[NSUserDefaults standardUserDefaults] setObject:result[@"first_name"] forKey:@"FBname"];
+                        [self requestFacebookLogin];
+                    }
+                }];
+            }
+        }
+    }];
+}
+
 
 - (IBAction)registerLogin:(id)sender {
     [self setButtonsDisable];
@@ -272,7 +286,7 @@
         }else if([APPDELEGATE.loginType isEqualToString:@"facebook"]){
             [APPDELEGATE setFacebookUserConstrains];
             [[NSUserDefaults standardUserDefaults] setObject:@"FACEBOOK" forKey:@"loginType"];
-            [[NSUserDefaults standardUserDefaults] setObject:facebookUser forKey:@"savedFacebookUser"];
+//            [[NSUserDefaults standardUserDefaults] setObject:facebookUser forKey:@"savedFacebookUser"];
         }else{
             [APPDELEGATE setAnonymouseUserConstrains];
         }
@@ -331,14 +345,14 @@
     APPDELEGATE.loginType = @"anonymous";
 }
 
--(void) requestRegisterLoginWithEmail:(NSString*)email password:(NSString*)pssd
+-(void) requestRegisterLoginWithEmail:(NSString*)email password:(NSString*)password
 {
 //    loginEmail = self.emailInput.text;
 //    loginPassword = self.passwordInput.text;
     NSDictionary* singinData = @{@"signinType" : @"REGISTER",
                                  @"version": [APPDELEGATE version],
                                  @"uid" : email,
-                                 @"password" : pssd,
+                                 @"password" : password,
                                  @"lng" : APPDELEGATE.lng,
                                  @"lat" : APPDELEGATE.lat
                                  };
@@ -346,97 +360,32 @@
     APPDELEGATE.loginType = @"register";
 }
 
-- (void) requestFacebookLogin:(id<FBGraphUser>)fbUser
+- (void) requestFacebookLogin
 {
-    NSString *email = [fbUser objectForKey:@"email"];
-    if (email == nil) {
-        email = @"";
-    }
-    NSString *fbThumbnailURL = [NSString stringWithFormat:@"https://graph.facebook.com/%@/picture?type=large&return_ssl_resources=1", fbUser.objectID];
-    [[NSUserDefaults standardUserDefaults] setObject:fbThumbnailURL forKey:@"savedFBthumbnailURL"];
-    [[NSUserDefaults standardUserDefaults] setObject:fbUser.objectID forKey:@"savedFBuid"];
-    [[NSUserDefaults standardUserDefaults] setObject:email forKey:@"savedFBemail"];
-    [[NSUserDefaults standardUserDefaults] setObject:fbUser.link forKey:@"savedFBlink"];
-    [[NSUserDefaults standardUserDefaults] setObject:fbUser.name forKey:@"savedFBname"];
-    NSDictionary* singinData = @{@"signinType" : @"FACEBOOK",
-                                 @"version": [APPDELEGATE version],
-                                 @"uid" : fbUser.objectID,
-                                 @"email": email,
-                                 @"fbLink":fbUser.link,
-                                 @"userName": fbUser.name,
-                                 @"thumbnailURL":fbThumbnailURL,
-                                 @"lng" : APPDELEGATE.lng,
-                                 @"lat" : APPDELEGATE.lat
-                                 };
-    [socketIO emitObjc:@"login" withItems:@[singinData]];
-    APPDELEGATE.loginType = @"facebook";
-}
-
-#pragma mark -Facebook Login Delegate
-
--(void)fireFbLoginView{
-    for(id object in fbLoginView.subviews){
-        if([[object class] isSubclassOfClass:[UIButton class]]){
-            UIButton* button = (UIButton*)object;
-            [button sendActionsForControlEvents:UIControlEventTouchUpInside];
-        }
-    }
-}
-
-- (void)loginViewFetchedUserInfo:(FBLoginView *)loginView user:(id<FBGraphUser>)fbUser
-{
-    facebookUser = fbUser;
-    if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied){
-        [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device setting"];
-    }
-//    else if ([socketIO isConnected] == FALSE){
-//        [APPDELEGATE connectServer];
-//        [self performSelector:@selector(requestFacebookLogin:) withObject:fbUser afterDelay:1.0];
-//    }
-    else {
-        [self requestFacebookLogin:fbUser];
-    }
-}
-
-- (void)loginViewShowingLoggedInUser:(FBLoginView *)loginView {
-    NSLog(@"facebook logged in");
-}
-
-- (void)loginViewShowingLoggedOutUser:(FBLoginView *)loginView {
-    self.profilePictureView.profileID = nil;
-    self.nameLabel.text = @"";
-    self.statusLabel.text= @"You're not logged in!";
-    [FBSettings setLoggingBehavior:[NSSet setWithObjects:FBLoggingBehaviorFBRequests, nil]];
-    if (FBSession.activeSession.isOpen) {
-        [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection,id<FBGraphUser> fbUser,NSError *error) {
-            if (!error) {
-                NSString *fbID = fbUser.objectID;
-                NSLog(@"UserID: %@",fbID);
-                NSLog(@"TESTING: %@",fbUser.name);
-            }
-        }];
-    }
-}
-
-- (void)loginView:(FBLoginView *)loginView handleError:(NSError *)error {
-    NSString *alertMessage, *alertTitle;
-    if ([FBErrorUtility shouldNotifyUserForError:error]) {
-        alertTitle = @"Facebook error";
-        alertMessage = [FBErrorUtility userMessageForError:error];
-    } else if ([FBErrorUtility errorCategoryForError:error] == FBErrorCategoryAuthenticationReopenSession) {
-        alertTitle = @"Session Error";
-        alertMessage = @"Your current session is no longer valid. Please log in again.";
-    } else if ([FBErrorUtility errorCategoryForError:error] == FBErrorCategoryUserCancelled) {
-        NSLog(@"user cancelled login");
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"FBid"] == nil){
+        [self showAlertWithTitle:@"Facebook Login Fail" message:@"FB id is nil"];
+    } else if([[NSUserDefaults standardUserDefaults] objectForKey:@"FBemail"] == nil) {
+        [self showAlertWithTitle:@"Facebook Login Fail" message:@"FB email is nil"];
+    } else if([[NSUserDefaults standardUserDefaults] objectForKey:@"FBlink"] == nil) {
+        [self showAlertWithTitle:@"Facebook Login Fail" message:@"FB link is nil"];
+    } else if([[NSUserDefaults standardUserDefaults] objectForKey:@"FBname"] == nil) {
+        [self showAlertWithTitle:@"Facebook Login Fail" message:@"FB name is nil"];
+    } else if([[NSUserDefaults standardUserDefaults] objectForKey:@"FBthumbnailURL"] == nil) {
+        [self showAlertWithTitle:@"Facebook Login Fail" message:@"FB thumbnail is nil"];
     } else {
-        alertTitle  = @"Something went wrong";
-        alertMessage = @"Please try again later.";
-        NSLog(@"Unexpected error:%@", error);
-    }
-    if (alertMessage) {
-        [self showAlertWithTitle:alertTitle message:alertMessage];
+        NSDictionary* singinData = @{@"signinType" : @"FACEBOOK",
+                                     @"version": [APPDELEGATE version],
+                                     @"uid" : [[NSUserDefaults standardUserDefaults] objectForKey:@"FBid"],
+                                     @"email": [[NSUserDefaults standardUserDefaults] objectForKey:@"FBemail"],
+                                     @"fbLink":[[NSUserDefaults standardUserDefaults] objectForKey:@"FBlink"],
+                                     @"username": [[NSUserDefaults standardUserDefaults] objectForKey:@"FBname"],
+                                     @"thumbnailURL":[[NSUserDefaults standardUserDefaults] objectForKey:@"FBthumbnailURL"],
+                                     @"lng" : APPDELEGATE.lng,
+                                     @"lat" : APPDELEGATE.lat
+                                     };
+        [socketIO emitObjc:@"login" withItems:@[singinData]];
+        APPDELEGATE.loginType = @"facebook";
     }
 }
-
 
 @end

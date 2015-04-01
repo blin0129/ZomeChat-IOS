@@ -66,20 +66,20 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TUJ-Jb-0Mj">
                                 <rect key="frame" x="50" y="275" width="220" height="60"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bQ8-Fo-E2c" customClass="FBLoginView">
-                                        <rect key="frame" x="8" y="8" width="204" height="50"/>
-                                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="D8P-lD-oeR"/>
-                                            <constraint firstAttribute="width" constant="204" id="m1h-L4-tZH"/>
-                                        </constraints>
-                                    </view>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mGE-51-s22">
+                                        <rect key="frame" x="55" y="15" width="111" height="30"/>
+                                        <state key="normal" title="Facebook Login">
+                                            <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="facebookLogin:" destination="ZZk-BB-2gw" eventType="touchUpInside" id="9RY-PJ-kcr"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstAttribute="centerX" secondItem="bQ8-Fo-E2c" secondAttribute="centerX" id="AY7-3M-zui"/>
                                     <constraint firstAttribute="height" constant="60" id="cnV-Hw-Zmx"/>
-                                    <constraint firstAttribute="centerY" secondItem="bQ8-Fo-E2c" secondAttribute="centerY" constant="-3" id="qX9-oC-gTD"/>
                                 </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XdO-Vj-Ksh">
@@ -127,7 +127,6 @@
                     <connections>
                         <outlet property="anonLoginButton" destination="uRj-tc-Lse" id="tkG-SQ-U5T"/>
                         <outlet property="emailInput" destination="8Az-F8-EJc" id="3wH-Ia-nuJ"/>
-                        <outlet property="fbLoginView" destination="bQ8-Fo-E2c" id="XoB-15-s9I"/>
                         <outlet property="passwordInput" destination="Lrf-BE-dCf" id="smZ-ZF-7MS"/>
                         <outlet property="toSignupButton" destination="XdO-Vj-Ksh" id="8OA-ju-ZH9"/>
                     </connections>
@@ -490,10 +489,6 @@
                                     <action selector="helpBtnClicked:" destination="gIa-ex-HOv" eventType="touchUpInside" id="kR8-XC-uyA"/>
                                 </connections>
                             </button>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iFK-iD-QL5" customClass="FBLoginView">
-                                <rect key="frame" x="16" y="452" width="288" height="47"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1OQ-1A-hD0">
                                 <rect key="frame" x="18" y="395" width="286" height="30"/>
                                 <constraints>
@@ -540,7 +535,6 @@
                     <connections>
                         <outlet property="LogoutBtn" destination="1OQ-1A-hD0" id="GHZ-1R-opa"/>
                         <outlet property="editUserNameBtn" destination="J7Y-Fw-nPg" id="GXV-dZ-df0"/>
-                        <outlet property="fbLoginView" destination="iFK-iD-QL5" id="kYB-If-oPQ"/>
                         <outlet property="saveButton" destination="J7Y-Fw-nPg" id="gA3-rN-1Vv"/>
                         <outlet property="thumbnail" destination="gJL-SU-sak" id="PZo-lh-ebC"/>
                         <outlet property="userIdLabel" destination="tGs-uB-0QB" id="8im-ee-iTg"/>

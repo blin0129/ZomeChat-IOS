@@ -7,8 +7,7 @@
 //
 
 #import "ProfilePageViewController.h"
-#import <FacebookSDK/FacebookSDK.h>
-
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
 @interface ProfilePageViewController ()
 
 @end
@@ -65,18 +64,6 @@
     
     if (APPDELEGATE.changeUsername == NO) {
         saveButton.hidden = YES;
-    }
-    
-    NSString *loginType = [[NSUserDefaults standardUserDefaults] objectForKey:@"loginType"];
-    if([loginType isEqualToString:@"facebook"]){
-        _fbLoginView = [[FBLoginView alloc] init];
-        _fbLoginView.delegate = self;
-        _LogoutBtn.hidden = true;
-        _fbLoginView.hidden = false;
-        NSLog(@"loginType :%@", loginType);
-    } else {
-        _fbLoginView.hidden = true;
-        _LogoutBtn.hidden = false;
     }
 }
 
@@ -170,9 +157,9 @@
 
 - (void) toLoginView
 {
-//    [self dismissViewControllerAnimated:YES completion:nil];
-//    LoginViewController *fistView = [self.storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
-//    [self presentViewController:fistView  animated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:nil];
+    LoginViewController *fistView = [self.storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
+    [self presentViewController:fistView  animated:YES completion:nil];
 }
 
 
@@ -268,21 +255,21 @@
     [newMessageAlert show];
 }
 
-- (void)loginViewShowingLoggedOutUser:(FBLoginView *)loginView {
-    [FBSettings setLoggingBehavior:[NSSet setWithObjects:FBLoggingBehaviorFBRequests, nil]];
-    if (FBSession.activeSession.isOpen) {
-        [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection,id<FBGraphUser> fbUser,NSError *error) {
-            if (!error) {
-                NSString *fbID = fbUser.objectID;
-                NSLog(@"UserID: %@",fbID);
-                NSLog(@"TESTING: %@",fbUser.name);
-            }
-        }];
-    }
-    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"loginType"];
-    [APPDELEGATE disconnectServer];
-    [self toLoginView];
-}
+//- (void)loginViewShowingLoggedOutUser:(FBLoginView *)loginView {
+//    [FBSettings setLoggingBehavior:[NSSet setWithObjects:FBLoggingBehaviorFBRequests, nil]];
+//    if (FBSession.activeSession.isOpen) {
+//        [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection,id<FBGraphUser> fbUser,NSError *error) {
+//            if (!error) {
+//                NSString *fbID = fbUser.objectID;
+//                NSLog(@"UserID: %@",fbID);
+//                NSLog(@"TESTING: %@",fbUser.name);
+//            }
+//        }];
+//    }
+//    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"loginType"];
+//    [APPDELEGATE disconnectServer];
+//    [self toLoginView];
+//}
 
 
 @end
