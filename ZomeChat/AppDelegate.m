@@ -79,12 +79,6 @@
 - (void) disconnectServer
 {
     [socketIO closed];
-    //    if (!_socketIO) {
-//        _socketIO = [[SocketIO alloc] init];
-//    }
-//    if([_socketIO isConnected]){
-//        [_socketIO disconnect];
-//    }
 }
 
 - (void) initLocationManager

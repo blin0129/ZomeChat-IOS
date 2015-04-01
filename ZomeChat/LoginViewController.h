@@ -9,15 +9,12 @@
 #import <UIKit/UIKit.h>
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <FBSDKLoginKit/FBSDKLoginKit.h>
-
-#import "ZomeChat-Swift.h"
 #import "AppDelegate.h"
 
 @interface LoginViewController : UIViewController<UITextFieldDelegate>
 
 @property (retain, nonatomic) IBOutlet UITextField *emailInput;
 @property (retain, nonatomic) IBOutlet UITextField *passwordInput;
-@property (nonatomic, strong) SocketIOClient *socketIO;
 
 @property (weak, nonatomic) IBOutlet UITextField *signupPassword;
 @property (weak, nonatomic) IBOutlet UITextField *signupPasswordC;

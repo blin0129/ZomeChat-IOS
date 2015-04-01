@@ -88,13 +88,11 @@
 -(void) receiveProfileUpdateRespond: (NSDictionary *)data
 {
     if([[data objectForKey:@"respond"] isEqual:@"RESPOND_OKAY"]){
-        NSLog(@"%@",data);
         APPDELEGATE.userName = [data objectForKey:@"username"];
         self.userNameLabel.text = [data objectForKey:@"username"];
         thumbnail.image = [self getImageFromURL:[data objectForKey:@"imageURL"]];
         oldImage = thumbnail.image;
         if([data objectForKey:@"imageURL"] != nil && ![[data objectForKey:@"imageURL"] isEqualToString:@""]){
-            NSLog(@"inserting imageURL");
             NSString *imageURL = [data objectForKey:@"imageURL"];
             [APPDELEGATE.imageCache setObject:thumbnail.image forKey:imageURL];
         }
@@ -145,7 +143,6 @@
 
 - (void) updateProfileImage: (NSString *)imageURL
 {
-    NSLog(@"updateProfileImage caleld");
     [thumbnail setImage:[self getImageFromURL:imageURL]];
 }
 
@@ -157,9 +154,13 @@
 
 - (void) toLoginView
 {
-    [self dismissViewControllerAnimated:YES completion:nil];
-    LoginViewController *fistView = [self.storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
-    [self presentViewController:fistView  animated:YES completion:nil];
+//    [self dismissViewControllerAnimated:YES completion:nil];
+//    LoginViewController *loginView = [self.storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
+//    [self presentViewController:loginView  animated:YES completion:nil];
+    
+    AppDelegate *appDel = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+    LoginViewController *rootView = [self.storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
+    [appDel.window setRootViewController:rootView];
 }
 
 

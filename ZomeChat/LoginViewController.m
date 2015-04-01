@@ -8,6 +8,7 @@
 
 #import "LoginViewController.h"
 #import "MainViewController.h"
+#import "ZomeChat-Swift.h"
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <FBSDKLoginKit/FBSDKLoginKit.h>
 
@@ -15,14 +16,14 @@
     NSString *loginEmail;
     NSString *loginPassword;
     UIImageView *backgroundIV;
+    SocketIOClient *socketIO;
+    BOOL loginSuccess;
 }
-
 @end
 
 @implementation LoginViewController
 @synthesize passwordInput;
 @synthesize emailInput;
-@synthesize socketIO;
 
 - (void)viewDidLoad
 {
@@ -35,34 +36,20 @@
     backgroundIV = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background-darkblue@x2.png"]];
     backgroundIV.frame = self.view.bounds;
     [self.view addSubview:backgroundIV];
+    [self.view bringSubviewToFront:backgroundIV];
     [self initLoginView];
     
-    //Display saved email/password
-    NSString *savedEmail = [[NSUserDefaults standardUserDefaults] objectForKey:@"savedEmail"];
-    NSString *savedPassword = [[NSUserDefaults standardUserDefaults] objectForKey:@"savedPassword"];
-    emailInput.text = savedEmail;
-    passwordInput.text = savedPassword;
-    
-    //Auto login
-    NSString *previousLogin = [[NSUserDefaults standardUserDefaults] objectForKey:@"loginType"];
-    if(previousLogin != nil){
-        if ([previousLogin isEqualToString:@"REGISTER"]){
-            if(![savedEmail isEqual:[NSNull null]] && [savedPassword isEqual:[NSNull null]]){
-                [self requestRegisterLoginWithEmail:savedEmail password:savedPassword];
-                //        [self.view bringSubviewToFront:backgroundIV];
-                [self performSelector:@selector(loginFail) withObject:nil afterDelay:3.0];
-            }
-        } else if([previousLogin isEqualToString:@"FACEBOOK"]){
-            [self.view bringSubviewToFront:backgroundIV];
-            [self performSelector:@selector(loginFail) withObject:nil afterDelay:3.0];
-        }
+    //Auto fillin name and password
+    NSString *savedEmail = [[NSUserDefaults standardUserDefaults] objectForKey:@"email"];
+    NSString *savedPassword = [[NSUserDefaults standardUserDefaults] objectForKey:@"password"];
+    if (savedEmail != nil && savedPassword != nil){
+        emailInput.text = savedEmail;
+        passwordInput.text = savedPassword;
     }
+    loginSuccess = false;
 }
 
 - (void) initLoginView{
-//    [self initFacebookLogin];
-    [self.view sendSubviewToBack:backgroundIV];
-
     //Buttons
     _toLoginButton.layer.borderWidth = 2;
     _toLoginButton.layer.borderColor = [UIColor whiteColor].CGColor;
@@ -93,24 +80,34 @@
 
 - (void) loginFail
 {
-    if(self.isViewLoaded && self.view.window){
+    if(loginSuccess == false){
         [self showAlertWithTitle:@"Login Fail" message:@"Connection Timeout"];
         [self.view sendSubviewToBack:backgroundIV];
     }
 }
 
 - (void) viewDidAppear:(BOOL)animated{
-    //Auto fillin name and password
-    NSString *savedEmail = [[NSUserDefaults standardUserDefaults] objectForKey:@"savedEmail"];
-    NSString *savedPassword = [[NSUserDefaults standardUserDefaults] objectForKey:@"savedPassword"];
-    if (savedEmail != nil && savedPassword != nil){
-        emailInput.text = savedEmail;
-        passwordInput.text = savedPassword;
+    //Auto login
+    NSString *savedEmail = [[NSUserDefaults standardUserDefaults] objectForKey:@"email"];
+    NSString *savedPassword = [[NSUserDefaults standardUserDefaults] objectForKey:@"password"];
+    NSString *previousLogin = [[NSUserDefaults standardUserDefaults] objectForKey:@"loginType"];
+    if(previousLogin != nil){
+        if ([previousLogin isEqualToString:@"REGISTER"]){
+            if(savedEmail != nil && savedPassword != nil){
+                [self requestRegisterLoginWithEmail:savedEmail password:savedPassword];
+                [self performSelector:@selector(loginFail) withObject:nil afterDelay:5.0];
+            } else {
+                [self.view sendSubviewToBack:backgroundIV];
+            }
+        } else if([previousLogin isEqualToString:@"FACEBOOK"]){
+            [self requestFacebookLogin];
+            [self performSelector:@selector(loginFail) withObject:nil afterDelay:5.0];
+        } else{
+            [self.view sendSubviewToBack:backgroundIV];
+        }
+    } else{
+        [self.view sendSubviewToBack:backgroundIV];
     }
-}
-
-- (void) viewDidDisappear:(BOOL)animated{
-//    fbLoginView.delegate = Nil;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
@@ -123,12 +120,9 @@
 
 - (IBAction)facebookLogin:(id)sender {
     NSString* fbid = [[NSUserDefaults standardUserDefaults] objectForKey:@"FBid"];
-    NSLog(@"facebookLogin clicked %@",fbid);
     if(fbid == nil){
-        NSLog(@"access facebook info");
         [self accessFacebookInfo];
     }else{
-        NSLog(@"request facebook login");
         [self requestFacebookLogin];
     }
 }
@@ -168,9 +162,7 @@
     if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied){
         [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device setting"];
     } else {
-        loginEmail = self.emailInput.text;
-        loginPassword = self.passwordInput.text;
-        [self requestRegisterLoginWithEmail:loginEmail password:loginPassword ];
+        [self requestRegisterLoginWithEmail:self.emailInput.text password:self.passwordInput.text];
     }
 }
 
@@ -264,8 +256,8 @@
 - (void) receiveSignupResponse:(NSDictionary *)data
 {
     if([[data objectForKey:@"respond"] isEqual:@"SIGNUP_SUCCESS"]){
-        [[NSUserDefaults standardUserDefaults] setObject:loginEmail forKey:@"savedEmail"];
-        [[NSUserDefaults standardUserDefaults] setObject:loginPassword forKey:@"savedPassword"];
+        [[NSUserDefaults standardUserDefaults] setObject:loginEmail forKey:@"email"];
+        [[NSUserDefaults standardUserDefaults] setObject:loginPassword forKey:@"password"];
         [_toLoginButton sendActionsForControlEvents:UIControlEventTouchUpInside];
         [self showAlertWithTitle:@"Signup Succeed" message:[data objectForKey:@"displayMessage"]];
     } else{
@@ -276,19 +268,20 @@
 - (void) receiveLoginResponse:(NSDictionary *)data
 {
     if([[data objectForKey:@"respond"] isEqual:@"LOGIN_SUCCESS"]){
+        loginSuccess = true;
         APPDELEGATE.userName = [data objectForKey:@"userName"];
         APPDELEGATE.uid = [data objectForKey:@"uid"];
-        if([APPDELEGATE.loginType isEqualToString:@"register"]){
-            [[NSUserDefaults standardUserDefaults] setObject:loginEmail forKey:@"savedEmail"];
-            [[NSUserDefaults standardUserDefaults] setObject:loginPassword forKey:@"savedPassword"];
+        if([[data objectForKey:@"userType"] isEqualToString:@"REGISTER"]){
+            [[NSUserDefaults standardUserDefaults] setObject:loginEmail forKey:@"email"];
+            [[NSUserDefaults standardUserDefaults] setObject:loginPassword forKey:@"password"];
             [[NSUserDefaults standardUserDefaults] setObject:@"REGISTER" forKey:@"loginType"];
             [APPDELEGATE setRegularUserConstrains];
-        }else if([APPDELEGATE.loginType isEqualToString:@"facebook"]){
+        }else if([[data objectForKey:@"userType"] isEqualToString:@"FACEBOOK"]){
             [APPDELEGATE setFacebookUserConstrains];
             [[NSUserDefaults standardUserDefaults] setObject:@"FACEBOOK" forKey:@"loginType"];
-//            [[NSUserDefaults standardUserDefaults] setObject:facebookUser forKey:@"savedFacebookUser"];
         }else{
             [APPDELEGATE setAnonymouseUserConstrains];
+            [[NSUserDefaults standardUserDefaults] setObject:@"ANONYMOUS" forKey:@"loginType"];
         }
         UIStoryboard *storyboard = self.storyboard;
         MainViewController *mainView = [storyboard instantiateViewControllerWithIdentifier:@"MainView"];
@@ -316,7 +309,6 @@
     loginPassword = self.signupPassword.text;
     NSString *passwordConfirm = self.signupPasswordC.text;
     NSString *email = self.signupEmail.text;
-    
     if([self checkSingupConstraints:loginEmail:loginPassword:passwordConfirm]){
         NSDictionary* signupData = @{@"uid" : loginEmail,
                                      @"version": [APPDELEGATE version],
@@ -330,25 +322,21 @@
 
 -(void) requestAnonLogin
 {
-    NSNull *email = [NSNull null];
-    NSNull *password = [NSNull null];
-    loginEmail = nil;
-    loginPassword = nil;
     NSDictionary* singinData = @{@"signinType" : @"ANONYMOUS",
                                  @"version": [APPDELEGATE version],
-                                 @"uid" : email,
-                                 @"password" : password,
+                                 @"uid" : [NSNull null],
+                                 @"password" : [NSNull null],
                                  @"lng" : APPDELEGATE.lng,
                                  @"lat" : APPDELEGATE.lat
                                  };
     [socketIO emitObjc:@"login" withItems:@[singinData]];
-    APPDELEGATE.loginType = @"anonymous";
+    APPDELEGATE.loginType = @"ANONYMOUS";
 }
 
 -(void) requestRegisterLoginWithEmail:(NSString*)email password:(NSString*)password
 {
-//    loginEmail = self.emailInput.text;
-//    loginPassword = self.passwordInput.text;
+    loginEmail = email;
+    loginPassword = password;
     NSDictionary* singinData = @{@"signinType" : @"REGISTER",
                                  @"version": [APPDELEGATE version],
                                  @"uid" : email,
@@ -357,7 +345,7 @@
                                  @"lat" : APPDELEGATE.lat
                                  };
     [socketIO emitObjc:@"login" withItems:@[singinData]];
-    APPDELEGATE.loginType = @"register";
+    APPDELEGATE.loginType = @"REGISTER";
 }
 
 - (void) requestFacebookLogin
@@ -384,7 +372,7 @@
                                      @"lat" : APPDELEGATE.lat
                                      };
         [socketIO emitObjc:@"login" withItems:@[singinData]];
-        APPDELEGATE.loginType = @"facebook";
+        APPDELEGATE.loginType = @"FACEBOOK";
     }
 }
 
