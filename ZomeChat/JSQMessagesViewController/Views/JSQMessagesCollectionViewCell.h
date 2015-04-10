@@ -30,6 +30,8 @@
 
 @required
 
+- (void)report:(id)sender forCell:(JSQMessagesCollectionViewCell *)cell;
+
 /**
  *  Tells the delegate that the avatarImageView of the cell has been tapped.
  *

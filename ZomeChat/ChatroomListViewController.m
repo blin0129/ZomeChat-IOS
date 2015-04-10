@@ -83,9 +83,11 @@
     {
         NSDictionary *roomInfo = [receiveList objectAtIndex:i];
         NSString *roomType = [roomInfo objectForKey:@"roomType"];
-        if ([roomType isEqualToString:@"default"] || [roomType isEqualToString:@"DEFAULT"]){
+        if ([roomType isEqualToString:@"MANUAL"] || [roomType isEqualToString:@"DEFAULT"]){
             [APPDELEGATE.mainVC.defaultRoomList addObject:roomInfo];
-        } else if([roomType isEqualToString:@"custom"] || [roomType isEqualToString:@"CUSTOM"]){
+        } else if([roomType isEqualToString:@"CUSTOM"]){
+            [APPDELEGATE.mainVC.customRoomList addObject:roomInfo];
+        } else {
             [APPDELEGATE.mainVC.customRoomList addObject:roomInfo];
         }
         

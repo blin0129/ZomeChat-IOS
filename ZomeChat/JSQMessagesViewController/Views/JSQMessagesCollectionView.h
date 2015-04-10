@@ -99,3 +99,5 @@
 - (JSQMessagesLoadEarlierHeaderView *)dequeueLoadEarlierMessagesViewHeaderForIndexPath:(NSIndexPath *)indexPath;
 
 @end
+
+

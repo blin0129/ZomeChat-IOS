@@ -378,7 +378,6 @@
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     if(alertView.cancelButtonIndex == buttonIndex){
-        NSLog(@"canceled");
     } else {
         if([[alertView buttonTitleAtIndex:1] isEqualToString:@"Search"]){
             NSString *searchedTag = ((UITextField *)[alertView textFieldAtIndex:0]).text;

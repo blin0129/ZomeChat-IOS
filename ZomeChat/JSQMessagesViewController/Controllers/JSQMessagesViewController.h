@@ -20,6 +20,7 @@
 
 #import "JSQMessagesCollectionView.h"
 #import "JSQMessagesCollectionViewFlowLayout.h"
+#import "JSQMessagesCollectionView.h"
 
 @class JSQMessagesInputToolbar;
 
@@ -31,6 +32,7 @@
  */
 @interface JSQMessagesViewController : UIViewController <JSQMessagesCollectionViewDataSource,
                                                          JSQMessagesCollectionViewDelegateFlowLayout,
+                                                         JSQMessagesCollectionViewCellDelegate,
                                                          UITextViewDelegate>
 
 /**
@@ -246,5 +248,6 @@
  *  @param animated Pass `YES` if you want to animate scrolling, `NO` if it should be immediate.
  */
 - (void)scrollToBottomAnimated:(BOOL)animated;
+
 
 @end

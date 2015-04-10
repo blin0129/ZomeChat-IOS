@@ -306,6 +306,12 @@
     [socketIO onAny:^(SocketAnyEvent* respond) {
         NSLog(@"socket recieved evet: %@",respond.event);
         NSString *event = respond.event;
+        if([event isEqual:@"disconnect"] || [event isEqual:@"reconnect"]){
+            return;
+        }
+        if(respond.items == nil || [respond.items objectAtIndex:0] == nil){
+            return;
+        }
         NSDictionary *data = [respond.items objectAtIndex:0];
         if([[data objectForKey:@"resopnd"] isEqualToString:@"RESPOND_FAIL"]){
             [self showDefaultServerErrorAlert];
@@ -317,6 +323,9 @@
             [self receiveAssignChatroom:data];
             
         } else if([event isEqual:@"chatroomMessage"]){
+            [self receivedChatroomMessage:data];
+            
+        } else if([event isEqual:@"chatroomImage"]){
             [self receivedChatroomMessage:data];
             
         } else if([event isEqual:@"messageboardMessages"]){

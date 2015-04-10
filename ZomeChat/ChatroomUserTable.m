@@ -8,6 +8,7 @@
 
 #import "ChatroomUserTable.h"
 #import "UIImage+ProportionalFill.h"
+#import "UserTableViewCell.h"
 
 @interface ChatroomUserTable ()
 
@@ -34,7 +35,99 @@
 //    for (NSDictionary *obj in APPDELEGATE.chatVC.chatroomUsers){
 //        [self.chatroomUsers addObject:obj];
 //    }
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    longPressGesture.minimumPressDuration = .5;
+    longPressGesture.delegate = self;
+    [self.view addGestureRecognizer:longPressGesture];
+    
     self.chatroomUsers = [APPDELEGATE.chatVC.chatroomUsers mutableCopy];
+}
+
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+-(void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
+{
+    if(gestureRecognizer.state == UIGestureRecognizerStateBegan)
+    {
+        CGPoint point = [gestureRecognizer locationInView:self.tableView];
+        NSIndexPath * indexPath = [self.tableView indexPathForRowAtPoint:point];
+        if(indexPath == nil) return ;
+        
+        UserTableViewCell *cell = (UserTableViewCell *)[self.tableView cellForRowAtIndexPath:indexPath];
+        UIMenuController *menu = [UIMenuController sharedMenuController];
+        [menu setTargetRect:cell.frame inView:cell.superview];
+        [menu setMenuVisible:YES animated:YES];
+        [cell becomeFirstResponder]; //here set the cell as the responder of the menu action
+    }
+}
+
+- (BOOL) canPerformAction:(SEL)action withSender:(id)sender {
+    if (action == NSSelectorFromString(@"report:")) {
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)tableView:(UITableView *)tableView canPerformAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
+{
+    if (action == NSSelectorFromString(@"report:")) {
+        return YES;
+    }
+    return NO;
+}
+
+- (void)tableView:(UITableView *)tableView performAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
+{
+    NSLog(@"performAction been called");
+    if(action == NSSelectorFromString(@"report:")){
+        NSLog(@"performAction report");
+
+        NSString *displayMsg = [[self.chatroomUsers objectAtIndex:indexPath.row] objectForKey:@"username"];
+        UITextField *reasonTextField = [[UITextField alloc] initWithFrame:CGRectMake(0.0, 0.0, 245.0, 25.0)];
+        UIAlertView *reportAlert = [[UIAlertView alloc] initWithTitle:@"Report This User:"
+                                                               message:displayMsg
+                                                              delegate:self
+                                                     cancelButtonTitle:@"Cancel"
+                                                     otherButtonTitles:@"Report", nil];
+        [reportAlert addSubview:reasonTextField];
+        reportAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
+        [reportAlert show];
+    }
+}
+
+-(void)willPresentAlertView:(UIAlertView *)alertView {
+    UITextField *reasonTextField = [alertView textFieldAtIndex:0];
+    [reasonTextField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@"Reason"]];
+    reasonTextField.delegate = self;
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if(alertView.cancelButtonIndex != buttonIndex){
+        NSString *reportReason = ((UITextField *)[alertView textFieldAtIndex:0]).text;
+        if([reportReason isEqual:@""]){
+            [self showAlertBox:@"Report Fail"
+                       message:@"Please enter report reason"
+                        button:@"OK"];
+        } else {
+            //TODO:  [APPDELEGATE.mainVC requestReportViolationOf:@"USER" withId:messageId andReason:reportReason];
+            [self showAlertBox:@"Report Succeed"
+                       message:@"This User is going under our inspection list."
+                        button:@"OK"];
+        }
+    }
+}
+
+-(void)showAlertBox:(NSString *)title message:(NSString *)message button:(NSString *)buttonTitle
+{
+    UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:title
+                                                              message:message
+                                                             delegate:self
+                                                    cancelButtonTitle:buttonTitle
+                                                    otherButtonTitles:nil];
+    [newMessageAlert show];
 }
 
 - (void)didReceiveMemoryWarning
@@ -90,10 +183,10 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"UserListCell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    
+    UserTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil){
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier: CellIdentifier];
+        cell = [[UserTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier: CellIdentifier];
+        cell.delegate = self;
         [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         cell.textLabel.textColor = [UIColor blackColor];
         cell.textLabel.font = [UIFont systemFontOfSize:17];

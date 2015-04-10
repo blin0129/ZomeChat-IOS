@@ -507,10 +507,10 @@ static void * kJSQMessagesKeyValueObservingContext = &kJSQMessagesKeyValueObserv
 - (BOOL)collectionView:(JSQMessagesCollectionView *)collectionView shouldShowMenuForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     //  disable menu for media messages
-    id<JSQMessageData> messageItem = [collectionView.dataSource collectionView:collectionView messageDataForItemAtIndexPath:indexPath];
-    if ([messageItem isMediaMessage]) {
-        return NO;
-    }
+//    id<JSQMessageData> messageItem = [collectionView.dataSource collectionView:collectionView messageDataForItemAtIndexPath:indexPath];
+//    if ([messageItem isMediaMessage]) {
+//        return NO;
+//    }
     
     self.selectedIndexPathForMenu = indexPath;
     
@@ -520,16 +520,17 @@ static void * kJSQMessagesKeyValueObservingContext = &kJSQMessagesKeyValueObserv
     //  temporarily disable 'selectable' to prevent this issue
     JSQMessagesCollectionViewCell *selectedCell = (JSQMessagesCollectionViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
     selectedCell.textView.selectable = NO;
-    
     return YES;
 }
 
 - (BOOL)collectionView:(UICollectionView *)collectionView canPerformAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
 {
-    if (action == @selector(copy:)) {
+    if (!self.selectedIndexPathForMenu) {
+        return action == NSSelectorFromString(@"copy:");
+    }
+    if (action == NSSelectorFromString(@"report:") || action == NSSelectorFromString(@"copy:")) {
         return YES;
     }
-    
     return NO;
 }
 
@@ -688,6 +689,7 @@ static void * kJSQMessagesKeyValueObservingContext = &kJSQMessagesKeyValueObserv
                                                  name:UIMenuControllerWillShowMenuNotification
                                                object:nil];
 }
+
 
 - (void)jsq_didReceiveMenuWillHideNotification:(NSNotification *)notification
 {
@@ -919,8 +921,7 @@ static void * kJSQMessagesKeyValueObservingContext = &kJSQMessagesKeyValueObserv
                                                  selector:@selector(jsq_didReceiveMenuWillHideNotification:)
                                                      name:UIMenuControllerWillHideMenuNotification
                                                    object:nil];
-    }
-    else {
+    } else {
         [[NSNotificationCenter defaultCenter] removeObserver:self
                                                         name:UIApplicationDidChangeStatusBarFrameNotification
                                                       object:nil];

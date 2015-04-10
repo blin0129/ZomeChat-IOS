@@ -68,6 +68,7 @@
 
 @implementation JSQMessagesCollectionViewCell
 
+
 #pragma mark - Class methods
 
 + (UINib *)nib
@@ -150,7 +151,20 @@
     _tapGestureRecognizer = nil;
 }
 
+
 #pragma mark - Collection view cell
+
+- (void)report:(id)sender {
+    UIView* v = self;
+    do {
+        v = v.superview;
+    } while (![v isKindOfClass:[UICollectionView class]]);
+    UICollectionView* cv = (UICollectionView*) v;
+    // ask it what index path we are
+    NSIndexPath* ip = [cv indexPathForCell:self];
+    if (cv.delegate && [cv.delegate respondsToSelector: @selector(collectionView:performAction:forItemAtIndexPath:withSender:)])
+        [cv.delegate collectionView:cv performAction:_cmd forItemAtIndexPath:ip withSender:sender];
+}
 
 - (void)prepareForReuse
 {

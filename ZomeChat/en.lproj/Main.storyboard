@@ -865,7 +865,7 @@
                                             <constraint firstAttribute="height" constant="146" id="mxn-q1-za6"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done"/>
                                         <dataDetectorType key="dataDetectorTypes" link="YES"/>
                                     </textView>
                                 </subviews>

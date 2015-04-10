@@ -42,6 +42,7 @@
     self.navigationItem.title = self.roomName;
     self.senderId = APPDELEGATE.uid;
     self.userImageDictionary = [[NSMutableDictionary alloc] init];
+    self.collectionView.delegate = self;
     
     //Background
     [self.collectionView setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"background-babyblue"]]];
@@ -63,6 +64,11 @@
     UITapGestureRecognizer *tapRec = [[UITapGestureRecognizer alloc]
                                       initWithTarget:self action:@selector(tap:)];
     [self.view addGestureRecognizer: tapRec];
+    
+
+    //Report content
+    UIMenuItem * reportItem = [[UIMenuItem alloc] initWithTitle:@"Report" action:@selector(report:)];
+    [[UIMenuController sharedMenuController] setMenuItems:[NSArray arrayWithObjects:reportItem, nil]];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -131,6 +137,8 @@
     NSString *msgSenderName = [messageObj objectForKey:@"senderName"];
     NSString *msgSenderId = [messageObj objectForKey:@"senderId"];
     NSString *senderImageURL = [messageObj objectForKey:@"senderImageURL"];
+    NSString *msgId = [messageObj objectForKey:@"messageId"];
+
     if(senderImageURL != nil){
         [userImageDictionary setObject:senderImageURL forKey:msgSenderId];
     }
@@ -138,32 +146,27 @@
     float messageSentTime = [[messageObj objectForKey:@"time"] floatValue] / 1000;
     NSDate *timeInNSDate = [NSDate dateWithTimeIntervalSince1970:messageSentTime];
 
-
     if([[messageObj objectForKey:@"isImage"] boolValue] == YES){
         NSString *imageURL = [messageObj objectForKey:@"message"];
         UIImage *image = [APPDELEGATE.imageCache objectForKey:imageURL];
         if(!image){
-            image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString: imageURL]]];
-            if(image){
-                [APPDELEGATE.imageCache setObject:image forKey:imageURL];
-            }
+            image = [self getImageFromURL:imageURL];
         }
-        if(image){
-            JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:image];
-            JSQMediaMessage *photoMessage = [JSQMediaMessage messageWithSenderId:msgSenderId
-                                                                     displayName:msgSenderName
-                                                                           media:photoItem];
-            [photoItem setImageURL:imageURL];
+        JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:image];
+        JSQMediaMessage *photoMessage = [JSQMediaMessage messageWithSenderId:msgSenderId
+                                                                 displayName:msgSenderName
+                                                                       media:photoItem];
+        photoMessage.messageId = msgId;
+        [photoItem setImageURL:imageURL];
+        [self.chatData.messages addObject:photoMessage];
 
-            [self.chatData.messages addObject:photoMessage];
-        }
     }else{
         NSString *receivedMessage = [messageObj objectForKey:@"message"];
-        
         JSQTextMessage *message = [[JSQTextMessage alloc] initWithSenderId:msgSenderId
                                                          senderDisplayName:msgSenderName
                                                                       date:timeInNSDate
                                                                       text:receivedMessage];
+        message.messageId = msgId;
         [self.chatData.messages addObject:message];
     }
 }
@@ -186,6 +189,7 @@
 
 }
 
+
 - (UIImage *) getImageFromURL: (NSString *) imageURL{
     if ([imageURL isEqualToString:@""]) {
         return nil;
@@ -193,8 +197,11 @@
     UIImage *img = [APPDELEGATE.imageCache objectForKey:imageURL];
     if(!img){
         img = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString: imageURL]]];
-        [APPDELEGATE.imageCache setObject:img forKey:imageURL];
+        if(img){
+            [APPDELEGATE.imageCache setObject:img forKey:imageURL];
+        }
     }
+    NSLog(@"%@",img);
     return [self resizeImage:img];
 }
 
@@ -262,32 +269,15 @@
     NSLayoutConstraint *constraint = [NSLayoutConstraint constraintWithItem:imgView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:imgView attribute:NSLayoutAttributeHeight multiplier:imgRatio constant:0.0f];
     
     [imgView addConstraint:constraint];
-    
+    _popupType = @"PICTURE";
     UIAlertView *sendingImageAlert = [[UIAlertView alloc] initWithTitle:@"Sending Image"
                                                            message:@""
                                                           delegate:self
                                                  cancelButtonTitle:@"Cancel"
                                                  otherButtonTitles:@"Send", nil];
-
     [sendingImageAlert setValue:imgView forKey:@"accessoryView"];
     [sendingImageAlert show];
 }
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    if(alertView.cancelButtonIndex != buttonIndex){
-        [APPDELEGATE.mainVC requestSendImage:[self encodeToBase64String:sendingImage] inRoom:roomKey];
-    }
-}
-
-//-(void)willPresentAlertView:(UIAlertView *)alertView {
-//    if(![APPDELEGATE.loginType isEqualToString:@"Anonymous"]){
-//        //        if(_timeSinceLastRoom >= 300 && APPDELEGATE.chatVC.ownedRoomName == nil){
-//        UITextField *nameField = [alertView textFieldAtIndex:0];
-//        [nameField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@"Room Name"]];
-//        nameField.delegate = self;
-//        //        }
-//    }
-//}
 
 
 - (UIImage *) resizeImage:(UIImage *)originalImage {
@@ -488,6 +478,71 @@
                                                     cancelButtonTitle:buttonTitle
                                                     otherButtonTitles:nil];
     [newMessageAlert show];
+}
+
+- (void)report:(id) sender
+{
+    
+}
+
+- (BOOL) canPerformAction:(SEL)action withSender:(id)sender {
+    if (action == NSSelectorFromString(@"copy:")) {
+        return YES;
+    }
+    return NO;
+}
+
+- (void)collectionView:(JSQMessagesViewController *)collectionView performAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
+{
+    if(action == NSSelectorFromString(@"copy:")){
+        id<JSQMessageData> messageData = [self collectionView:collectionView messageDataForItemAtIndexPath:indexPath];
+        [[UIPasteboard generalPasteboard] setString:[messageData text]];
+    } else if(action == NSSelectorFromString(@"report:")){
+        _popupType = @"REPORT";
+        JSQMessage *reportedMsg = [self.chatData.messages objectAtIndex:indexPath.item];
+        NSString *displayMsg = @"";
+        if(reportedMsg.isMediaMessage){
+            displayMsg = @"(Picture)";
+        } else {
+            displayMsg = reportedMsg.text;
+        }
+        UITextField *reasonTextField = [[UITextField alloc] initWithFrame:CGRectMake(0.0, 0.0, 245.0, 25.0)];
+        UIAlertView *reportAlert = [[UIAlertView alloc] initWithTitle:@"Report This Message:"
+                                                               message:displayMsg
+                                                              delegate:self
+                                                     cancelButtonTitle:@"Cancel"
+                                                     otherButtonTitles:@"Report", nil];
+        [reportAlert addSubview:reasonTextField];
+        reportAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
+        [reportAlert show];
+    }
+}
+
+-(void)willPresentAlertView:(UIAlertView *)alertView {
+    UITextField *reasonTextField = [alertView textFieldAtIndex:0];
+    [reasonTextField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@"Reason"]];
+    reasonTextField.delegate = self;
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if(alertView.cancelButtonIndex != buttonIndex){
+        if([_popupType isEqualToString:@"PICTURE"]){
+            [APPDELEGATE.mainVC requestSendImage:[self encodeToBase64String:sendingImage] inRoom:roomKey];
+        } else if([_popupType isEqualToString:@"REPORT"]) {
+            NSString *reportReason = ((UITextField *)[alertView textFieldAtIndex:0]).text;
+            if([reportReason isEqual:@""]){
+                [self showAlertBox:@"Report Fail"
+                           message:@"Please enter report reason"
+                            button:@"OK"];
+            } else {
+                //TODO:  [APPDELEGATE.mainVC requestReportViolationOf:@"MESSAGE" withId:messageId andReason:reportReason];
+                [self showAlertBox:@"Report Succeed"
+                           message:@"This Message is going under our inspection list. It will be removed shortly if violates our terms"
+                            button:@"OK"];
+            }
+        }
+        _popupType = @"";
+    }
 }
 
 

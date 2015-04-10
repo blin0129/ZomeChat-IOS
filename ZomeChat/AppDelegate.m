@@ -28,17 +28,19 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    version = @"1.11";
+    version = @"1.12";
     userName = [[NSMutableString alloc] init];
     imageCache = [[NSCache alloc] init];
-    lng = @"-122.260505";
-    lat = @"37.872045";
-//    lng = @"-122.408227";
-//    lat = @"37.7873589";
-//    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com";
-    serverURL = @"192.168.42.74";
-    listeningPort = 1442;
+    //Berkeley
+//    lng = @"-122.260505";
+//    lat = @"37.872045";
     
+    //SF
+    lng = @"-122.408225";
+    lat = @"37.7873560";
+//    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com:1442";
+    serverURL = @"localhost:1442";
+
     [self initAppSetting];
     [self initLocationManager];
     [self connectServer];
@@ -68,17 +70,18 @@
 
 - (void) connectServer
 {
-    NSString* serverString = @"localhost:1442";
-    socketIO = [[SocketIOClient alloc] initWithSocketURL:serverString options:nil];
+    socketIO = [[SocketIOClient alloc] initWithSocketURL:serverURL options:@{@"reconnects": @true}];
     [socketIO connect];
-    [socketIO on: @"connect" callback: ^(NSArray* data, void (^ack)(NSArray*)) {
-        NSLog(@"Server connected");
-    }];
+//    [socketIO on: @"connect" callback: ^(NSArray* data, void (^ack)(NSArray*)) {
+//        NSLog(@"Server connected");
+//    }];
 }
 
 - (void) disconnectServer
 {
-    [socketIO closed];
+    NSLog(@"Reconnect server");
+    [socketIO closeWithFast:@true];
+    [socketIO connect];
 }
 
 - (void) initLocationManager

@@ -47,6 +47,9 @@
  */
 @property (assign, nonatomic, readonly) BOOL isMediaMessage;
 
+@property (strong, nonatomic) NSString *messageId;
+
+
 #pragma mark - Initialization
 
 /**

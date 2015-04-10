@@ -102,6 +102,14 @@
     [[self view] endEditing: YES];
 }
 
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
+{
+    if ([text isEqualToString:@"\n"]){
+        [textView resignFirstResponder];
+    }
+    return YES;
+}
+
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *) Picker {
     [Picker dismissViewControllerAnimated:YES completion:nil];
 }

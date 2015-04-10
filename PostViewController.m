@@ -153,16 +153,16 @@
     }
 }
 
-
-- (UIImage *) getImageFromURL: (NSString *) imageURL
-{
-    if(imageURL != NULL || [imageURL isEqualToString:@""]){
+- (UIImage *) getImageFromURL: (NSString *) imageURL{
+    if (imageURL == nil || [imageURL isEqualToString:@""]) {
         return nil;
     }
     UIImage *img = [APPDELEGATE.imageCache objectForKey:imageURL];
     if(!img){
         img = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString: imageURL]]];
-        [APPDELEGATE.imageCache setObject:img forKey:imageURL];
+        if(img){
+            [APPDELEGATE.imageCache setObject:img forKey:imageURL];
+        }
     }
     return [self resizeImage:img];
 }
@@ -372,9 +372,10 @@
 //         [cell.contentTextview sizeToFit];
          
          NSString *thumbnailURL = [commentData objectForKey:@"ownerImageURL"];
-         if(![thumbnailURL isEqual:[NSNull null]] && thumbnailURL != nil){
+         if(thumbnailURL !=(id)[NSNull null] && thumbnailURL != nil){
              if(![thumbnailURL isEqualToString:@""]){
-                 UIImage *thumbnail = [self resizeImageToThumbnail:[self getImageFromURL:[commentData     objectForKey:@"ownerImageURL"]] size:40.0f];
+                 NSLog(@"Setting commenter image url %@",thumbnailURL);
+                 UIImage *thumbnail =[self resizeImageToThumbnail:[self getImageFromURL:thumbnailURL] size:40.0f];
                  cell.userImage.image = thumbnail;
              }
          }

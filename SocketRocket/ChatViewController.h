@@ -19,7 +19,7 @@
 
 @end
 
-@interface ChatViewController : JSQMessagesViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+@interface ChatViewController : JSQMessagesViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate, JSQMessagesCollectionViewCellDelegate>
 
 @property (weak, nonatomic) id<JSQDemoViewControllerDelegate> delegateModal;
 @property (copy, nonatomic) NSDictionary *avatars;
@@ -35,6 +35,7 @@
 @property (nonatomic, retain) UIImagePickerController *imgPicker;
 @property (nonatomic, retain) UIImage *sendingImage;
 @property (nonatomic, retain) NSString *zoomImageURL;
+@property (nonatomic, retain) NSString *popupType;
 @property int userCount;
 
 - (void)receiveMessagePressed:(UIBarButtonItem *)sender;

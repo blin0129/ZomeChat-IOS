@@ -77,9 +77,13 @@
 {
     if([data objectForKey:@"imageURL"] != nil){
         NSString *imageURL = [data objectForKey:@"imageURL"];
-        UIImage *image = [self getImageFromURL:imageURL];
-        [thumbnail setImage:image];
-        oldImage = image;
+        if(![imageURL isEqual:[NSNull null]] && imageURL != nil){
+            if(![imageURL isEqualToString:@""]){
+                UIImage *image = [self getImageFromURL:imageURL];
+                [thumbnail setImage:image];
+                oldImage = image;
+            }
+        }
     } else {
         [thumbnail setBackgroundColor:[UIColor lightGrayColor]];
     }
@@ -92,9 +96,12 @@
         self.userNameLabel.text = [data objectForKey:@"username"];
         thumbnail.image = [self getImageFromURL:[data objectForKey:@"imageURL"]];
         oldImage = thumbnail.image;
-        if([data objectForKey:@"imageURL"] != nil && ![[data objectForKey:@"imageURL"] isEqualToString:@""]){
-            NSString *imageURL = [data objectForKey:@"imageURL"];
-            [APPDELEGATE.imageCache setObject:thumbnail.image forKey:imageURL];
+        
+        NSString* imageURL = [data objectForKey:@"imageURL"];
+        if(![imageURL isEqual:[NSNull null]] && imageURL != nil){
+            if(![imageURL isEqualToString:@""]){
+                [APPDELEGATE.imageCache setObject:thumbnail.image forKey:imageURL];
+            }
         }
     } else {
         [thumbnail setImage:oldImage];
@@ -148,6 +155,7 @@
 
 - (IBAction)logout:(id)sender {
     [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"loginType"];
+    NSLog(@"set loginType to nil");
     [APPDELEGATE disconnectServer];
     [self performSelector:@selector(toLoginView) withObject:nil afterDelay:0.0];
 }
