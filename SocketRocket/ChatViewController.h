@@ -36,6 +36,7 @@
 @property (nonatomic, retain) UIImage *sendingImage;
 @property (nonatomic, retain) NSString *zoomImageURL;
 @property (nonatomic, retain) NSString *popupType;
+@property (nonatomic, retain) NSString *reportMessageId;
 @property int userCount;
 
 - (void)receiveMessagePressed:(UIBarButtonItem *)sender;

@@ -14,6 +14,8 @@
 @property NSString *choosedRoomName;
 @property NSString *choosedRoomKey;
 @property (weak, nonatomic) IBOutlet UIView *mapContainer;
+@property (strong, nonatomic) NSString *popupType;
+@property (strong, nonatomic) NSString *reportChatroomId;
 
 -(void) updateChatroomList:(NSDictionary *)packet;
 

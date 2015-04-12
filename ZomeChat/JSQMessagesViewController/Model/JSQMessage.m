@@ -108,6 +108,16 @@
     [aCoder encodeBool:self.isMediaMessage forKey:NSStringFromSelector(@selector(isMediaMessage))];
 }
 
+- (void)setMessageId:(NSString *)messageId
+{
+    _messageId = messageId;
+}
+
+- (NSString *) getMessageId
+{
+    return _messageId;
+}
+
 #pragma mark - NSCopying
 
 - (instancetype)copyWithZone:(NSZone *)zone

@@ -19,7 +19,8 @@
 @property (weak, nonatomic) IBOutlet UITableView *commentTable;
 @property (strong, nonatomic) NSMutableArray *comments;
 @property (strong, nonatomic) NSMutableArray *likes;
-@property (strong, nonatomic) NSString *feedId;
+@property (strong, nonatomic) NSString *postId;
+@property (strong, nonatomic) NSString *reportCommentId;
 
 - (void) receiveFeedDetail:(NSDictionary *)packet;
 

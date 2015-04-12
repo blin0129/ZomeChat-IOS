@@ -52,6 +52,11 @@
     
     dateFormat = [[NSDateFormatter alloc] init];
     [dateFormat setDateFormat:@"yyyy-MM-dd HH:mm"];
+    
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    longPressGesture.minimumPressDuration = .5;
+    longPressGesture.delegate = self;
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 - (void)customNavBar
@@ -235,6 +240,7 @@
     PostTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (!cell){
         cell = [[PostTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        cell.delegate = self;
         cell.backgroundColor = [UIColor clearColor];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
@@ -350,6 +356,7 @@
 }
 
 - (void) tagSearchAlert{
+    _popupType = @"TAGSEARCH";
     UITextField *messageField = [[UITextField alloc] initWithFrame:CGRectMake(20.0, 45.0, 245.0, 25.0)];
 //    messageField.placeholder = @"Search for a hashtag";
 //    [messageField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@""]];
@@ -362,30 +369,6 @@
     newSearchAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
     [newSearchAlert show];
     
-}
-
-
-//- (void)willPresentAlertView:(UIAlertView *)alertView {
-//    if(![APPDELEGATE.loginType isEqualToString:@"Anonymous"])
-//    {
-//        if (_timeSinceLastMessage >= 1800){
-//            UITextField *messageField = [alertView textFieldAtIndex:0];
-//            [messageField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@"New Message"]];
-//            messageField.delegate =self;
-//        }
-//    }
-//}
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    if(alertView.cancelButtonIndex == buttonIndex){
-    } else {
-        if([[alertView buttonTitleAtIndex:1] isEqualToString:@"Search"]){
-            NSString *searchedTag = ((UITextField *)[alertView textFieldAtIndex:0]).text;
-            [self updateListWithTag:searchedTag];
-        } else if([[alertView buttonTitleAtIndex:1] isEqualToString:@"New Post"]){
-            [self toNewPostPage];
-        }
-    }
 }
 
 - (void) updateListWithTag:(NSString *)tagString{
@@ -402,6 +385,7 @@
 }
 
 - (void) emptyPostAlert{
+    _popupType = @"NEWPOST";
     UIAlertView *newPostAlert = [[UIAlertView alloc] initWithTitle:APPDELEGATE.firstPostAlertTitle
                                                               message:APPDELEGATE.firstPostAlertMessage
                                                              delegate:self
@@ -423,6 +407,86 @@
     tableData = messageList;
     [self.tableView reloadData];
     [self customNavBar];
+}
+
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+-(void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
+{
+    if(gestureRecognizer.state == UIGestureRecognizerStateBegan){
+        CGPoint point = [gestureRecognizer locationInView:self.tableView];
+        NSIndexPath * indexPath = [self.tableView indexPathForRowAtPoint:point];
+        if(indexPath == nil) return ;
+        
+        PostTableViewCell *cell = (PostTableViewCell *)[self.tableView cellForRowAtIndexPath:indexPath];
+        UIMenuController *menu = [UIMenuController sharedMenuController];
+        [menu setTargetRect:cell.frame inView:cell.superview];
+        [menu setMenuVisible:YES animated:YES];
+        [cell becomeFirstResponder]; //here set the cell as the responder of the menu action
+    }
+}
+
+- (BOOL) canPerformAction:(SEL)action withSender:(id)sender {
+    return (action == NSSelectorFromString(@"report:"));
+}
+
+- (BOOL)tableView:(UITableView *)tableView canPerformAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
+{
+    return (action == NSSelectorFromString(@"report:"));
+}
+
+- (void)tableView:(UITableView *)tableView performAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
+{
+    if(action == NSSelectorFromString(@"report:")){
+        _popupType = @"REPORT";
+        _reportPostId = [[tableData objectAtIndex:indexPath.row] objectForKey:@"postId"];
+        NSString *displayMsg = [[tableData objectAtIndex:indexPath.row] objectForKey:@"content"];
+        UITextField *reasonTextField = [[UITextField alloc] initWithFrame:CGRectMake(0.0, 0.0, 245.0, 25.0)];
+        UIAlertView *reportAlert = [[UIAlertView alloc] initWithTitle:@"Report This Post:"
+                                                              message:displayMsg
+                                                             delegate:self
+                                                    cancelButtonTitle:@"Cancel"
+                                                    otherButtonTitles:@"Report", nil];
+        [reportAlert addSubview:reasonTextField];
+        reportAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
+        [reportAlert show];
+    }
+}
+
+-(void)willPresentAlertView:(UIAlertView *)alertView {
+    if([_popupType isEqualToString:@"REPORT"]){
+        UITextField *reasonTextField = [alertView textFieldAtIndex:0];
+        [reasonTextField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@"Reason"]];
+        reasonTextField.delegate = self;
+    }
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if(alertView.cancelButtonIndex != buttonIndex){
+        if([_popupType isEqualToString:@"REPORT"]){
+            NSString *reportReason = ((UITextField *)[alertView textFieldAtIndex:0]).text;
+            if([reportReason isEqual:@""]){
+                [self showAlertBox:@"Report Fail"
+                           message:@"Please enter report reason"
+                            button:@"OK"];
+            } else {
+                [APPDELEGATE.mainVC requestReportViolationOf:@"POST" withId:_reportPostId andReason:reportReason];
+                [self showAlertBox:@"Report Succeed"
+                           message:@"This post is going under our inspection list. It will be removed shortly if it violates our terms"
+                            button:@"OK"];
+            }
+        } else if([_popupType isEqualToString:@"TAGSEARCH"]){
+            NSString *searchedTag = ((UITextField *)[alertView textFieldAtIndex:0]).text;
+            [self updateListWithTag:searchedTag];
+        } else if([_popupType isEqualToString:@"NEWPOST"]){
+            [self toNewPostPage];
+
+        }
+
+    }
 }
 
 -(void)showAlertBox:(NSString *)title message:(NSString *)message button:(NSString *)buttonTitle

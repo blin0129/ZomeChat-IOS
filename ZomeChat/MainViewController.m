@@ -250,6 +250,16 @@
     [socketIO emitObjc:@"requestFeedDetail" withItems:@[requestFeedDetailData]];
 }
 
+- (void) requestReportViolationOf:(NSString *)object withId:(NSString *)objectId andReason:(NSString *)reason
+{
+    NSDictionary *requestReportData = @{@"uid":APPDELEGATE.uid,
+                                        @"reportObject":object,
+                                        @"objectId":objectId,
+                                        @"reportReason":reason
+                                        };
+    [socketIO emitObjc:@"requestReport" withItems:@[requestReportData]];
+}
+
 
 
 //** Chatroom Received Methods **//
@@ -306,7 +316,7 @@
     [socketIO onAny:^(SocketAnyEvent* respond) {
         NSLog(@"socket recieved evet: %@",respond.event);
         NSString *event = respond.event;
-        if([event isEqual:@"disconnect"] || [event isEqual:@"reconnect"]){
+        if([event isEqual:@"disconnect"] || [event isEqual:@"reconnect"] || [event isEqual:@"reconnectAttempt"]){
             return;
         }
         if(respond.items == nil || [respond.items objectAtIndex:0] == nil){

@@ -8,6 +8,7 @@
 
 #import "ChatroomListViewController.h"
 #import "ChatViewController.h"
+#import "ChatroomTableViewCell.h"
 
 @interface ChatroomListViewController ()
 
@@ -37,6 +38,11 @@
     [APPDELEGATE.mainVC requestChatroomList];
         [self.view setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"background-babyblue"]]];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    longPressGesture.minimumPressDuration = .5;
+    longPressGesture.delegate = self;
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 - (void)customNavBar
@@ -175,10 +181,11 @@
 {
     static NSString *CellIdentifier = @"ChatroomListCell";
     UILabel *userCountLabel;
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    ChatroomTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
     if (cell == nil){
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier: CellIdentifier];
+        cell = [[ChatroomTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier: CellIdentifier];
+        cell.delegate = self;
         cell.backgroundColor = [UIColor clearColor];
         
         [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
@@ -258,6 +265,7 @@
                        message:message
                         button:@"Okay"];
         } else {
+            _popupType = @"NEWROOM";
             UITextField *nameField = [[UITextField alloc] initWithFrame:CGRectMake(0.0, 0.0, 245.0, 25.0)];
             UIAlertView *newRoomAlert = [[UIAlertView alloc] initWithTitle:@"New Chatroom"
                                                                    message:@"Class, Event, Interest, etc "
@@ -275,7 +283,98 @@
     }
 }
 
-- (void)showAlertBox:(NSString *)title message:(NSString *)message button:(NSString *)buttonTitle
+
+
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+-(void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
+{
+    if(gestureRecognizer.state == UIGestureRecognizerStateBegan)
+    {
+        CGPoint point = [gestureRecognizer locationInView:self.tableView];
+        NSIndexPath * indexPath = [self.tableView indexPathForRowAtPoint:point];
+        if(indexPath == nil) return ;
+        
+        ChatroomTableViewCell *cell = (ChatroomTableViewCell *)[self.tableView cellForRowAtIndexPath:indexPath];
+        UIMenuController *menu = [UIMenuController sharedMenuController];
+        [menu setTargetRect:cell.frame inView:cell.superview];
+        [menu setMenuVisible:YES animated:YES];
+        [cell becomeFirstResponder]; //here set the cell as the responder of the menu action
+    }
+}
+
+- (BOOL)tableView:(UITableView *)tableView canPerformAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
+{
+    if(indexPath.section != 0){
+        if (action == NSSelectorFromString(@"report:")) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)tableView:(UITableView *)tableView performAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
+{
+    if(indexPath.section != 0){
+        if(action == NSSelectorFromString(@"report:")){
+            NSString *displayMsg = [[APPDELEGATE.mainVC.customRoomList objectAtIndex:indexPath.row] objectForKey:@"roomName"];
+            _popupType = @"REPORT";
+            _reportChatroomId =[[APPDELEGATE.mainVC.customRoomList objectAtIndex:indexPath.row] objectForKey:@"roomKey"];
+            UITextField *reasonTextField = [[UITextField alloc] initWithFrame:CGRectMake(0.0, 0.0, 245.0, 25.0)];
+            UIAlertView *reportAlert = [[UIAlertView alloc] initWithTitle:@"Report This Chatroom:"
+                                                                  message:displayMsg
+                                                                 delegate:self
+                                                        cancelButtonTitle:@"Cancel"
+                                                        otherButtonTitles:@"Report", nil];
+            [reportAlert addSubview:reasonTextField];
+            reportAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [reportAlert show];
+        }
+    }
+}
+
+-(void)willPresentAlertView:(UIAlertView *)alertView {
+    if([_popupType isEqualToString:@"REPORT"]){
+        UITextField *reasonTextField = [alertView textFieldAtIndex:0];
+        [reasonTextField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@"Reason"]];
+        reasonTextField.delegate = self;
+    } else if([_popupType isEqualToString:@"NEWROOM"]){
+        if(APPDELEGATE.createChatroom){
+            UITextField *nameField = [alertView textFieldAtIndex:0];
+            [nameField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@"Room Title"]];
+            nameField.delegate = self;
+        }
+    }
+
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if(alertView.cancelButtonIndex != buttonIndex){
+        if([_popupType isEqualToString:@"REPORT"]){
+            NSString *reportReason = ((UITextField *)[alertView textFieldAtIndex:0]).text;
+            if([reportReason isEqual:@""]){
+                [self showAlertBox:@"Report Fail"
+                           message:@"Please enter report reason"
+                            button:@"OK"];
+            } else {
+                [APPDELEGATE.mainVC requestReportViolationOf:@"CHATROOM" withId:_reportChatroomId andReason:reportReason];
+                [self showAlertBox:@"Report Succeed"
+                           message:@"This Chatroom is going under our inspection list. It will be removed shortly if it violates our terms"
+                            button:@"OK"];
+            }
+        } else if([_popupType isEqualToString:@"NEWROOM"]){
+            NSString *newRoomName = ((UITextField *)[alertView textFieldAtIndex:0]).text;
+            ChatViewController *vc = [ChatViewController messagesViewController];
+            [self.navigationController pushViewController:vc animated:YES];
+            [APPDELEGATE.mainVC requestCreateNewRoom:newRoomName];
+        }
+    }
+}
+
+-(void)showAlertBox:(NSString *)title message:(NSString *)message button:(NSString *)buttonTitle
 {
     UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:title
                                                               message:message
@@ -285,24 +384,5 @@
     [newMessageAlert show];
 }
 
--(void)willPresentAlertView:(UIAlertView *)alertView {
-    if(APPDELEGATE.createChatroom){
-        UITextField *nameField = [alertView textFieldAtIndex:0];
-        [nameField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@"Room Title"]];
-        nameField.delegate = self;
-    }
-}
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    if(alertView.cancelButtonIndex == buttonIndex){
-        NSLog(@"canceled");
-    } else {
-        NSString *newRoomName = ((UITextField *)[alertView textFieldAtIndex:0]).text;
-        ChatViewController *vc = [ChatViewController messagesViewController];
-        [self.navigationController pushViewController:vc animated:YES];
-        [APPDELEGATE.mainVC requestCreateNewRoom:newRoomName];
-
-    }
-}
 
 @end

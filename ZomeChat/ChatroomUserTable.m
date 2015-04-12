@@ -81,10 +81,8 @@
 
 - (void)tableView:(UITableView *)tableView performAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
 {
-    NSLog(@"performAction been called");
     if(action == NSSelectorFromString(@"report:")){
-        NSLog(@"performAction report");
-
+        _reportUserId = [[self.chatroomUsers objectAtIndex:indexPath.row] objectForKey:@"userId"];
         NSString *displayMsg = [[self.chatroomUsers objectAtIndex:indexPath.row] objectForKey:@"username"];
         UITextField *reasonTextField = [[UITextField alloc] initWithFrame:CGRectMake(0.0, 0.0, 245.0, 25.0)];
         UIAlertView *reportAlert = [[UIAlertView alloc] initWithTitle:@"Report This User:"
@@ -112,7 +110,7 @@
                        message:@"Please enter report reason"
                         button:@"OK"];
         } else {
-            //TODO:  [APPDELEGATE.mainVC requestReportViolationOf:@"USER" withId:messageId andReason:reportReason];
+            [APPDELEGATE.mainVC requestReportViolationOf:@"USER" withId:_reportUserId andReason:reportReason];
             [self showAlertBox:@"Report Succeed"
                        message:@"This User is going under our inspection list."
                         button:@"OK"];

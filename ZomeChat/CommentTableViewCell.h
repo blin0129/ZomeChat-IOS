@@ -9,9 +9,14 @@
 #import <UIKit/UIKit.h>
 
 @interface CommentTableViewCell : UITableViewCell
+
+@property (nonatomic, strong) CommentTableViewCell *delegate;
+
 @property (weak, nonatomic) IBOutlet UIImageView *userImage;
 @property (weak, nonatomic) IBOutlet UILabel *usernameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
 @property (weak, nonatomic) IBOutlet UITextView *contentTextview;
+
+-(void)report:(id)sender;
 
 @end

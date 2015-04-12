@@ -111,6 +111,7 @@
 		C64AB1B1185FE007009FD17C /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C64AB1B0185FE007009FD17C /* CoreLocation.framework */; };
 		C64AB1C41864E10F009FD17C /* ChatroomTable.m in Sources */ = {isa = PBXBuildFile; fileRef = C64AB1C31864E10F009FD17C /* ChatroomTable.m */; };
 		C66FCFB91AD84E360047F6F6 /* UserTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C66FCFB81AD84E360047F6F6 /* UserTableViewCell.m */; };
+		C66FCFBC1AD88EB90047F6F6 /* ChatroomTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C66FCFBB1AD88EB90047F6F6 /* ChatroomTableViewCell.m */; };
 		C67A8AA91ACB84BA00A32F8A /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C67A8AA81ACB84BA00A32F8A /* FBSDKCoreKit.framework */; };
 		C67A8AAB1ACB881100A32F8A /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C67A8AAA1ACB881100A32F8A /* FBSDKLoginKit.framework */; };
 		C67B14381AC88D0400B6FF89 /* SocketAckHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67B142D1AC88D0400B6FF89 /* SocketAckHandler.swift */; };
@@ -396,6 +397,8 @@
 		C64AB1C31864E10F009FD17C /* ChatroomTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatroomTable.m; sourceTree = "<group>"; };
 		C66FCFB71AD84E360047F6F6 /* UserTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserTableViewCell.h; sourceTree = "<group>"; };
 		C66FCFB81AD84E360047F6F6 /* UserTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserTableViewCell.m; sourceTree = "<group>"; };
+		C66FCFBA1AD88EB90047F6F6 /* ChatroomTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatroomTableViewCell.h; sourceTree = "<group>"; };
+		C66FCFBB1AD88EB90047F6F6 /* ChatroomTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatroomTableViewCell.m; sourceTree = "<group>"; };
 		C67A8AA81ACB84BA00A32F8A /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = "<group>"; };
 		C67A8AAA1ACB881100A32F8A /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
 		C67B142D1AC88D0400B6FF89 /* SocketAckHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketAckHandler.swift; sourceTree = "<group>"; };
@@ -1028,6 +1031,8 @@
 				C6D2AF241A33E74400C5708F /* PostTableViewCell.m */,
 				C66FCFB71AD84E360047F6F6 /* UserTableViewCell.h */,
 				C66FCFB81AD84E360047F6F6 /* UserTableViewCell.m */,
+				C66FCFBA1AD88EB90047F6F6 /* ChatroomTableViewCell.h */,
+				C66FCFBB1AD88EB90047F6F6 /* ChatroomTableViewCell.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -1295,6 +1300,7 @@
 				C6D90DBC1884FDD100BFB039 /* ProfilePageViewController.m in Sources */,
 				C621528819E47A7800181380 /* JSQMessagesLoadEarlierHeaderView.m in Sources */,
 				C621527219E47A7800181380 /* JSQMessagesBubbleImageFactory.m in Sources */,
+				C66FCFBC1AD88EB90047F6F6 /* ChatroomTableViewCell.m in Sources */,
 				C621527319E47A7800181380 /* JSQMessagesTimestampFormatter.m in Sources */,
 				C621528719E47A7800181380 /* JSQMessagesLabel.m in Sources */,
 				C621527619E47A7800181380 /* JSQMessagesCollectionViewFlowLayoutInvalidationContext.m in Sources */,

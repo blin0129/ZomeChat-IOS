@@ -66,6 +66,10 @@
         [[UIApplication sharedApplication] endBackgroundTask:self.backgroundTask];
         self.backgroundTask = UIBackgroundTaskInvalid;
     }];
+    
+    //Report content
+    UIMenuItem * reportItem = [[UIMenuItem alloc] initWithTitle:@"Report" action:@selector(report:)];
+    [[UIMenuController sharedMenuController] setMenuItems:[NSArray arrayWithObjects:reportItem, nil]];
 }
 
 - (void) connectServer

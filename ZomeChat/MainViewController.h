@@ -43,6 +43,7 @@
 - (void) requestPostComment: (NSString *)comment onFeed: (NSString *)feedId;
 - (void) requestLikeFeed: (NSString *)feedId;
 - (void) requestFeedDetail: (NSString *)feedId;
+- (void) requestReportViolationOf:(NSString *)object withId:(NSString *)objectId andReason:(NSString *)reason;
 
 
 - (void) updateLocationOnMap;

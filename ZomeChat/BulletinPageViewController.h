@@ -15,6 +15,8 @@
 @property (strong, nonatomic) NSMutableDictionary *hashTagDictionary;
 @property (strong , nonatomic) NSMutableArray *tableData;
 @property (strong, nonatomic) NSMutableDictionary *selectedData;
+@property (strong, nonatomic) NSString *popupType;
+@property (strong, nonatomic) NSString *reportPostId;
 @property BOOL pictureLoaded;
 
 - (void) updateMsgboardMessages:(NSDictionary *)packet;

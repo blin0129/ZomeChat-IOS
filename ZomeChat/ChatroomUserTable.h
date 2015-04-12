@@ -11,5 +11,6 @@
 @interface ChatroomUserTable : UITableViewController
 
 @property (strong, nonatomic) NSMutableArray *chatroomUsers;
+@property (strong, nonatomic) NSString *reportUserId;
 
 @end

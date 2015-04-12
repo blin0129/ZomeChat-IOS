@@ -66,9 +66,6 @@
     [self.view addGestureRecognizer: tapRec];
     
 
-    //Report content
-    UIMenuItem * reportItem = [[UIMenuItem alloc] initWithTitle:@"Report" action:@selector(report:)];
-    [[UIMenuController sharedMenuController] setMenuItems:[NSArray arrayWithObjects:reportItem, nil]];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -156,7 +153,7 @@
         JSQMediaMessage *photoMessage = [JSQMediaMessage messageWithSenderId:msgSenderId
                                                                  displayName:msgSenderName
                                                                        media:photoItem];
-        photoMessage.messageId = msgId;
+        [photoMessage setMessageId:msgId];
         [photoItem setImageURL:imageURL];
         [self.chatData.messages addObject:photoMessage];
 
@@ -166,7 +163,7 @@
                                                          senderDisplayName:msgSenderName
                                                                       date:timeInNSDate
                                                                       text:receivedMessage];
-        message.messageId = msgId;
+        [message setMessageId: msgId];
         [self.chatData.messages addObject:message];
     }
 }
@@ -201,7 +198,6 @@
             [APPDELEGATE.imageCache setObject:img forKey:imageURL];
         }
     }
-    NSLog(@"%@",img);
     return [self resizeImage:img];
 }
 
@@ -480,11 +476,6 @@
     [newMessageAlert show];
 }
 
-- (void)report:(id) sender
-{
-    
-}
-
 - (BOOL) canPerformAction:(SEL)action withSender:(id)sender {
     if (action == NSSelectorFromString(@"copy:")) {
         return YES;
@@ -500,6 +491,7 @@
     } else if(action == NSSelectorFromString(@"report:")){
         _popupType = @"REPORT";
         JSQMessage *reportedMsg = [self.chatData.messages objectAtIndex:indexPath.item];
+        _reportMessageId =[[self.chatData.messages objectAtIndex:indexPath.item] getMessageId];
         NSString *displayMsg = @"";
         if(reportedMsg.isMediaMessage){
             displayMsg = @"(Picture)";
@@ -535,9 +527,9 @@
                            message:@"Please enter report reason"
                             button:@"OK"];
             } else {
-                //TODO:  [APPDELEGATE.mainVC requestReportViolationOf:@"MESSAGE" withId:messageId andReason:reportReason];
+                [APPDELEGATE.mainVC requestReportViolationOf:@"MESSAGE" withId:_reportMessageId andReason:reportReason];
                 [self showAlertBox:@"Report Succeed"
-                           message:@"This Message is going under our inspection list. It will be removed shortly if violates our terms"
+                           message:@"This message is going under our inspection list. It will be removed shortly if it violates our terms"
                             button:@"OK"];
             }
         }

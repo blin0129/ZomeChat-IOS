@@ -67,4 +67,6 @@
                             date:(NSDate *)date
                          isMedia:(BOOL)isMedia;
 
+- (void)setMessageId:(NSString *)messageId;
+- (NSString *) getMessageId;
 @end

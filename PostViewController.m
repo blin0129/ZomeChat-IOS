@@ -32,8 +32,13 @@
     [self initView];
     [self customNavBar];
     self.postData = [APPDELEGATE.msglistVC selectedData];
-    self.feedId = [self.postData objectForKey:@"id"];
-    [APPDELEGATE.mainVC requestFeedDetail:self.feedId];
+    self.postId = [self.postData objectForKey:@"postId"];
+    [APPDELEGATE.mainVC requestFeedDetail:self.postId];
+    
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    longPressGesture.minimumPressDuration = .5;
+    longPressGesture.delegate = self;
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 - (void) initView
@@ -118,7 +123,7 @@
 - (IBAction)replayBtnClicked:(id)sender {
     if(APPDELEGATE.commentPost){
         NSString *comment = self.replyTextField.text;
-        [APPDELEGATE.mainVC requestPostComment:comment onFeed:self.feedId];
+        [APPDELEGATE.mainVC requestPostComment:comment onFeed:self.postId];
         self.replyTextField.text = @"";
     }else{
         [self showAlertBox:APPDELEGATE.commentPostAlertTitle
@@ -143,7 +148,7 @@
                 }
             }
             if (!likedBefore) {
-                [APPDELEGATE.mainVC requestLikeFeed:self.feedId];
+                [APPDELEGATE.mainVC requestLikeFeed:self.postId];
             }
         }
     } else {
@@ -359,6 +364,7 @@
          CommentTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
          if (cell == nil){
             cell = [[CommentTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+             cell.delegate = self;
              cell.backgroundColor = [UIColor clearColor];
              cell.selectionStyle = UITableViewCellSelectionStyleNone;
              [cell setUserInteractionEnabled:NO];
@@ -381,6 +387,74 @@
          }
          return cell;
      }
+}
+
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+-(void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
+{
+    if(gestureRecognizer.state == UIGestureRecognizerStateBegan){
+        CGPoint point = [gestureRecognizer locationInView:self.commentTable];
+        NSIndexPath * indexPath = [self.commentTable indexPathForRowAtPoint:point];
+        if(indexPath == nil) return ;
+        
+        CommentTableViewCell *cell = (CommentTableViewCell *)[self.commentTable cellForRowAtIndexPath:indexPath];
+        UIMenuController *menu = [UIMenuController sharedMenuController];
+        [menu setTargetRect:cell.frame inView:cell.superview];
+        [menu setMenuVisible:YES animated:YES];
+        [cell becomeFirstResponder]; //here set the cell as the responder of the menu action
+    }
+}
+
+- (BOOL) canPerformAction:(SEL)action withSender:(id)sender {
+    return (action == NSSelectorFromString(@"report:"));
+}
+
+- (BOOL)tableView:(UITableView *)tableView canPerformAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
+{
+    return (action == NSSelectorFromString(@"report:"));
+}
+
+- (void)tableView:(UITableView *)tableView performAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
+{
+    if(action == NSSelectorFromString(@"report:")){
+        _reportCommentId = [[self.comments objectAtIndex:(indexPath.row-1)] objectForKey:@"commentId"];
+        NSString *displayMsg = [[self.comments objectAtIndex:(indexPath.row-1)] objectForKey:@"content"];
+        UITextField *reasonTextField = [[UITextField alloc] initWithFrame:CGRectMake(0.0, 0.0, 245.0, 25.0)];
+        UIAlertView *reportAlert = [[UIAlertView alloc] initWithTitle:@"Report This Comment:"
+                                                              message:displayMsg
+                                                             delegate:self
+                                                    cancelButtonTitle:@"Cancel"
+                                                    otherButtonTitles:@"Report", nil];
+        [reportAlert addSubview:reasonTextField];
+        reportAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
+        [reportAlert show];
+    }
+}
+
+-(void)willPresentAlertView:(UIAlertView *)alertView {
+        UITextField *reasonTextField = [alertView textFieldAtIndex:0];
+        [reasonTextField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@"Reason"]];
+//        reasonTextField.delegate = self;
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if(alertView.cancelButtonIndex != buttonIndex){
+        NSString *reportReason = ((UITextField *)[alertView textFieldAtIndex:0]).text;
+        if([reportReason isEqual:@""]){
+            [self showAlertBox:@"Report Fail"
+                       message:@"Please enter report reason"
+                        button:@"OK"];
+        } else {
+            [APPDELEGATE.mainVC requestReportViolationOf:@"COMMENT" withId:_reportCommentId andReason:reportReason];
+            [self showAlertBox:@"Report Succeed"
+                       message:@"This comment is going under our inspection list. It will be removed shortly if it violates our terms"
+                        button:@"OK"];
+        }
+    }
 }
 
 

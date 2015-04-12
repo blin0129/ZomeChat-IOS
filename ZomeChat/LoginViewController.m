@@ -208,6 +208,9 @@
 {
     [socketIO onAny:^(SocketAnyEvent* respond) {
         NSString *event = respond.event;
+        if([event isEqual:@"disconnect"] || [event isEqual:@"reconnect"] || [event isEqual:@"reconnectAttempt"]){
+            return;
+        }
         NSDictionary *data = [respond.items objectAtIndex:0];
         if([event isEqual:@"signup_response"]){
             [self receiveSignupResponse:data];

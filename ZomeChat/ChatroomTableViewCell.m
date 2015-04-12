@@ -1,14 +1,14 @@
 //
-//  UserTableViewCell.m
+//  ChatroomTableViewCell.m
 //  ZomeChat
 //
 //  Created by Brian Lin on 4/10/15.
 //  Copyright (c) 2015 Zome. All rights reserved.
 //
 
-#import "UserTableViewCell.h"
+#import "ChatroomTableViewCell.h"
 
-@implementation UserTableViewCell
+@implementation ChatroomTableViewCell
 
 - (BOOL)canBecomeFirstResponder
 {
@@ -37,5 +37,6 @@
         [cv.delegate tableView:cv performAction:_cmd forRowAtIndexPath:ip withSender:sender];
     }
 }
+
 
 @end
