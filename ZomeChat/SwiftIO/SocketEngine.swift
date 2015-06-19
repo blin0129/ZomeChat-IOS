@@ -26,7 +26,7 @@ import Foundation
 
 extension String {
     private var length:Int {
-        return countElements(self)
+        return count(self)
     }
 }
 

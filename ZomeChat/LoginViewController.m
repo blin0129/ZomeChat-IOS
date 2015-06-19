@@ -294,7 +294,7 @@
                                      @"lng" : APPDELEGATE.lng,
                                      @"lat" : APPDELEGATE.lat
                                      };
-        [socketIO emitObjc:@"signup" withItems:@[signupData]];
+        [socketIO emit:@"signup" withItems:@[signupData]];
     }
 }
 
@@ -307,7 +307,7 @@
                                  @"lng" : APPDELEGATE.lng,
                                  @"lat" : APPDELEGATE.lat
                                  };
-    [socketIO emitObjc:@"login" withItems:@[singinData]];
+    [socketIO emit:@"login" withItems:@[singinData]];
     APPDELEGATE.loginType = @"ANONYMOUS";
 }
 
@@ -322,7 +322,7 @@
                                  @"lng" : APPDELEGATE.lng,
                                  @"lat" : APPDELEGATE.lat
                                  };
-    [socketIO emitObjc:@"login" withItems:@[singinData]];
+    [socketIO emit:@"login" withItems:@[singinData]];
     APPDELEGATE.loginType = @"REGISTER";
 }
 
@@ -350,7 +350,7 @@
                                      @"lng" : APPDELEGATE.lng,
                                      @"lat" : APPDELEGATE.lat
                                      };
-        [socketIO emitObjc:@"login" withItems:@[singinData]];
+        [socketIO emit:@"login" withItems:@[singinData]];
         APPDELEGATE.loginType = @"FACEBOOK";
     }
 }

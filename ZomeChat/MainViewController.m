@@ -128,7 +128,8 @@
     NSDictionary* requestEnterRoomData = @{@"uid" : APPDELEGATE.uid,
                                            @"roomKey" : roomKey,
                                            };
-    [socketIO emitObjc:@"requestEnterChatroom" withItems:@[requestEnterRoomData]];
+    [socketIO emit:@"requestEnterChatroom" withItems:@[requestEnterRoomData]];
+//    [socketIO emit:@"requestEnterChatroom" withItems:@[requestEnterRoomData]];
 }
 
 -(void) requestCreateNewMessage: (NSString *) messageContent withImage:(NSString *)imageString
@@ -140,7 +141,7 @@
                                               @"image" : imageString
                                               };
     [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"lastMessageCreatedTime"];
-    [socketIO emitObjc:@"requestCreateMessage" withItems:@[requestCreatingMessageData]];
+    [socketIO emit:@"requestCreateMessage" withItems:@[requestCreatingMessageData]];
 }
 
 -(void) requestMsgboardData
@@ -149,7 +150,7 @@
                                               @"lng" : APPDELEGATE.lng,
                                               @"lat" : APPDELEGATE.lat
                                               };
-    [socketIO emitObjc:@"requestMessageboard" withItems:@[requestMessageboardData]];
+    [socketIO emit:@"requestMessageboard" withItems:@[requestMessageboardData]];
 }
 
 
@@ -159,19 +160,19 @@
                                            @"roomName" : roomName
                                            };
     [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"lastRoomCreatedTime"];
-    [socketIO emitObjc:@"requestCreateNewRoom" withItems:@[requestCreatingRoomData]];
+    [socketIO emit:@"requestCreateNewRoom" withItems:@[requestCreatingRoomData]];
 }
 
 - (void) requestChatroomList
 {
     NSDictionary* requestThemeListData = @{@"uid" : APPDELEGATE.uid};
-    [socketIO emitObjc:@"requestChatroomList" withItems:@[requestThemeListData]];
+    [socketIO emit:@"requestChatroomList" withItems:@[requestThemeListData]];
 }
 
 - (void) requestProfile
 {
     NSDictionary* requestProfileData = @{@"uid" : APPDELEGATE.uid};
-    [socketIO emitObjc:@"requestProfile" withItems:@[requestProfileData]];
+    [socketIO emit:@"requestProfile" withItems:@[requestProfileData]];
 }
 
 - (void) requestUsernameChange: (NSString *)newName
@@ -179,7 +180,7 @@
     NSDictionary* requestUsernameChangeData = @{@"uid" : APPDELEGATE.uid,
                                               @"username" : newName
                                               };
-    [socketIO emitObjc:@"requestUsernameChange" withItems:@[requestUsernameChangeData]];
+    [socketIO emit:@"requestUsernameChange" withItems:@[requestUsernameChangeData]];
 }
 
 - (void) requestLocationUpdate
@@ -188,7 +189,7 @@
                                                @"lat" : APPDELEGATE.lat,
                                                @"lng" : APPDELEGATE.lng
                                                };
-    [socketIO emitObjc:@"requestLocationUpdate" withItems:@[requestLocationUpdateData]];
+    [socketIO emit:@"requestLocationUpdate" withItems:@[requestLocationUpdateData]];
 }
 
 - (void) requestSendMessage: (NSString *)message inRoom: (NSString *)roomKey
@@ -197,7 +198,7 @@
                                              @"message" : message,
                                              @"roomKey" : roomKey
                                              };
-    [socketIO emitObjc:@"sendChatroomMessage" withItems:@[requestSendMessageData]];
+    [socketIO emit:@"sendChatroomMessage" withItems:@[requestSendMessageData]];
 }
 
 - (void) requestSendImage: (NSString *)image inRoom:(NSString *)roomKey
@@ -206,7 +207,7 @@
                                               @"image" : image,
                                               @"roomKey" : roomKey
                                               };
-    [socketIO emitObjc:@"chatImage" withItems:@[requestSendImageData]];
+    [socketIO emit:@"chatImage" withItems:@[requestSendImageData]];
 }
 
 - (void) requestProfileUpdate: (NSString *)image
@@ -214,7 +215,7 @@
     NSDictionary* requestProfileUpdateData = @{@"uid" : APPDELEGATE.uid,
                                            @"image" : image,
                                            };
-    [socketIO emitObjc:@"profileUpdate" withItems:@[requestProfileUpdateData]];
+    [socketIO emit:@"profileUpdate" withItems:@[requestProfileUpdateData]];
 }
 
 - (void) requestLeaveChatroom: (NSString *)roomKey
@@ -222,7 +223,7 @@
     NSDictionary* requestLeaveRoomData = @{@"uid" : APPDELEGATE.uid,
                                              @"roomKey" : roomKey
                                              };
-    [socketIO emitObjc:@"requestLeaveChatroom" withItems:@[requestLeaveRoomData]];
+    [socketIO emit:@"requestLeaveChatroom" withItems:@[requestLeaveRoomData]];
 }
 
 - (void) requestPostComment: (NSString *)comment onFeed: (NSString *)feedId
@@ -231,7 +232,7 @@
                                                @"feedId" : feedId,
                                                @"content" : comment
                                                };
-    [socketIO emitObjc:@"requestPostComment" withItems:@[requestCommentOnPostData]];
+    [socketIO emit:@"requestPostComment" withItems:@[requestCommentOnPostData]];
 }
 
 - (void) requestLikeFeed: (NSString *)feedId
@@ -239,7 +240,7 @@
     NSDictionary* requestLikePostData = @{@"uid" : APPDELEGATE.uid,
                                           @"feedId" : feedId
                                           };
-    [socketIO emitObjc:@"requestLikeFeed" withItems:@[requestLikePostData]];
+    [socketIO emit:@"requestLikeFeed" withItems:@[requestLikePostData]];
 }
 
 - (void) requestFeedDetail: (NSString *)feedId
@@ -247,7 +248,7 @@
     NSDictionary* requestFeedDetailData = @{@"uid" : APPDELEGATE.uid,
                                           @"feedId" : feedId
                                           };
-    [socketIO emitObjc:@"requestFeedDetail" withItems:@[requestFeedDetailData]];
+    [socketIO emit:@"requestFeedDetail" withItems:@[requestFeedDetailData]];
 }
 
 - (void) requestReportViolationOf:(NSString *)object withId:(NSString *)objectId andReason:(NSString *)reason
@@ -257,7 +258,7 @@
                                         @"objectId":objectId,
                                         @"reportReason":reason
                                         };
-    [socketIO emitObjc:@"requestReport" withItems:@[requestReportData]];
+    [socketIO emit:@"requestReport" withItems:@[requestReportData]];
 }
 
 

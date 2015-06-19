@@ -28,7 +28,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    version = @"1.12";
+    version = @"1.13";
     userName = [[NSMutableString alloc] init];
     imageCache = [[NSCache alloc] init];
     //Berkeley
