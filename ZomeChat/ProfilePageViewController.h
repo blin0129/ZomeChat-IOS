@@ -8,15 +8,19 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ProfilePageViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>{
+@interface ProfilePageViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate>{
     UIImagePickerController *picker;
 }
 
 @property (weak, nonatomic) IBOutlet UIImageView *thumbnail;
-@property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UIButton *saveButton;
-@property (weak, nonatomic) IBOutlet UIButton *changePicButton;
+@property (weak, nonatomic) IBOutlet UILabel *userNameLabel;
+@property (weak, nonatomic) IBOutlet UILabel *userIdLabel;
+@property (weak, nonatomic) IBOutlet UIButton *editUserNameBtn;
+@property (weak, nonatomic) IBOutlet UIButton *LogoutBtn;
+@property UIImage *oldImage;
 
--(void) receiveMyProfile: (SocketIOPacket *)packet;
-
+-(void) receiveMyProfile: (NSDictionary *)packet;
+-(void) receiveProfileUpdateRespond: (NSDictionary *)packet;
+-(void) updateProfileImage: (NSString *)imageURL;
 @end

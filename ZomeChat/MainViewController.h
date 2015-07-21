@@ -7,40 +7,51 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SocketIO.h"
-#import "SocketIOPacket.h"
+#import "ZomeChat-Swift.h"
 #import "LoginViewController.h"
 
-@interface MainViewController : UITabBarController<SocketIODelegate>
-{
-    SocketIO *socketIO;
-}
+@interface MainViewController : UITabBarController
 
-@property (atomic) SocketIO *socketIO;
 @property NSNumber *themeCount;
-@property NSNumber *messageCount;
-@property NSNumber *nearbyUserCount;
+@property NSNumber *postCount;
+@property NSNumber *userCount;
 @property (nonatomic) CLLocation *currentLocation;
 @property NSTimer *timer;
-@property (strong, nonatomic) NSMutableArray *themeList;
+@property (strong, nonatomic) NSMutableArray *defaultRoomList;
+@property (strong, nonatomic) NSMutableArray *customRoomList;
+@property (strong, nonatomic) GMSMapView *mapView;
+@property (strong, nonatomic) GMSMarker *myLocationMarker;
+@property (nonatomic, strong) SocketIOClient *socketIO;
 
--(float) getLatitude;
--(float) getLongitude;
 
--(void) requestProfile;
--(void) requestThemeList;
--(void) requestMsgboardData;
--(void) requestLandingPageInfo;
--(void) requestRoom: (NSDictionary*) requestRoomData;
--(void) requestSendMessage: (NSString *)message inRoom: (NSString *)roomKey;
--(void) requestSendImage: (NSString *)image inRoom:(NSString *)roomKey;
--(void) requestLeaveRoom: (NSString *)roomKey;
--(void) requestCreatingNewRoom: (NSString *)roomName;
--(void) requestCreateNewMessage: (NSString *) messageContent;
+- (float) getLatitude;
+- (float) getLongitude;
+
+- (void) requestProfile;
+- (void) requestChatroomList;
+- (void) requestMsgboardData;
+- (void) requestLandingPageInfo;
+- (void) requestEnterChatroom: (NSString*) roomKey;
+- (void) requestSendMessage: (NSString *)message inRoom: (NSString *)roomKey;
+- (void) requestSendImage: (NSString *)image inRoom:(NSString *)roomKey;
+- (void) requestLeaveChatroom: (NSString *)roomKey;
+- (void) requestCreateNewRoom: (NSString *)roomName;
+- (void) requestCreateNewMessage: (NSString *) messageContent withImage:(NSString *) imageString;
 - (void) requestProfileUpdate: (NSString *)image;
+- (void) requestUsernameChange: (NSString *)newName;
+- (void) requestLocationUpdate;
+- (void) requestPostComment: (NSString *)comment onFeed: (NSString *)feedId;
+- (void) requestLikeFeed: (NSString *)feedId;
+- (void) requestFeedDetail: (NSString *)feedId;
+- (void) requestReportViolationOf:(NSString *)object withId:(NSString *)objectId andReason:(NSString *)reason;
 
--(void)toLandingPage;
--(void)toChatPage;
--(void)toMessagePage;
+
+- (void) updateLocationOnMap;
+- (void) cleanAllMarkerFromMap;
+- (void) addMapMarkerWithLongitude: (float)lng latitude:(float)lat roomName:(NSString *)note;
+
+- (void)toLandingPage;
+- (void)toChatPage;
+- (void)toMessagePage;
 
 @end

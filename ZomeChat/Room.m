@@ -26,20 +26,17 @@
     if (self) {
         self.name = roomName;
         self.key = roomKey;
-        self.content = [[NSMutableString alloc] init];
+        self.content = [ChatViewController messagesViewController];
+//        self.content = [[NSMutableString alloc] init];
         self.roommates = [[NSMutableArray alloc] init];
         self.userCount = roommates.count;
         
-        self.contentView = [[UITextView alloc] init];
-//        self.contentView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.35];
-        self.contentView.backgroundColor = [UIColor clearColor];
-        self.contentView.textColor = [UIColor whiteColor];
-        self.contentView.editable = NO;
-        self.contentView.font = [UIFont systemFontOfSize:20];
-//        self.contentView.layer.borderWidth = 2;
-//        self.contentView.layer.borderColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.35].CGColor;
-//        self.contentView.layer.cornerRadius = 0;
-//        self.contentView.layer.masksToBounds = YES;
+//        self.contentView = [[UITextView alloc] init];
+//        self.contentView.backgroundColor = [UIColor clearColor];
+//        self.contentView.textColor = [UIColor whiteColor];
+//        self.contentView.editable = NO;
+//        self.contentView.font = [UIFont systemFontOfSize:20];
+
         
         self.nextLineY = 0;
         [self createTableView];
@@ -50,73 +47,48 @@
 
 -(void)addContent:(NSString *)msg
 {
-    [self.content appendString:msg];
-    [self.content appendString:@"\n"];
-    self.contentView.text = self.content;
-    self.nextLineY = contentView.contentSize.height;
-    [self scrollToBottom];
+//    [self.content appendString:msg];
+//    [self.content appendString:@"\n"];
+//    self.contentView.text = self.content;
+//    self.nextLineY = contentView.contentSize.height;
+//    [self scrollToBottom];
 }
 
 -(void)scrollToBottom
 {
-    if(contentView.text.length > 0 ) {
-        NSRange bottom = NSMakeRange(contentView.text.length + 5, 1);
-        [contentView scrollRangeToVisible:bottom];
-    }
+//    if(contentView.text.length > 0 ) {
+//        NSRange bottom = NSMakeRange(contentView.text.length + 5, 1);
+//        [contentView scrollRangeToVisible:bottom];
+//    }
 }
 
 -(void)addImageSender:(NSString *)senderName
 {
-    [self.content appendString:senderName];
-    self.contentView.text = self.content;
-    self.nextLineY = contentView.contentSize.height;
+//    [self.content appendString:senderName];
+//    self.contentView.text = self.content;
+//    self.nextLineY = contentView.contentSize.height;
 }
 
 -(void)addEmptyLines
 {
-    float heightNeeded = self.nextLineY - contentView.contentSize.height;
-    int nSpace = (heightNeeded / contentView.font.lineHeight) + 2;
-    for(int i = 0; i < nSpace; i++){
-        [self.content appendString:@"\n"];
-    }
-    self.contentView.text = self.content;
+//    float heightNeeded = self.nextLineY - contentView.contentSize.height;
+//    int nSpace = (heightNeeded / contentView.font.lineHeight) + 2;
+//    for(int i = 0; i < nSpace; i++){
+//        [self.content appendString:@"\n"];
+//    }
+//    self.contentView.text = self.content;
 }
 
 -(void)addImage: (UIImage *)image
 {
-    UIImageView *new = [[UIImageView alloc] initWithFrame:CGRectMake(10, nextLineY - 5, image.size.width/2, image.size.height/2)];
-    new.image = image;
-    [self.contentView addSubview:new];
-    self.nextLineY += image.size.height/2;
-    [self addEmptyLines];
-    [self scrollToBottom];
+//    UIImageView *new = [[UIImageView alloc] initWithFrame:CGRectMake(10, nextLineY - 5, image.size.width/2, image.size.height/2)];
+//    new.image = image;
+//    [self.contentView addSubview:new];
+//    self.nextLineY += image.size.height/2;
+//    [self addEmptyLines];
+//    [self scrollToBottom];
 }
 
--(void)addARoommate:(User *)newUser
-{
-    //Check if multiple login
-    for(User *user in roommates){
-        if([user.name isEqualToString:newUser.name]){
-            return;
-        }
-    }
-    [roommates addObject:newUser];
-    [self.userTableView reloadData];
-    self.userCount = roommates.count;
-}
-
--(void)removeARoommate:(NSString *)uid
-{
-    for(User *user in roommates){
-        if([user.name isEqualToString:uid]){
-            [user cleanThumbnail];
-            [roommates removeObject:user];
-            [self.userTableView reloadData];
-            break;
-        }
-    }
-    self.userCount = roommates.count;
-}
 
 -(void)createTableView
 {
