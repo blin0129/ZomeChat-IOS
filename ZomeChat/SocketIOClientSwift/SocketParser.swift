@@ -22,11 +22,11 @@
 
 import Foundation
 
-private let shredder = SocketParser.PacketShredder()
-
-class SocketParser {
+class SocketParser {    
+    private static let shredder = SocketParser.PacketShredder()
+    
     // Translation of socket.io-parser#deconstructPacket
-    private class PacketShredder {
+    private final class PacketShredder {
         var buf = ContiguousArray<NSData>()
         
         func shred(data:AnyObject) -> AnyObject {
@@ -48,7 +48,7 @@ class SocketParser {
                 var newDict = NSMutableDictionary(dictionary: dict)
                 
                 for (key, value) in newDict {
-                    newDict[key as NSCopying] = shred(value)
+                    newDict[key as! NSCopying] = shred(value)
                 }
                 
                 return newDict
@@ -80,12 +80,12 @@ class SocketParser {
     }
     
     // Translation of socket.io-client#decodeString
-    class func parseString(str:String) -> SocketPacket? {
+    static func parseString(str:String) -> SocketPacket? {
         let arr = Array(str)
         let type = String(arr[0])
         
         if arr.count == 1 {
-            return SocketPacket(type: SocketPacketType(str: type))
+            return SocketPacket(type: SocketPacket.PacketType(str: type))
         }
         
         var id = nil as Int?
@@ -103,11 +103,11 @@ class SocketParser {
                 }
             }
             
-            if buf.toInt() == nil || arr[i] != "-" {
+            if let holders = buf.toInt() where arr[i] == "-" {
+                placeholders = holders
+            } else {
                 NSLog("Error parsing \(str)")
                 return nil
-            } else {
-                placeholders = buf.toInt()!
             }
         }
         
@@ -124,7 +124,7 @@ class SocketParser {
         }
         
         if i + 1 >= arr.count {
-            return SocketPacket(type: SocketPacketType(str: type),
+            return SocketPacket(type: SocketPacket.PacketType(str: type),
                 nsp: nsp, placeholders: placeholders, id: id)
         }
         
@@ -144,13 +144,12 @@ class SocketParser {
             id = c.toInt()
         }
         
-        if i + 1 < arr.count {
-            let d = String(arr[++i...arr.count-1])
+        if ++i < arr.count {
+            let d = str[advance(str.startIndex, i)...advance(str.startIndex, count(str)-1)]
             let noPlaceholders = d["(\\{\"_placeholder\":true,\"num\":(\\d*)\\})"] ~= "\"~~$2\""
+            let data = SocketParser.parseData(noPlaceholders) as? [AnyObject] ?? [noPlaceholders]
             
-            let data = SocketParser.parseData(noPlaceholders) as [AnyObject]
-            
-            return SocketPacket(type: SocketPacketType(str: type), data: data,
+            return SocketPacket(type: SocketPacket.PacketType(str: type), data: data,
                 nsp: nsp, placeholders: placeholders, id: id)
         }
         
@@ -158,11 +157,11 @@ class SocketParser {
     }
     
     // Parses data for events
-    class func parseData(data:String) -> AnyObject? {
+    static func parseData(data:String) -> AnyObject? {
         var err:NSError?
         let stringData = data.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)
         let parsed:AnyObject? = NSJSONSerialization.JSONObjectWithData(stringData!,
-            options: NSJSONReadingOptions.AllowFragments, error: &err)
+            options: NSJSONReadingOptions.MutableContainers, error: &err)
         
         if err != nil {
             // println(err)
@@ -172,53 +171,60 @@ class SocketParser {
         return parsed
     }
     
-    class func parseForEmit(packet:SocketPacket) {
+    static func parseForEmit(packet:SocketPacket) {
         shredder.deconstructPacket(packet)
     }
     
     // Parses messages recieved
-    class func parseSocketMessage(stringMessage:String, socket:SocketIOClient) {
+    static func parseSocketMessage(stringMessage:String, socket:SocketIOClient) {
         if stringMessage == "" {
             return
         }
         
         func checkNSP(nsp:String) -> Bool {
-            if nsp == "" && socket.nsp != "/" {
-                return true
-            } else {
-                return false
-            }
+            return nsp == "" && socket.nsp != "/"
         }
         
-        let p = parseString(stringMessage) as SocketPacket!
+        SocketLogger.log("Parsing %@", client: socket, altType: "SocketParser", args: stringMessage)
         
-        if p.type == SocketPacketType.EVENT {
+        let p:SocketPacket
+        
+        if let pack = parseString(stringMessage) {
+            p = pack
+        } else {
+            socket.didError("Error parsing packet")
+            return
+        }
+        
+        SocketLogger.log("Decoded packet as: %@", client: socket, altType: "SocketParser", args: p)
+        
+        if p.type == SocketPacket.PacketType.EVENT {
             if checkNSP(p.nsp) {
                 return
             }
             
             socket.handleEvent(p.getEvent(), data: p.data,
                 isInternalMessage: false, wantsAck: p.id)
-        } else if p.type == SocketPacketType.ACK {
+        } else if p.type == SocketPacket.PacketType.ACK {
             if checkNSP(p.nsp) {
                 return
             }
             
             socket.handleAck(p.id!, data: p.data)
-        } else if p.type == SocketPacketType.BINARY_EVENT {
+        } else if p.type == SocketPacket.PacketType.BINARY_EVENT {
             if checkNSP(p.nsp) {
                 return
             }
             
             socket.waitingData.append(p)
-        } else if p.type == SocketPacketType.BINARY_ACK {
+        } else if p.type == SocketPacket.PacketType.BINARY_ACK {
             if checkNSP(p.nsp) {
                 return
             }
             
             p.justAck = true
             socket.waitingData.append(p)
-        } else if p.type == SocketPacketType.CONNECT {
+        } else if p.type == SocketPacket.PacketType.CONNECT {
             if p.nsp == "" && socket.nsp != "/" {
                 socket.joinNamespace()
             } else if p.nsp != "" && socket.nsp == "/" {
@@ -226,17 +232,16 @@ class SocketParser {
             } else {
                 socket.didConnect()
             }
-        } else if p.type == SocketPacketType.DISCONNECT {
-            socket.didForceClose("Got Disconnect")
+        } else if p.type == SocketPacket.PacketType.DISCONNECT {
+            socket.didDisconnect("Got Disconnect")
+        } else if p.type == SocketPacket.PacketType.ERROR {
+            socket.didError(p.data == nil ? "Error" : p.data!)
         }
     }
     
-    // Handles binary data
-    class func parseBinaryData(data:NSData, socket:SocketIOClient) {
-        // NSLog(data.base64EncodedStringWithOptions(NSDataBase64EncodingOptions.allZeros))
-        
+    static func parseBinaryData(data:NSData, socket:SocketIOClient) {
         if socket.waitingData.count == 0 {
-            NSLog("Got data when not remaking packet")
+            SocketLogger.err("Got data when not remaking packet", client: socket, altType: "SocketParser")
             return
         }
         

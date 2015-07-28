@@ -40,7 +40,7 @@
     lat = @"37.7873560";
 //    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com:1442";
     serverURL = @"localhost:1442";
-
+    
     [self initAppSetting];
     [self initLocationManager];
     [self connectServer];

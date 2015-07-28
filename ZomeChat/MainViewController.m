@@ -7,7 +7,7 @@
 //
 
 #import "MainViewController.h"
-#import "Room.h"
+//#import "Room.h"
 
 @interface MainViewController ()
 
@@ -315,7 +315,7 @@
 - (void) socketOnRecievedData
 {
     [socketIO onAny:^(SocketAnyEvent* respond) {
-        NSLog(@"socket recieved evet: %@",respond.event);
+        NSLog(@"socket recieved event: %@",respond.event);
         NSString *event = respond.event;
         if([event isEqual:@"disconnect"] || [event isEqual:@"reconnect"] || [event isEqual:@"reconnectAttempt"]){
             return;
@@ -324,7 +324,7 @@
             return;
         }
         NSDictionary *data = [respond.items objectAtIndex:0];
-        if([[data objectForKey:@"resopnd"] isEqualToString:@"RESPOND_FAIL"]){
+        if([[data objectForKey:@"respond"] isEqualToString:@"RESPOND_FAIL"]){
             [self showDefaultServerErrorAlert];
             
         } else if([event isEqual:@"chatroomList"]){
