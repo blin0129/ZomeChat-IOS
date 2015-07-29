@@ -7,7 +7,6 @@
 //
 
 #import "MainViewController.h"
-//#import "Room.h"
 
 @interface MainViewController ()
 
@@ -129,7 +128,6 @@
                                            @"roomKey" : roomKey,
                                            };
     [socketIO emit:@"requestEnterChatroom" withItems:@[requestEnterRoomData]];
-//    [socketIO emit:@"requestEnterChatroom" withItems:@[requestEnterRoomData]];
 }
 
 -(void) requestCreateNewMessage: (NSString *) messageContent withImage:(NSString *)imageString
@@ -261,9 +259,7 @@
     [socketIO emit:@"requestReport" withItems:@[requestReportData]];
 }
 
-
-
-//** Chatroom Received Methods **//
+#pragma mark - Chatroom Recieved Information
 
 -(void) receiveChatroomList:(NSDictionary *)packet
 {
@@ -288,7 +284,7 @@
 }
 
 
-//** Bulletin Board Received Methods **//
+#pragma mark - Bulletin Board Recieved Information
 
 - (void) updateMsgboardMessages: (NSDictionary *)packet
 {
@@ -373,19 +369,5 @@
                                                     otherButtonTitles:nil];
     [newMessageAlert show];
 }
-
-//- (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error
-//{
-////    NSLog(@"socket.io disconnected. did error occur? %@", error);
-//        UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:@"Server Disconnected"
-//                                                                  message:@"Plase signin again"
-//                                                                 delegate:self
-//                                                        cancelButtonTitle:@"Okay"
-//                                                        otherButtonTitles:nil];
-//        [newMessageAlert show];
-//    LoginViewController *loginView = [self.storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
-//    [self presentViewController:loginView  animated:YES completion:NULL];
-//    
-//}
 
 @end

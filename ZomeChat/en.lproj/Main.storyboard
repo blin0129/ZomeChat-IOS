@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7702" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="ZZk-BB-2gw">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="ZZk-BB-2gw">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
@@ -261,8 +261,8 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </tabBar>
                     <connections>
-                        <segue destination="hXh-JX-Acy" kind="relationship" relationship="viewControllers" id="a1x-TU-w2D"/>
                         <segue destination="tow-bL-ShL" kind="relationship" relationship="viewControllers" id="twz-n1-bTD"/>
+                        <segue destination="hXh-JX-Acy" kind="relationship" relationship="viewControllers" id="a1x-TU-w2D"/>
                         <segue destination="4L0-G9-Kam" kind="relationship" relationship="viewControllers" id="naq-OI-hSt"/>
                     </connections>
                 </tabBarController>
