@@ -15,6 +15,7 @@
     float yBound;
     UITableViewCell *cellForRowHeightCalculation;
     NSDateFormatter *dateFormat;
+    UIBarButtonItem *likeBtn;
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder
@@ -90,7 +91,7 @@
 - (void)customNavBar
 {
     self.navigationItem.title = @"Feed";
-    UIBarButtonItem * likeBtn= [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"bar_icon_like"] style:UIBarButtonItemStylePlain target:self action:@selector(likeThePost)];
+    likeBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"bar_icon_like"] style:UIBarButtonItemStylePlain target:self action:@selector(likeThePost)];
     
     UIBarButtonItem *negativeSpacer = [[UIBarButtonItem alloc]
                                        initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
@@ -108,6 +109,9 @@
     [APPDELEGATE.msglistVC updateFeedStatus:[data objectForKey:@"id"]
                                   likeCount:[NSNumber numberWithInteger:self.likes.count]
                                commentCount:[NSNumber numberWithInteger:self.comments.count]];
+    if ([self.likes containsObject:APPDELEGATE.uid]) {
+        [likeBtn setImage:[UIImage imageNamed:@"bar_icon_like_filled"]];
+    }
 }
 
 -(void)showAlertBox:(NSString *)title message:(NSString *)message button:(NSString *)buttonTitle
@@ -149,6 +153,7 @@
             }
             if (!likedBefore) {
                 [APPDELEGATE.mainVC requestLikeFeed:self.postId];
+                [likeBtn setImage:[UIImage imageNamed:@"bar_icon_like_filled"]];
             }
         }
     } else {

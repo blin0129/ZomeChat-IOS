@@ -12,7 +12,7 @@
 @interface PostViewController : UIViewController <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource>
 
 @property (strong, nonatomic) NSDictionary *postData;
-@property (weak, nonatomic) IBOutlet UIButton *replyBtn;
+@property (weak, nonatomic) IBOutlet UIButton *replyBtn; 
 @property (weak, nonatomic) IBOutlet UIView *replyContainer;
 @property (weak, nonatomic) IBOutlet UITextField *replyTextField;
 @property (strong, nonatomic) JSQMessagesKeyboardController *keyboardController;
