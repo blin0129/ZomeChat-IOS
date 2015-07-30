@@ -8,7 +8,9 @@
 
 #import "ProfilePageViewController.h"
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
-@interface ProfilePageViewController ()
+#import <MessageUI/MessageUI.h>
+
+@interface ProfilePageViewController () <MFMessageComposeViewControllerDelegate>
 
 @end
 
@@ -17,6 +19,7 @@
 @synthesize thumbnail;
 @synthesize oldImage;
 
+#pragma mark - UIViewController
 
 -(id)initWithCoder:(NSCoder *)aDecoder
 {
@@ -73,6 +76,8 @@
     [super didReceiveMemoryWarning];
 }
 
+# pragma mark - Data Receival
+
 -(void) receiveMyProfile: (NSDictionary *)data
 {
     if([data objectForKey:@"imageURL"] != nil){
@@ -105,19 +110,33 @@
         }
     } else {
         [thumbnail setImage:oldImage];
-        //TODO: Alart, update faile
+        [self showAlertBox:@"Error" message:@"Could not update profile." button:@"OK"];
     }
 }
 
-- (IBAction)helpBtnClicked:(id)sender {
+# pragma mark - IBActions
+
+- (IBAction)editUsernameBtnPressed:(id)sender {
+    UITextField *nameField = [[UITextField alloc] initWithFrame:CGRectMake(0.0, 0.0, 245.0, 25.0)];
+    UIAlertView *changeNameAlert = [[UIAlertView alloc] initWithTitle:@"Edit Username"
+                                                              message:@""
+                                                             delegate:self
+                                                    cancelButtonTitle:@"Cancel"
+                                                    otherButtonTitles:@"Save", nil];
+    [changeNameAlert addSubview:nameField];
+    changeNameAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [changeNameAlert show];
+}
+
+- (IBAction)helpBtnPressed:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.zomeapp.com/qa.html"]];
 }
 
-- (IBAction)termBtnClicked:(id)sender {
+- (IBAction)termBtnPressed:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.zomeapp.com/terms.html"]];
 }
 
-- (IBAction)aboutZomeBtnClicked:(id)sender {
+- (IBAction)aboutZomeBtnPressed:(id)sender {
     NSString *title = [NSString stringWithFormat:@"Current Version V%@", APPDELEGATE.version];
     NSString *message = [NSString stringWithFormat:@"Latest Version V%@", APPDELEGATE.version];
     [self showAlertBox:title
@@ -125,12 +144,51 @@
                 button:@"OK"];
 }
 
-- (void)selectProfilePicture{
-    picker = [[UIImagePickerController alloc] init];
-    picker.delegate = self;
-    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-    [self presentViewController:picker animated:YES completion:nil];
+- (IBAction)inviteFriendsBtnPressed:(id)sender {
+    if ([MFMessageComposeViewController canSendText]) {
+        MFMessageComposeViewController *messageVC = [[MFMessageComposeViewController alloc] init];
+        
+        messageVC.body = @"";
+        messageVC.recipients = @[@""];
+        messageVC.messageComposeDelegate = self;
+        
+        [self presentViewController:messageVC animated:YES completion:nil];
+    } else {
+        [self showAlertBox:@"There's just one problem..." message:@"Your device can't send messages." button:@"OK"];
+    }
 }
+
+- (IBAction)logoutBtnPressed:(id)sender {
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"loginType"];
+    NSLog(@"set loginType to nil");
+    [APPDELEGATE disconnectServer];
+    [self performSelector:@selector(toLoginView) withObject:nil afterDelay:0.0];
+}
+
+
+# pragma mark - MFMessageComposeViewControllerDelegate
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller didFinishWithResult:(MessageComposeResult)result {
+    switch (result) {
+        case MessageComposeResultCancelled:
+            NSLog(@"Canceled message.");
+            break;
+        case MessageComposeResultFailed:
+        {
+            [self showAlertBox:@"Oh no!" message:@"Your message could not be sent." button:@"OK"];
+            break;
+        }
+        case MessageComposeResultSent:
+            NSLog(@"Sent message successfully.");
+            break;
+        default:
+            break;
+    }
+
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+# pragma mark - UIImagePickerControllerDelegate
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *) Picker {
     [Picker dismissViewControllerAnimated:YES completion:nil];
@@ -148,16 +206,40 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+# pragma mark - UIAlertViewDelegate
+
+-(void)willPresentAlertView:(UIAlertView *)alertView {
+    if(![APPDELEGATE.loginType isEqualToString:@"Anonymous"]){
+        //        if(_timeSinceLastRoom >= 300 && APPDELEGATE.chatVC.ownedRoomName == nil){
+        UITextField *nameField = [alertView textFieldAtIndex:0];
+        [nameField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@"New Username"]];
+        nameField.delegate = self;
+        //        }
+    }
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if(alertView.cancelButtonIndex == buttonIndex){
+        NSLog(@"canceled");
+    } else {
+        NSString *newUsername = ((UITextField *)[alertView textFieldAtIndex:0]).text;
+        [APPDELEGATE.mainVC requestUsernameChange:newUsername];
+        [alertView removeFromSuperview];
+    }
+}
+
+#pragma mark - Helper Methods
+
+- (void)selectProfilePicture{
+    picker = [[UIImagePickerController alloc] init];
+    picker.delegate = self;
+    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    [self presentViewController:picker animated:YES completion:nil];
+}
+
 - (void) updateProfileImage: (NSString *)imageURL
 {
     [thumbnail setImage:[self getImageFromURL:imageURL]];
-}
-
-- (IBAction)logout:(id)sender {
-    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"loginType"];
-    NSLog(@"set loginType to nil");
-    [APPDELEGATE disconnectServer];
-    [self performSelector:@selector(toLoginView) withObject:nil afterDelay:0.0];
 }
 
 - (void) toLoginView
@@ -222,38 +304,6 @@
     return newImage;
 }
 
-- (IBAction)editUsernameBtnClick:(id)sender {
-    UITextField *nameField = [[UITextField alloc] initWithFrame:CGRectMake(0.0, 0.0, 245.0, 25.0)];
-    UIAlertView *changeNameAlert = [[UIAlertView alloc] initWithTitle:@"Edit Username"
-                                                              message:@""
-                                                             delegate:self
-                                                    cancelButtonTitle:@"Cancel"
-                                                    otherButtonTitles:@"Save", nil];
-    [changeNameAlert addSubview:nameField];
-    changeNameAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [changeNameAlert show];
-}
-
--(void)willPresentAlertView:(UIAlertView *)alertView {
-    if(![APPDELEGATE.loginType isEqualToString:@"Anonymous"]){
-        //        if(_timeSinceLastRoom >= 300 && APPDELEGATE.chatVC.ownedRoomName == nil){
-        UITextField *nameField = [alertView textFieldAtIndex:0];
-        [nameField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@"New Username"]];
-        nameField.delegate = self;
-        //        }
-    }
-}
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    if(alertView.cancelButtonIndex == buttonIndex){
-        NSLog(@"canceled");
-    } else {
-        NSString *newUsername = ((UITextField *)[alertView textFieldAtIndex:0]).text;
-        [APPDELEGATE.mainVC requestUsernameChange:newUsername];
-        [alertView removeFromSuperview];
-    }
-}
-
 -(void)showAlertBox:(NSString *)title message:(NSString *)message button:(NSString *)buttonTitle
 {
     UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:title
@@ -263,22 +313,5 @@
                                                     otherButtonTitles:nil];
     [newMessageAlert show];
 }
-
-//- (void)loginViewShowingLoggedOutUser:(FBLoginView *)loginView {
-//    [FBSettings setLoggingBehavior:[NSSet setWithObjects:FBLoggingBehaviorFBRequests, nil]];
-//    if (FBSession.activeSession.isOpen) {
-//        [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection,id<FBGraphUser> fbUser,NSError *error) {
-//            if (!error) {
-//                NSString *fbID = fbUser.objectID;
-//                NSLog(@"UserID: %@",fbID);
-//                NSLog(@"TESTING: %@",fbUser.name);
-//            }
-//        }];
-//    }
-//    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"loginType"];
-//    [APPDELEGATE disconnectServer];
-//    [self toLoginView];
-//}
-
 
 @end

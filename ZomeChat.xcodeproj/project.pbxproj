@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9C20D1871B6AC70B0070A2C6 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C20D1861B6AC70B0070A2C6 /* MessageUI.framework */; };
 		9CF83A481B61CDE900470F19 /* GoogleMaps.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6D90D931880A8BB00BFB039 /* GoogleMaps.framework */; };
 		C60E5BB5191222C1004FE4CC /* notification_sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C60E5BB4191222C1004FE4CC /* notification_sound.mp3 */; };
 		C61544A7186D043400155267 /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = C61544A6186D043400155267 /* iCarousel.m */; };
@@ -188,6 +189,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9C20D1861B6AC70B0070A2C6 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		9C9DDD3F1B683FBE006B0D54 /* SocketIOClientSwift-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SocketIOClientSwift-Bridging-Header.h"; sourceTree = "<group>"; };
 		C60E5BB4191222C1004FE4CC /* notification_sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = notification_sound.mp3; sourceTree = "<group>"; };
 		C61544A5186D043400155267 /* iCarousel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCarousel.h; sourceTree = SOURCE_ROOT; };
@@ -443,6 +445,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C20D1871B6AC70B0070A2C6 /* MessageUI.framework in Frameworks */,
 				C615FCBB1943E74A006B774D /* AudioToolbox.framework in Frameworks */,
 				C6D90D941880A8BB00BFB039 /* GoogleMaps.framework in Frameworks */,
 				C6D90D901880A2A300BFB039 /* SystemConfiguration.framework in Frameworks */,
@@ -734,6 +737,7 @@
 		C64AB01A185E927A009FD17C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9C20D1861B6AC70B0070A2C6 /* MessageUI.framework */,
 				C67A8AAA1ACB881100A32F8A /* FBSDKLoginKit.framework */,
 				C67A8AA81ACB84BA00A32F8A /* FBSDKCoreKit.framework */,
 				C615FCBA1943E749006B774D /* AudioToolbox.framework */,
