@@ -7,7 +7,6 @@
 //
 
 #import "MainViewController.h"
-#import "Room.h"
 
 @interface MainViewController ()
 
@@ -129,7 +128,6 @@
                                            @"roomKey" : roomKey,
                                            };
     [socketIO emit:@"requestEnterChatroom" withItems:@[requestEnterRoomData]];
-//    [socketIO emit:@"requestEnterChatroom" withItems:@[requestEnterRoomData]];
 }
 
 -(void) requestCreateNewMessage: (NSString *) messageContent withImage:(NSString *)imageString
@@ -261,9 +259,7 @@
     [socketIO emit:@"requestReport" withItems:@[requestReportData]];
 }
 
-
-
-//** Chatroom Received Methods **//
+#pragma mark - Chatroom Recieved Information
 
 -(void) receiveChatroomList:(NSDictionary *)packet
 {
@@ -288,7 +284,7 @@
 }
 
 
-//** Bulletin Board Received Methods **//
+#pragma mark - Bulletin Board Recieved Information
 
 - (void) updateMsgboardMessages: (NSDictionary *)packet
 {
@@ -315,7 +311,7 @@
 - (void) socketOnRecievedData
 {
     [socketIO onAny:^(SocketAnyEvent* respond) {
-        NSLog(@"socket recieved evet: %@",respond.event);
+        NSLog(@"socket recieved event: %@",respond.event);
         NSString *event = respond.event;
         if([event isEqual:@"disconnect"] || [event isEqual:@"reconnect"] || [event isEqual:@"reconnectAttempt"]){
             return;
@@ -324,7 +320,7 @@
             return;
         }
         NSDictionary *data = [respond.items objectAtIndex:0];
-        if([[data objectForKey:@"resopnd"] isEqualToString:@"RESPOND_FAIL"]){
+        if([[data objectForKey:@"respond"] isEqualToString:@"RESPOND_FAIL"]){
             [self showDefaultServerErrorAlert];
             
         } else if([event isEqual:@"chatroomList"]){
@@ -373,19 +369,5 @@
                                                     otherButtonTitles:nil];
     [newMessageAlert show];
 }
-
-//- (void) socketIODidDisconnect:(SocketIO *)socket disconnectedWithError:(NSError *)error
-//{
-////    NSLog(@"socket.io disconnected. did error occur? %@", error);
-//        UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:@"Server Disconnected"
-//                                                                  message:@"Plase signin again"
-//                                                                 delegate:self
-//                                                        cancelButtonTitle:@"Okay"
-//                                                        otherButtonTitles:nil];
-//        [newMessageAlert show];
-//    LoginViewController *loginView = [self.storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
-//    [self presentViewController:loginView  animated:YES completion:NULL];
-//    
-//}
 
 @end

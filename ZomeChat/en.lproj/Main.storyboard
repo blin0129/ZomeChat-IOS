@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7702" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="ZZk-BB-2gw">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="ZZk-BB-2gw">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
@@ -261,8 +261,8 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </tabBar>
                     <connections>
-                        <segue destination="hXh-JX-Acy" kind="relationship" relationship="viewControllers" id="a1x-TU-w2D"/>
                         <segue destination="tow-bL-ShL" kind="relationship" relationship="viewControllers" id="twz-n1-bTD"/>
+                        <segue destination="hXh-JX-Acy" kind="relationship" relationship="viewControllers" id="a1x-TU-w2D"/>
                         <segue destination="4L0-G9-Kam" kind="relationship" relationship="viewControllers" id="naq-OI-hSt"/>
                     </connections>
                 </tabBarController>
@@ -435,7 +435,7 @@
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
-                                            <action selector="editUsernameBtnClick:" destination="gIa-ex-HOv" eventType="touchUpInside" id="I2g-mV-wOI"/>
+                                            <action selector="editUsernameBtnPressed:" destination="gIa-ex-HOv" eventType="touchUpInside" id="nET-5e-p4W"/>
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="uid" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tGs-uB-0QB">
@@ -476,11 +476,25 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="aboutZomeBtnClicked:" destination="gIa-ex-HOv" eventType="touchUpInside" id="JOW-qp-qCN"/>
+                                    <action selector="aboutZomeBtnPressed:" destination="gIa-ex-HOv" eventType="touchUpInside" id="Ktf-90-qF8"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tUv-hl-4Fo">
-                                <rect key="frame" x="16" y="315" width="288" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Kuo-PS-bUO">
+                                <rect key="frame" x="18" y="395" width="286" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="psL-a0-RFy"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal" title="Invite Friends">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="inviteFriendsBtnPressed:" destination="gIa-ex-HOv" eventType="touchUpInside" id="au9-nH-13G"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tUv-hl-4Fo">
+                                <rect key="frame" x="16" y="315" width="286" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="dKj-EG-BWx"/>
                                 </constraints>
@@ -490,7 +504,7 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="termBtnClicked:" destination="gIa-ex-HOv" eventType="touchUpInside" id="CoJ-Je-hgp"/>
+                                    <action selector="termBtnPressed:" destination="gIa-ex-HOv" eventType="touchUpInside" id="4ID-TF-JMQ"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lJK-uD-r4S">
@@ -504,21 +518,18 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="helpBtnClicked:" destination="gIa-ex-HOv" eventType="touchUpInside" id="kR8-XC-uyA"/>
+                                    <action selector="helpBtnPressed:" destination="gIa-ex-HOv" eventType="touchUpInside" id="bos-bC-keq"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1OQ-1A-hD0">
-                                <rect key="frame" x="18" y="395" width="286" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="H4Z-Sd-olL"/>
-                                </constraints>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1OQ-1A-hD0">
+                                <rect key="frame" x="18" y="435" width="286" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <state key="normal" title="Logout">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="logout:" destination="gIa-ex-HOv" eventType="touchUpInside" id="ewH-VP-BQe"/>
+                                    <action selector="logoutBtnPressed:" destination="gIa-ex-HOv" eventType="touchUpInside" id="jqn-4f-bMu"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -527,16 +538,15 @@
                             <constraint firstItem="tUv-hl-4Fo" firstAttribute="leading" secondItem="lJK-uD-r4S" secondAttribute="leading" constant="-2" id="026-yz-cOs"/>
                             <constraint firstItem="ajk-SJ-WGn" firstAttribute="top" secondItem="tUv-hl-4Fo" secondAttribute="bottom" constant="10" id="0Yc-yf-enz"/>
                             <constraint firstItem="KoJ-2M-pHy" firstAttribute="leading" secondItem="vPW-aY-nyh" secondAttribute="leadingMargin" constant="-16" id="3XK-cJ-n27"/>
-                            <constraint firstItem="1OQ-1A-hD0" firstAttribute="top" secondItem="ajk-SJ-WGn" secondAttribute="bottom" constant="10" id="B4d-wb-yiB"/>
-                            <constraint firstItem="1OQ-1A-hD0" firstAttribute="trailing" secondItem="lJK-uD-r4S" secondAttribute="trailing" id="Jc9-LL-zjO"/>
+                            <constraint firstItem="1OQ-1A-hD0" firstAttribute="top" secondItem="Kuo-PS-bUO" secondAttribute="bottom" constant="10" id="FtB-6w-aP0"/>
                             <constraint firstItem="tUv-hl-4Fo" firstAttribute="top" secondItem="lJK-uD-r4S" secondAttribute="bottom" constant="10" id="K9e-Ci-StN"/>
-                            <constraint firstItem="1OQ-1A-hD0" firstAttribute="leading" secondItem="lJK-uD-r4S" secondAttribute="leading" id="S3O-gB-40p"/>
                             <constraint firstItem="lJK-uD-r4S" firstAttribute="top" secondItem="KoJ-2M-pHy" secondAttribute="bottom" constant="20" id="TqN-ME-09K"/>
                             <constraint firstItem="lJK-uD-r4S" firstAttribute="trailing" secondItem="ajk-SJ-WGn" secondAttribute="trailing" id="Xee-tc-geY"/>
                             <constraint firstItem="gJL-SU-sak" firstAttribute="leading" secondItem="vPW-aY-nyh" secondAttribute="leadingMargin" constant="-6" id="YJW-Vo-YV0"/>
                             <constraint firstItem="KoJ-2M-pHy" firstAttribute="top" secondItem="naV-c3-zNh" secondAttribute="bottom" constant="82" id="Ym4-23-VVd"/>
                             <constraint firstAttribute="width" secondItem="KoJ-2M-pHy" secondAttribute="height" multiplier="320:237" constant="172.82700421940928" id="ZoD-2a-7Xk"/>
                             <constraint firstItem="lJK-uD-r4S" firstAttribute="leading" secondItem="ajk-SJ-WGn" secondAttribute="leading" id="aOl-Ph-Yra"/>
+                            <constraint firstItem="Kuo-PS-bUO" firstAttribute="leading" secondItem="lJK-uD-r4S" secondAttribute="leading" id="b5W-c6-0sv"/>
                             <constraint firstItem="tGs-uB-0QB" firstAttribute="leading" secondItem="gJL-SU-sak" secondAttribute="trailing" constant="20" id="bRk-BC-rQy"/>
                             <constraint firstItem="KoJ-2M-pHy" firstAttribute="top" secondItem="3wQ-u3-MuX" secondAttribute="bottom" constant="-3" id="dy2-Uu-rdL"/>
                             <constraint firstAttribute="centerX" secondItem="KoJ-2M-pHy" secondAttribute="centerX" id="fvH-K6-pRX"/>
@@ -544,9 +554,13 @@
                             <constraint firstAttribute="trailingMargin" secondItem="3wQ-u3-MuX" secondAttribute="trailing" constant="-7" id="gEy-Pg-SPW"/>
                             <constraint firstItem="gJL-SU-sak" firstAttribute="top" secondItem="naV-c3-zNh" secondAttribute="bottom" constant="10" id="jFI-ZL-LST"/>
                             <constraint firstItem="tUv-hl-4Fo" firstAttribute="trailing" secondItem="lJK-uD-r4S" secondAttribute="trailing" id="lNb-10-8i6"/>
+                            <constraint firstItem="Kuo-PS-bUO" firstAttribute="top" secondItem="ajk-SJ-WGn" secondAttribute="bottom" constant="10" id="p3w-Of-oEr"/>
+                            <constraint firstItem="Kuo-PS-bUO" firstAttribute="trailing" secondItem="lJK-uD-r4S" secondAttribute="trailing" id="r3O-QU-Cl4"/>
+                            <constraint firstItem="lJK-uD-r4S" firstAttribute="trailing" secondItem="1OQ-1A-hD0" secondAttribute="trailing" id="rLS-yW-4jc"/>
                             <constraint firstItem="3wQ-u3-MuX" firstAttribute="leading" secondItem="gJL-SU-sak" secondAttribute="trailing" constant="8" id="s1c-YM-fYL"/>
                             <constraint firstItem="lJK-uD-r4S" firstAttribute="trailing" secondItem="vPW-aY-nyh" secondAttribute="trailingMargin" id="vwq-eW-VyG"/>
                             <constraint firstItem="lJK-uD-r4S" firstAttribute="leading" secondItem="vPW-aY-nyh" secondAttribute="leadingMargin" constant="2" id="wVf-La-9BW"/>
+                            <constraint firstItem="lJK-uD-r4S" firstAttribute="leading" secondItem="1OQ-1A-hD0" secondAttribute="leading" id="zEg-ma-vbn"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Setting" id="hNn-13-Ka9"/>

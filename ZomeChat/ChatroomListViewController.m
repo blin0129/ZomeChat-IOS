@@ -16,9 +16,13 @@
 
 @implementation ChatroomListViewController
 
+#pragma mark - Instance Variables
+
 @synthesize choosedRoomKey;
 @synthesize choosedRoomName;
 @synthesize mapContainer;
+
+
 
 -(id)initWithCoder:(NSCoder *)aDecoder
 {
@@ -102,9 +106,23 @@
         float lat = [[roomInfo objectForKey:@"lat"] floatValue];
         [APPDELEGATE.mainVC addMapMarkerWithLongitude:lng latitude:lat roomName:[roomInfo objectForKey:@"roomName"]];
     }
-//    [APPDELEGATE.landVC updateRoomCount:[NSString stringWithFormat:@"%lu",(unsigned long)receiveList.count]];
     [self.tableView reloadData];
+    if (receiveList.count == 1) {
+        [self performSelector:@selector(suggestCreateNewRoom) withObject:self afterDelay:0.5];
+    }
+}
 
+-(void)suggestCreateNewRoom
+{
+    _popupType = @"SUGGESTCREATE";
+    NSString *title = @"No Chatrooms Exist!";
+    NSString *message = @"Do you wish to create one?";
+    UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:title
+                                                              message:message
+                                                             delegate:self
+                                                    cancelButtonTitle:@"Cancel"
+                                                    otherButtonTitles:@"Create", nil];
+    [newMessageAlert show];
 }
 
 //TODO REDEFINED THIS METHOD
@@ -370,6 +388,8 @@
             ChatViewController *vc = [ChatViewController messagesViewController];
             [self.navigationController pushViewController:vc animated:YES];
             [APPDELEGATE.mainVC requestCreateNewRoom:newRoomName];
+        } else if([_popupType isEqualToString:@"SUGGESTCREATE"]) {
+            [self createNewRoom];
         }
     }
 }
