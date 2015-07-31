@@ -148,8 +148,8 @@
     if ([MFMessageComposeViewController canSendText]) {
         MFMessageComposeViewController *messageVC = [[MFMessageComposeViewController alloc] init];
         
-        messageVC.body = @"";
-        messageVC.recipients = @[@""];
+        messageVC.body = @"Join me on ZomeChat! https://itunes.apple.com/us/app/id828153007?mt=8";
+        messageVC.recipients = @[];
         messageVC.messageComposeDelegate = self;
         
         [self presentViewController:messageVC animated:YES completion:nil];
