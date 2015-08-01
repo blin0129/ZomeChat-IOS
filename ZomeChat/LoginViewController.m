@@ -83,7 +83,8 @@
     _signupPasswordC.delegate = self;
     _signupEmail.delegate = self;
     
-    _activityIndicator.hidden = YES;
+    _loginActivityIndicator.hidden = YES;
+    _signupActivityIndicator.hidden = YES;
     
     if([CLLocationManager locationServicesEnabled]){
         _currentLocation = APPDELEGATE.locationManager.location;
@@ -91,12 +92,12 @@
 
 }
 
-#pragma mark - Logins -
+#pragma mark - Logins and Signups -
 
 #pragma mark IBActions
 
 - (IBAction)facebookLogin:(id)sender {
-    [self startActivity];
+    [self startLoginActivityIndicator];
     loginAttemptSuccess = false;
     NSString* fbid = [[NSUserDefaults standardUserDefaults] objectForKey:@"FBid"];
     if(fbid == nil){
@@ -104,13 +105,13 @@
     }else{
         [self requestFacebookLogin];
     }
-    [self stopActivity];
+    [self stopLoginActivityIndicator];
 }
 
 
 
 - (IBAction)registerLogin:(id)sender {
-    [self startActivity];
+    [self startLoginActivityIndicator];
     loginAttemptSuccess = false;
     [self setButtonsDisable];
     [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
@@ -119,11 +120,11 @@
     } else {
         [self requestRegisterLoginWithEmail:self.emailInput.text password:self.passwordInput.text];
     }
-    [self stopActivity];
+    [self stopLoginActivityIndicator];
 }
 
 - (IBAction)anonymousLogin:(id)sender {
-    [self startActivity];
+    [self startLoginActivityIndicator];
     loginAttemptSuccess = false;
     [self setButtonsDisable];
     [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
@@ -132,13 +133,15 @@
     } else {
         [self requestAnonLogin];
     }
-    [self stopActivity];
+    [self stopLoginActivityIndicator];
 }
 
 - (IBAction)signUp:(id)sender {
+    [self startSignupActivityIndicator];
     [self setButtonsDisable];
     [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
     [self requestSignUp];
+    [self stopSignupActivityIndicator];
 }
 
 - (IBAction)toSignUpPage:(id)sender {
@@ -149,7 +152,7 @@
 
 - (void) autoLogin
 {
-    [self startActivity];
+    [self startLoginActivityIndicator];
     [self performSelector:@selector(autoLoginFail) withObject:nil afterDelay:5.0];
     NSString *savedEmail = [[NSUserDefaults standardUserDefaults] objectForKey:@"email"];
     NSString *savedPassword = [[NSUserDefaults standardUserDefaults] objectForKey:@"password"];
@@ -166,7 +169,7 @@
             }
         }
     }];
-    [self stopActivity];
+    [self stopLoginActivityIndicator];
 }
 
 - (void) autoLoginFail
@@ -232,14 +235,24 @@
     [_anonLoginButton setEnabled:TRUE];
 }
 
-- (void)startActivity {
-    _activityIndicator.hidden = NO;
-    [_activityIndicator startAnimating];
+- (void)startLoginActivityIndicator {
+    _loginActivityIndicator.hidden = NO;
+    [_loginActivityIndicator startAnimating];
 }
 
-- (void)stopActivity {
-    _activityIndicator.hidden = YES;
-    [_activityIndicator stopAnimating];
+- (void)stopLoginActivityIndicator {
+    _loginActivityIndicator.hidden = YES;
+    [_loginActivityIndicator stopAnimating];
+}
+
+- (void)startSignupActivityIndicator {
+    _signupActivityIndicator.hidden = NO;
+    [_signupActivityIndicator startAnimating];
+}
+
+- (void)stopSignupActivityIndicator {
+    _signupActivityIndicator.hidden = YES;
+    [_signupActivityIndicator stopAnimating];
 }
 
 - (void)showAlertWithTitle:(NSString*) title message:(NSString*) message
