@@ -13,6 +13,8 @@
 
 @interface LoginViewController : UIViewController<UITextFieldDelegate>
 
+@property (strong, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
+
 @property (retain, nonatomic) IBOutlet UITextField *emailInput;
 @property (retain, nonatomic) IBOutlet UITextField *passwordInput;
 

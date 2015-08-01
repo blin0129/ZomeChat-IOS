@@ -26,6 +26,8 @@
 @synthesize passwordInput;
 @synthesize emailInput;
 
+#pragma mark - UIViewController
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -81,14 +83,73 @@
     _signupPasswordC.delegate = self;
     _signupEmail.delegate = self;
     
+    _activityIndicator.hidden = YES;
+    
     if([CLLocationManager locationServicesEnabled]){
         _currentLocation = APPDELEGATE.locationManager.location;
     }
 
 }
 
+#pragma mark - Logins -
+
+#pragma mark IBActions
+
+- (IBAction)facebookLogin:(id)sender {
+    [self startActivity];
+    loginAttemptSuccess = false;
+    NSString* fbid = [[NSUserDefaults standardUserDefaults] objectForKey:@"FBid"];
+    if(fbid == nil){
+        [self accessFacebookInfo];
+    }else{
+        [self requestFacebookLogin];
+    }
+    [self stopActivity];
+}
+
+
+
+- (IBAction)registerLogin:(id)sender {
+    [self startActivity];
+    loginAttemptSuccess = false;
+    [self setButtonsDisable];
+    [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
+    if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied){
+        [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device setting"];
+    } else {
+        [self requestRegisterLoginWithEmail:self.emailInput.text password:self.passwordInput.text];
+    }
+    [self stopActivity];
+}
+
+- (IBAction)anonymousLogin:(id)sender {
+    [self startActivity];
+    loginAttemptSuccess = false;
+    [self setButtonsDisable];
+    [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
+    if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied){
+        [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device setting"];
+    } else {
+        [self requestAnonLogin];
+    }
+    [self stopActivity];
+}
+
+- (IBAction)signUp:(id)sender {
+    [self setButtonsDisable];
+    [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
+    [self requestSignUp];
+}
+
+- (IBAction)toSignUpPage:(id)sender {
+    
+}
+
+#pragma mark Auto Login
+
 - (void) autoLogin
 {
+    [self startActivity];
     [self performSelector:@selector(autoLoginFail) withObject:nil afterDelay:5.0];
     NSString *savedEmail = [[NSUserDefaults standardUserDefaults] objectForKey:@"email"];
     NSString *savedPassword = [[NSUserDefaults standardUserDefaults] objectForKey:@"password"];
@@ -105,6 +166,7 @@
             }
         }
     }];
+    [self stopActivity];
 }
 
 - (void) autoLoginFail
@@ -115,53 +177,7 @@
     [self.view sendSubviewToBack:backgroundIV];
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
-{
-    if(textField){
-        [textField resignFirstResponder];
-    }
-    return NO;
-}
-
-- (IBAction)facebookLogin:(id)sender {
-    loginAttemptSuccess = false;
-    NSString* fbid = [[NSUserDefaults standardUserDefaults] objectForKey:@"FBid"];
-    if(fbid == nil){
-        [self accessFacebookInfo];
-    }else{
-        [self requestFacebookLogin];
-    }
-}
-
-
-
-- (IBAction)registerLogin:(id)sender {
-    loginAttemptSuccess = false;
-    [self setButtonsDisable];
-    [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
-    if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied){
-        [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device setting"];
-    } else {
-        [self requestRegisterLoginWithEmail:self.emailInput.text password:self.passwordInput.text];
-    }
-}
-
-- (IBAction)anonymousLogin:(id)sender {
-    loginAttemptSuccess = false;
-    [self setButtonsDisable];
-    [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
-    if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied){
-        [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device setting"];
-    } else {
-        [self requestAnonLogin];
-    }
-}
-
-
-
-- (IBAction)toSignUpPage:(id)sender {
-}
-
+#pragma mark - Validations
 
 -(BOOL) checkSingupConstraints: (NSString *)email :(NSString *)pssd :(NSString *)pssdc
 {
@@ -188,6 +204,20 @@
     return [emailTest evaluateWithObject:checkString];
 }
 
+#pragma mark - View Helpers -
+
+#pragma mark UITextViewDelegate
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    if(textField){
+        [textField resignFirstResponder];
+    }
+    return NO;
+}
+
+#pragma mark Custom
+
 - (void) setButtonsDisable
 {
     [_toSignupButton setEnabled:FALSE];
@@ -202,28 +232,14 @@
     [_anonLoginButton setEnabled:TRUE];
 }
 
-#pragma mark -ServerCommunication
-
-- (void) socketOnRecievedData
-{
-    [socketIO onAny:^(SocketAnyEvent* respond) {
-        NSString *event = respond.event;
-        if([event isEqual:@"disconnect"] || [event isEqual:@"reconnect"] || [event isEqual:@"reconnectAttempt"]){
-            return;
-        }
-        NSDictionary *data = [respond.items objectAtIndex:0];
-        if([event isEqual:@"signup_response"]){
-            [self receiveSignupResponse:data];
-        } else if([event isEqual:@"login_response"]){
-            [self receiveLoginResponse:data];
-        } else if([event isEqual:@"error"]){
-            [self showAlertWithTitle:@"Server Error" message:[data objectForKey:@"message"]];
-        }
-    }];
+- (void)startActivity {
+    _activityIndicator.hidden = NO;
+    [_activityIndicator startAnimating];
 }
 
-- (void)showDefaultServerErrorAlert{
-    [self showAlertWithTitle:@"Server Error" message:@"Woop, something is wrong with our server"];
+- (void)stopActivity {
+    _activityIndicator.hidden = YES;
+    [_activityIndicator stopAnimating];
 }
 
 - (void)showAlertWithTitle:(NSString*) title message:(NSString*) message
@@ -236,50 +252,9 @@
     [newMessageAlert show];
 }
 
-- (void) receiveSignupResponse:(NSDictionary *)data
-{
-    if([[data objectForKey:@"respond"] isEqual:@"SIGNUP_SUCCESS"]){
-        [[NSUserDefaults standardUserDefaults] setObject:loginEmail forKey:@"email"];
-        [[NSUserDefaults standardUserDefaults] setObject:loginPassword forKey:@"password"];
-        [_toLoginButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-        [self showAlertWithTitle:@"Signup Succeed" message:[data objectForKey:@"displayMessage"]];
-    } else{
-        [self showAlertWithTitle:@"Signup Failed" message:[data objectForKey:@"displayMessage"]];
-    }
-}
+#pragma mark - Server Communication -
 
-- (void) receiveLoginResponse:(NSDictionary *)data
-{
-    if([[data objectForKey:@"respond"] isEqual:@"LOGIN_SUCCESS"]){
-        loginAttemptSuccess = true;
-        APPDELEGATE.userName = [data objectForKey:@"userName"];
-        APPDELEGATE.uid = [data objectForKey:@"uid"];
-        if([[data objectForKey:@"userType"] isEqualToString:@"REGISTER"]){
-            [[NSUserDefaults standardUserDefaults] setObject:loginEmail forKey:@"email"];
-            [[NSUserDefaults standardUserDefaults] setObject:loginPassword forKey:@"password"];
-            [[NSUserDefaults standardUserDefaults] setObject:@"REGISTER" forKey:@"loginType"];
-            [APPDELEGATE setRegularUserConstrains];
-        }else if([[data objectForKey:@"userType"] isEqualToString:@"FACEBOOK"]){
-            [APPDELEGATE setFacebookUserConstrains];
-            [[NSUserDefaults standardUserDefaults] setObject:@"FACEBOOK" forKey:@"loginType"];
-        }else{
-            [APPDELEGATE setAnonymouseUserConstrains];
-            [[NSUserDefaults standardUserDefaults] setObject:@"ANONYMOUS" forKey:@"loginType"];
-        }
-        UIStoryboard *storyboard = self.storyboard;
-        MainViewController *mainView = [storyboard instantiateViewControllerWithIdentifier:@"MainView"];
-        [self presentViewController:mainView  animated:YES completion:nil];
-    } else{
-        [self showAlertWithTitle:@"Login Failed" message:[data objectForKey:@"displayMessage"]];
-        [self.view sendSubviewToBack:backgroundIV];
-    }
-}
-
-- (IBAction)signUp:(id)sender {
-    [self setButtonsDisable];
-    [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
-    [self requestSignUp];
-}
+#pragma mark Request Data
 
 -(void) requestSignUp
 {
@@ -382,6 +357,71 @@
             }
         }
     }];
+}
+
+#pragma mark Recieve Data
+
+- (void) socketOnRecievedData
+{
+    [socketIO onAny:^(SocketAnyEvent* respond) {
+        NSString *event = respond.event;
+        if([event isEqual:@"disconnect"] || [event isEqual:@"reconnect"] || [event isEqual:@"reconnectAttempt"]){
+            return;
+        }
+        NSDictionary *data = [respond.items objectAtIndex:0];
+        if([event isEqual:@"signup_response"]){
+            [self receiveSignupResponse:data];
+        } else if([event isEqual:@"login_response"]){
+            [self receiveLoginResponse:data];
+        } else if([event isEqual:@"error"]){
+            [self showAlertWithTitle:@"Server Error" message:[data objectForKey:@"message"]];
+        }
+    }];
+}
+
+- (void) receiveSignupResponse:(NSDictionary *)data
+{
+    if([[data objectForKey:@"respond"] isEqual:@"SIGNUP_SUCCESS"]){
+        [[NSUserDefaults standardUserDefaults] setObject:loginEmail forKey:@"email"];
+        [[NSUserDefaults standardUserDefaults] setObject:loginPassword forKey:@"password"];
+        [_toLoginButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+        [self showAlertWithTitle:@"Signup Succeed" message:[data objectForKey:@"displayMessage"]];
+    } else{
+        [self showAlertWithTitle:@"Signup Failed" message:[data objectForKey:@"displayMessage"]];
+    }
+}
+
+- (void) receiveLoginResponse:(NSDictionary *)data
+{
+    if([[data objectForKey:@"respond"] isEqual:@"LOGIN_SUCCESS"]){
+        loginAttemptSuccess = true;
+        APPDELEGATE.userName = [data objectForKey:@"userName"];
+        APPDELEGATE.uid = [data objectForKey:@"uid"];
+        if([[data objectForKey:@"userType"] isEqualToString:@"REGISTER"]){
+            [[NSUserDefaults standardUserDefaults] setObject:loginEmail forKey:@"email"];
+            [[NSUserDefaults standardUserDefaults] setObject:loginPassword forKey:@"password"];
+            [[NSUserDefaults standardUserDefaults] setObject:@"REGISTER" forKey:@"loginType"];
+            [APPDELEGATE setRegularUserConstrains];
+        }else if([[data objectForKey:@"userType"] isEqualToString:@"FACEBOOK"]){
+            [APPDELEGATE setFacebookUserConstrains];
+            [[NSUserDefaults standardUserDefaults] setObject:@"FACEBOOK" forKey:@"loginType"];
+        }else{
+            [APPDELEGATE setAnonymouseUserConstrains];
+            [[NSUserDefaults standardUserDefaults] setObject:@"ANONYMOUS" forKey:@"loginType"];
+        }
+        UIStoryboard *storyboard = self.storyboard;
+        MainViewController *mainView = [storyboard instantiateViewControllerWithIdentifier:@"MainView"];
+        [self presentViewController:mainView  animated:YES completion:nil];
+    } else{
+        [self showAlertWithTitle:@"Login Failed" message:[data objectForKey:@"displayMessage"]];
+        [self.view sendSubviewToBack:backgroundIV];
+    }
+}
+
+#pragma mark Server Alert
+
+- (void)showDefaultServerErrorAlert{
+    [self showAlertWithTitle:@"Server Error" message:@"Woop, something is wrong with our server"];
 }
 
 @end
