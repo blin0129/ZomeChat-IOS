@@ -100,52 +100,63 @@
     [self startLoginActivityIndicator];
     loginAttemptSuccess = false;
     NSString* fbid = [[NSUserDefaults standardUserDefaults] objectForKey:@"FBid"];
-    if(fbid == nil){
-        [self accessFacebookInfo];
-    }else{
-        [self requestFacebookLogin];
-    }
-    [self stopLoginActivityIndicator];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        if (fbid == nil) [self accessFacebookInfo];
+        else [self requestFacebookLogin];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self stopLoginActivityIndicator];
+        });
+    });
 }
 
-
-
 - (IBAction)registerLogin:(id)sender {
-    [self startLoginActivityIndicator];
-    loginAttemptSuccess = false;
-    [self setButtonsDisable];
-    [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
-    if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied){
-        [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device setting"];
+    if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied) {
+        [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device settings."];
     } else {
-        [self requestRegisterLoginWithEmail:self.emailInput.text password:self.passwordInput.text];
+        [self startLoginActivityIndicator];
+        [self setButtonsDisable];
+        loginAttemptSuccess = false;
+        [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self requestRegisterLoginWithEmail:self.emailInput.text password:self.passwordInput.text];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self stopLoginActivityIndicator];
+            });
+        });
     }
-    [self stopLoginActivityIndicator];
 }
 
 - (IBAction)anonymousLogin:(id)sender {
-    [self startLoginActivityIndicator];
-    loginAttemptSuccess = false;
-    [self setButtonsDisable];
-    [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
     if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied){
-        [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device setting"];
+        [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device settings."];
     } else {
-        [self requestAnonLogin];
+        [self startLoginActivityIndicator];
+        [self setButtonsDisable];
+        loginAttemptSuccess = false;
+        [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self requestAnonLogin];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self stopLoginActivityIndicator];
+            });
+        });
     }
-    [self stopLoginActivityIndicator];
 }
 
 - (IBAction)signUp:(id)sender {
     [self startSignupActivityIndicator];
     [self setButtonsDisable];
     [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
-    [self requestSignUp];
-    [self stopSignupActivityIndicator];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        [self requestSignUp];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self stopSignupActivityIndicator];
+        });
+    });
 }
 
 - (IBAction)toSignUpPage:(id)sender {
-    
+
 }
 
 #pragma mark Auto Login
