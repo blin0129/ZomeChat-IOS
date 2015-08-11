@@ -15,6 +15,8 @@
 
 @implementation NewPostViewController
 
+#pragma mark - NSObject
+
 -(id)initWithCoder:(NSCoder *)aDecoder
 {
     self = [super initWithCoder:aDecoder];
@@ -23,6 +25,8 @@
     }
     return self;
 }
+
+#pragma mark - UIViewController
 
 - (void)viewDidLoad
 {
@@ -83,6 +87,11 @@
     [super didReceiveMemoryWarning];
 }
 
+
+#pragma mark - Text View -
+
+#pragma mark UITextViewDelegate
+
 - (void)textViewDidChange:(UITextView *)textView
 {
     NSMutableAttributedString * string = [[NSMutableAttributedString alloc]initWithString:textView.text];
@@ -98,10 +107,6 @@
     [textView setAttributedText:string];
 }
 
--(void)tap:(UITapGestureRecognizer *)tapRec{
-    [[self view] endEditing: YES];
-}
-
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
     if ([text isEqualToString:@"\n"]){
@@ -110,9 +115,16 @@
     return YES;
 }
 
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *) Picker {
-    [Picker dismissViewControllerAnimated:YES completion:nil];
+#pragma mark Helpers
+
+-(void)tap:(UITapGestureRecognizer *)tapRec{
+    [[self view] endEditing: YES];
 }
+
+#pragma mark - Image Picker -
+
+#pragma mark IBActions
+
 - (IBAction)removePictureBunClick:(id)sender {
     self.removePictureBtn.hidden = YES;
     self.addPictureBtn.hidden = NO;
@@ -148,6 +160,9 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+
+#pragma mark UIImagePickerControllerDelegate
+
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)img editingInfo:(NSDictionary *)editInfo {
     self.postingImage = [self resizeImage:img];
     [self.postImageView setImage:self.postingImage];
@@ -156,6 +171,12 @@
     self.removePictureBtn.hidden = NO;
     self.addPictureBtn.hidden = YES;
 }
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *) Picker {
+    [Picker dismissViewControllerAnimated:YES completion:nil];
+}
+
+#pragma mark Helpers
 
 - (UIImage *) resizeImage:(UIImage *)originalImage {
     float height = originalImage.size.height;
@@ -178,6 +199,8 @@
         return nil;
     return [UIImagePNGRepresentation(image) base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
 }
+
+#pragma mark - Alert View
 
 -(void)showAlertBox:(NSString *)title message:(NSString *)message button:(NSString *)buttonTitle
 {
