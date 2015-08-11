@@ -22,19 +22,23 @@
 @synthesize pictureLoaded;
 @synthesize tableData;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-    }
-    return self;
-}
+#pragma mark - NSObject
 
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
     self = [super initWithCoder:aDecoder];
     if(self){
         APPDELEGATE.msglistVC = self;
+    }
+    return self;
+}
+
+#pragma mark - UIViewController
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
     }
     return self;
 }
@@ -59,6 +63,14 @@
     [self.view addGestureRecognizer:longPressGesture];
 }
 
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Custom View
+
 - (void)customNavBar
 {
     self.navigationItem.title = @"Feed";
@@ -75,11 +87,9 @@
 
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+#pragma mark - Bulletin Board -
+
+#pragma mark Update
 
 - (void) updateMsgboardMessages:(NSDictionary *)data
 {
@@ -127,6 +137,19 @@
     }
 }
 
+- (void) updateListWithTag:(NSString *)tagString{
+    NSMutableArray *tagPosts = (NSMutableArray *)[hashTagDictionary objectForKey:tagString];
+    if(tagPosts != nil){
+        tableData = tagPosts;
+        [self showAllPostIcon];
+        [self.tableView reloadData];
+    } else {
+        [self showAlertBox:APPDELEGATE.noTaggedFeedAlertTitle
+                   message:APPDELEGATE.noTaggedFeedAlertMessage
+                    button:@"OK"];
+    }
+}
+
 - (void) fetchHashTag:(NSString *)tag post:(NSDictionary *) post{
     if([hashTagDictionary objectForKey:tag] == nil){
         NSMutableArray *postsWithTags = [[NSMutableArray alloc] initWithObjects: post, nil];
@@ -149,11 +172,98 @@
     return sortedArray;
 }
 
+#pragma mark Images
+
+- (UIImage *) getImageFromURL: (NSString *) imageURL{
+    if ([imageURL isEqualToString:@""]) {
+        return nil;
+    }
+    UIImage *img = [APPDELEGATE.imageCache objectForKey:imageURL];
+    if(!img){
+        img = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString: imageURL]]];
+        if(img){
+            [APPDELEGATE.imageCache setObject:img forKey:imageURL];
+        }
+    }
+    return [self resizeImage:img];
+}
+
+- (UIImage *) resizeImage:(UIImage *)originalImage {
+    float width = originalImage.size.width;
+    float weidthScale = width/([[UIScreen mainScreen] bounds].size.width - 30);
+    float finalScale = 1;
+    if (weidthScale >= 1) {
+        finalScale = 1 / weidthScale;
+    }
+    CGSize newSize = CGSizeMake(width * finalScale, originalImage.size.height * finalScale);
+    UIImage *newImage =[originalImage imageCroppedToFitSize:newSize];
+    return newImage;
+}
+
+#pragma mark Presentation
+
+- (void) hashtagColor:(UITextView *)textView{
+    NSMutableAttributedString * string = [[NSMutableAttributedString alloc]initWithString:textView.text];
+    [string addAttribute:NSForegroundColorAttributeName value:[UIColor darkGrayColor] range:NSMakeRange(0,[string length])];
+    [string addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:13.0f] range:NSMakeRange(0,[string length])];
+    NSError *error = nil;
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"#(\\w+)" options:0 error:&error];
+    NSArray *matches = [regex matchesInString:textView.text options:0 range:NSMakeRange(0, textView.text.length)];
+    for (NSTextCheckingResult *match in matches) {
+        NSRange wordRange = [match rangeAtIndex:0];
+        [string addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x5c9fd6) range:wordRange];
+    }
+    [textView setAttributedText:string];
+}
+
+- (void) toNewPostPage
+{
+    if(APPDELEGATE.postFeed){
+        NSDate *lastMessageTime = [[NSUserDefaults standardUserDefaults] objectForKey:@"lastMessageCreatedTime"];
+        _timeSinceLastMessage = -1 * [lastMessageTime timeIntervalSinceNow];
+        if (_timeSinceLastMessage < APPDELEGATE.postingFeedTimerOffset && lastMessageTime != nil){
+            int waitingTime = (APPDELEGATE.postingFeedTimerOffset - _timeSinceLastMessage)/60 + 1;
+            NSString *message = [NSString stringWithFormat:@"Please wait for %d min", waitingTime];
+            UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:@"You just create a message"
+                                                                      message:message
+                                                                     delegate:self
+                                                            cancelButtonTitle:@"Okay"
+                                                            otherButtonTitles:nil];
+            [newMessageAlert show];
+        } else {
+            NewPostViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"NewPost"];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+    } else {
+        [self showAlertBox:APPDELEGATE.postFeedAlertTitle
+                   message:APPDELEGATE.postFeedAlertMessage
+                    button:@"OK"];
+    }
+}
+
+- (void) showAllPostIcon{
+    UIBarButtonItem *negativeSpacer = [[UIBarButtonItem alloc]
+                                       initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
+                                       target:nil action:nil];
+    negativeSpacer.width = -10;
+    UIBarButtonItem * item2= [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"bar_icon_back"] style:UIBarButtonItemStylePlain target:self action:@selector(displayAllPosts)];
+    self.navigationItem.leftBarButtonItems =[NSArray arrayWithObjects:negativeSpacer, item2, nil];
+}
+
+- (void) displayAllPosts{
+    tableData = messageList;
+    [self.tableView reloadData];
+    [self customNavBar];
+}
+
+#pragma mark - UITextField
+
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSUInteger newLength = [textField.text length] + [string length] - range.length;
     return (newLength > 200) ? NO : YES;
 }
 
+#pragma mark - UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -173,6 +283,7 @@
     }
 }
 
+#pragma mark - UITableViewDelegate
 
 - (UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
@@ -281,158 +392,6 @@
     
 }
 
-
-- (void) hashtagColor:(UITextView *)textView{
-    NSMutableAttributedString * string = [[NSMutableAttributedString alloc]initWithString:textView.text];
-    [string addAttribute:NSForegroundColorAttributeName value:[UIColor darkGrayColor] range:NSMakeRange(0,[string length])];
-    [string addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:13.0f] range:NSMakeRange(0,[string length])];
-    NSError *error = nil;
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"#(\\w+)" options:0 error:&error];
-    NSArray *matches = [regex matchesInString:textView.text options:0 range:NSMakeRange(0, textView.text.length)];
-    for (NSTextCheckingResult *match in matches) {
-        NSRange wordRange = [match rangeAtIndex:0];
-        [string addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x5c9fd6) range:wordRange];
-    }
-    [textView setAttributedText:string];
-}
-
-- (UIImage *) getImageFromURL: (NSString *) imageURL{
-    if ([imageURL isEqualToString:@""]) {
-        return nil;
-    }
-    UIImage *img = [APPDELEGATE.imageCache objectForKey:imageURL];
-    if(!img){
-        img = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString: imageURL]]];
-        if(img){
-            [APPDELEGATE.imageCache setObject:img forKey:imageURL];
-        }
-    }
-    return [self resizeImage:img];
-}
-
-- (UIImage *) resizeImage:(UIImage *)originalImage {
-    float width = originalImage.size.width;
-    float weidthScale = width/([[UIScreen mainScreen] bounds].size.width - 30);
-    float finalScale = 1;
-    if (weidthScale >= 1) {
-        finalScale = 1 / weidthScale;
-    }
-    CGSize newSize = CGSizeMake(width * finalScale, originalImage.size.height * finalScale);
-    UIImage *newImage =[originalImage imageCroppedToFitSize:newSize];
-    return newImage;
-}
-
-
-- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    self.selectedData = [tableData objectAtIndex:indexPath.row];
-    NewPostViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"Post"];
-    [self.navigationController pushViewController:vc animated:YES];
-}
-
-- (void) toNewPostPage
-{
-    if(APPDELEGATE.postFeed){
-        NSDate *lastMessageTime = [[NSUserDefaults standardUserDefaults] objectForKey:@"lastMessageCreatedTime"];
-        _timeSinceLastMessage = -1 * [lastMessageTime timeIntervalSinceNow];
-        if (_timeSinceLastMessage < APPDELEGATE.postingFeedTimerOffset && lastMessageTime != nil){
-            int waitingTime = (APPDELEGATE.postingFeedTimerOffset - _timeSinceLastMessage)/60 + 1;
-            NSString *message = [NSString stringWithFormat:@"Please wait for %d min", waitingTime];
-            UIAlertView *newMessageAlert = [[UIAlertView alloc] initWithTitle:@"You just create a message"
-                                                                      message:message
-                                                                     delegate:self
-                                                            cancelButtonTitle:@"Okay"
-                                                            otherButtonTitles:nil];
-            [newMessageAlert show];
-        } else {
-            NewPostViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"NewPost"];
-            [self.navigationController pushViewController:vc animated:YES];
-        }
-    } else {
-        [self showAlertBox:APPDELEGATE.postFeedAlertTitle
-                   message:APPDELEGATE.postFeedAlertMessage
-                    button:@"OK"];
-    }
-}
-
-- (void) tagSearchAlert{
-    _popupType = @"TAGSEARCH";
-    UITextField *messageField = [[UITextField alloc] initWithFrame:CGRectMake(20.0, 45.0, 245.0, 25.0)];
-//    messageField.placeholder = @"Search for a hashtag";
-//    [messageField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@""]];
-    UIAlertView *newSearchAlert = [[UIAlertView alloc] initWithTitle:@"Hashtag Search"
-                                                              message:@"Search for posts with specific hashtag"
-                                                             delegate:self
-                                                    cancelButtonTitle:@"Cancel"
-                                                    otherButtonTitles:@"Search", nil];
-    [newSearchAlert addSubview:messageField];
-    newSearchAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [newSearchAlert show];
-    
-}
-
-- (void) updateListWithTag:(NSString *)tagString{
-    NSMutableArray *tagPosts = (NSMutableArray *)[hashTagDictionary objectForKey:tagString];
-    if(tagPosts != nil){
-        tableData = tagPosts;
-        [self showAllPostIcon];
-        [self.tableView reloadData];
-    } else {
-        [self showAlertBox:APPDELEGATE.noTaggedFeedAlertTitle
-                   message:APPDELEGATE.noTaggedFeedAlertMessage
-                    button:@"OK"];
-    }
-}
-
-- (void) emptyPostAlert{
-    _popupType = @"NEWPOST";
-    UIAlertView *newPostAlert = [[UIAlertView alloc] initWithTitle:APPDELEGATE.firstPostAlertTitle
-                                                              message:APPDELEGATE.firstPostAlertMessage
-                                                             delegate:self
-                                                    cancelButtonTitle:@"Cancel"
-                                                    otherButtonTitles:@"New Post", nil];
-    [newPostAlert show];
-}
-
-- (void) showAllPostIcon{
-    UIBarButtonItem *negativeSpacer = [[UIBarButtonItem alloc]
-                                       initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
-                                       target:nil action:nil];
-    negativeSpacer.width = -10;
-    UIBarButtonItem * item2= [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"bar_icon_back"] style:UIBarButtonItemStylePlain target:self action:@selector(displayAllPosts)];
-        self.navigationItem.leftBarButtonItems =[NSArray arrayWithObjects:negativeSpacer, item2, nil];
-}
-
-- (void) displayAllPosts{
-    tableData = messageList;
-    [self.tableView reloadData];
-    [self customNavBar];
-}
-
-- (BOOL)canBecomeFirstResponder
-{
-    return YES;
-}
-
--(void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
-{
-    if(gestureRecognizer.state == UIGestureRecognizerStateBegan){
-        CGPoint point = [gestureRecognizer locationInView:self.tableView];
-        NSIndexPath * indexPath = [self.tableView indexPathForRowAtPoint:point];
-        if(indexPath == nil) return ;
-        
-        PostTableViewCell *cell = (PostTableViewCell *)[self.tableView cellForRowAtIndexPath:indexPath];
-        UIMenuController *menu = [UIMenuController sharedMenuController];
-        [menu setTargetRect:cell.frame inView:cell.superview];
-        [menu setMenuVisible:YES animated:YES];
-        [cell becomeFirstResponder]; //here set the cell as the responder of the menu action
-    }
-}
-
-- (BOOL) canPerformAction:(SEL)action withSender:(id)sender {
-    return (action == NSSelectorFromString(@"report:"));
-}
-
 - (BOOL)tableView:(UITableView *)tableView canPerformAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender
 {
     return (action == NSSelectorFromString(@"report:"));
@@ -455,6 +414,44 @@
         [reportAlert show];
     }
 }
+
+
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    self.selectedData = [tableData objectAtIndex:indexPath.row];
+    NewPostViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"Post"];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+#pragma mark - UILongPressGestureRecognizer
+
+-(void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
+{
+    if(gestureRecognizer.state == UIGestureRecognizerStateBegan){
+        CGPoint point = [gestureRecognizer locationInView:self.tableView];
+        NSIndexPath * indexPath = [self.tableView indexPathForRowAtPoint:point];
+        if(indexPath == nil) return ;
+        
+        PostTableViewCell *cell = (PostTableViewCell *)[self.tableView cellForRowAtIndexPath:indexPath];
+        UIMenuController *menu = [UIMenuController sharedMenuController];
+        [menu setTargetRect:cell.frame inView:cell.superview];
+        [menu setMenuVisible:YES animated:YES];
+        [cell becomeFirstResponder]; //here set the cell as the responder of the menu action
+    }
+}
+
+#pragma mark - UIResponder
+
+- (BOOL) canPerformAction:(SEL)action withSender:(id)sender {
+    return (action == NSSelectorFromString(@"report:"));
+}
+
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+#pragma mark - UIAlertViewDelegate
 
 -(void)willPresentAlertView:(UIAlertView *)alertView {
     if([_popupType isEqualToString:@"REPORT"]){
@@ -487,6 +484,34 @@
         }
 
     }
+}
+
+#pragma mark - Alerts
+
+- (void) tagSearchAlert{
+    _popupType = @"TAGSEARCH";
+    UITextField *messageField = [[UITextField alloc] initWithFrame:CGRectMake(20.0, 45.0, 245.0, 25.0)];
+    //    messageField.placeholder = @"Search for a hashtag";
+    //    [messageField setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:@""]];
+    UIAlertView *newSearchAlert = [[UIAlertView alloc] initWithTitle:@"Hashtag Search"
+                                                             message:@"Search for posts with specific hashtag"
+                                                            delegate:self
+                                                   cancelButtonTitle:@"Cancel"
+                                                   otherButtonTitles:@"Search", nil];
+    [newSearchAlert addSubview:messageField];
+    newSearchAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [newSearchAlert show];
+    
+}
+
+- (void) emptyPostAlert{
+    _popupType = @"NEWPOST";
+    UIAlertView *newPostAlert = [[UIAlertView alloc] initWithTitle:APPDELEGATE.firstPostAlertTitle
+                                                           message:APPDELEGATE.firstPostAlertMessage
+                                                          delegate:self
+                                                 cancelButtonTitle:@"Cancel"
+                                                 otherButtonTitles:@"New Post", nil];
+    [newPostAlert show];
 }
 
 -(void)showAlertBox:(NSString *)title message:(NSString *)message button:(NSString *)buttonTitle
