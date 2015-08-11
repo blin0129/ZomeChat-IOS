@@ -118,12 +118,7 @@
     [self startSignupActivityIndicator];
     [self setButtonsDisable];
     [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        [self requestSignUp];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self stopSignupActivityIndicator];
-        });
-    });
+    [self requestSignUp];
 }
 
 - (IBAction)toSignUpPage:(id)sender {
@@ -141,12 +136,7 @@
         [self setButtonsDisable];
         loginAttemptSuccess = false;
         [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            [self performSelector:requestSelector withObject:objectOne withObject:objectTwo];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self stopLoginActivityIndicator];
-            });
-        });
+        [self performSelector:requestSelector withObject:objectOne withObject:objectTwo];
     }
 }
 
@@ -410,6 +400,7 @@
     } else{
         [self showAlertWithTitle:@"Signup Failed" message:[data objectForKey:@"displayMessage"]];
     }
+    [self stopSignupActivityIndicator];
 }
 
 - (void) receiveLoginResponse:(NSDictionary *)data
@@ -437,12 +428,13 @@
         [self showAlertWithTitle:@"Login Failed" message:[data objectForKey:@"displayMessage"]];
         [self.view sendSubviewToBack:backgroundIV];
     }
+    [self stopLoginActivityIndicator];
 }
 
 #pragma mark Server Alert
 
 - (void)showDefaultServerErrorAlert{
-    [self showAlertWithTitle:@"Server Error" message:@"Woop, something is wrong with our server"];
+    [self showAlertWithTitle:@"Server Error" message:@"Whoops, something is wrong with our server"];
 }
 
 @end
