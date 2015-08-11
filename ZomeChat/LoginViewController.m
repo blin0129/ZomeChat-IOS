@@ -32,7 +32,7 @@
 {
     [super viewDidLoad];
     loginAttemptSuccess = true;
-
+    
     //Set socketIO listener
     socketIO = APPDELEGATE.socketIO;
     [self socketOnRecievedData];
@@ -89,7 +89,7 @@
     if([CLLocationManager locationServicesEnabled]){
         _currentLocation = APPDELEGATE.locationManager.location;
     }
-
+    
 }
 
 #pragma mark - Logins and Signups -
@@ -97,50 +97,21 @@
 #pragma mark IBActions
 
 - (IBAction)facebookLogin:(id)sender {
-    [self startLoginActivityIndicator];
-    loginAttemptSuccess = false;
     NSString* fbid = [[NSUserDefaults standardUserDefaults] objectForKey:@"FBid"];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        if (fbid == nil) [self accessFacebookInfo];
-        else [self requestFacebookLogin];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self stopLoginActivityIndicator];
-        });
-    });
+    [self performLoginWithRequest:@selector(facebookLoginHelper:)
+                        andObject:fbid
+                        andObject:nil];
 }
 
 - (IBAction)registerLogin:(id)sender {
-    if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied) {
-        [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device settings."];
-    } else {
-        [self startLoginActivityIndicator];
-        [self setButtonsDisable];
-        loginAttemptSuccess = false;
-        [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            [self requestRegisterLoginWithEmail:self.emailInput.text password:self.passwordInput.text];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self stopLoginActivityIndicator];
-            });
-        });
-    }
+    [self performLoginWithRequest:@selector(requestRegisterLoginWithEmail:password:)
+                        andObject:self.emailInput.text
+                        andObject:self.passwordInput.text];
 }
 
 - (IBAction)anonymousLogin:(id)sender {
-    if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied){
-        [self showAlertWithTitle:@"Location Service disabled" message:@"Please turn on Location Services in your device settings."];
-    } else {
-        [self startLoginActivityIndicator];
-        [self setButtonsDisable];
-        loginAttemptSuccess = false;
-        [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            [self requestAnonLogin];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self stopLoginActivityIndicator];
-            });
-        });
-    }
+    [self performLoginWithRequest:@selector(requestAnonLogin)
+                        andObject:nil andObject:nil];
 }
 
 - (IBAction)signUp:(id)sender {
@@ -156,8 +127,34 @@
 }
 
 - (IBAction)toSignUpPage:(id)sender {
-
+    
 }
+
+#pragma mark Helper Methods
+
+- (void)performLoginWithRequest:(SEL)requestSelector andObject:(NSObject*)objectOne andObject:(NSObject *)objectTwo {
+    if(![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied){
+        [self showAlertWithTitle:@"Location Service disabled"
+                         message:@"Please turn on Location Services in your device settings."];
+    } else {
+        [self startLoginActivityIndicator];
+        [self setButtonsDisable];
+        loginAttemptSuccess = false;
+        [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self performSelector:requestSelector withObject:objectOne withObject:objectTwo];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self stopLoginActivityIndicator];
+            });
+        });
+    }
+}
+
+- (void)facebookLoginHelper:(NSString*)FBid {
+    if (FBid) [self requestFacebookLogin];
+    else [self accessFacebookInfo];
+}
+
 
 #pragma mark Auto Login
 
