@@ -108,17 +108,31 @@
                                     <action selector="anonymousLogin:" destination="ZZk-BB-2gw" eventType="touchUpInside" id="rVg-1M-tsa"/>
                                 </connections>
                             </button>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="6mD-b0-tBK">
-                                <rect key="frame" x="150" y="50" width="20" height="20"/>
-                            </activityIndicatorView>
+                            <view alpha="0.69999999999999996" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="thm-TZ-bGw">
+                                <rect key="frame" x="105" y="246" width="110" height="75"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Logging In..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9im-9u-hLh">
+                                        <rect key="frame" x="7" y="43" width="96" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="6mD-b0-tBK">
+                                        <rect key="frame" x="45" y="15" width="20" height="20"/>
+                                    </activityIndicatorView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="centerX" secondItem="gSm-Rb-jhi" secondAttribute="centerX" id="3IE-Ds-Xri"/>
-                            <constraint firstItem="gSm-Rb-jhi" firstAttribute="trailing" secondItem="6mD-b0-tBK" secondAttribute="trailing" constant="100" id="7ac-9Y-kEy"/>
-                            <constraint firstItem="gSm-Rb-jhi" firstAttribute="top" secondItem="6mD-b0-tBK" secondAttribute="bottom" constant="40" id="8DJ-j4-hug"/>
                             <constraint firstItem="TUJ-Jb-0Mj" firstAttribute="top" secondItem="gSm-Rb-jhi" secondAttribute="bottom" constant="15" id="Aqw-oE-Eoe"/>
-                            <constraint firstItem="gSm-Rb-jhi" firstAttribute="leading" secondItem="6mD-b0-tBK" secondAttribute="leading" constant="-100" id="L4H-hl-AID"/>
                             <constraint firstItem="gSm-Rb-jhi" firstAttribute="top" secondItem="cna-jK-1QP" secondAttribute="bottom" constant="90" id="PqN-Cy-PjH"/>
                             <constraint firstItem="XdO-Vj-Ksh" firstAttribute="leading" secondItem="uRj-tc-Lse" secondAttribute="trailing" constant="11" id="Se6-iR-hf9"/>
                             <constraint firstItem="XdO-Vj-Ksh" firstAttribute="top" secondItem="TUJ-Jb-0Mj" secondAttribute="bottom" constant="15" id="Sfj-c3-s6R"/>
@@ -133,6 +147,7 @@
                     <connections>
                         <outlet property="anonLoginButton" destination="uRj-tc-Lse" id="tkG-SQ-U5T"/>
                         <outlet property="emailInput" destination="8Az-F8-EJc" id="3wH-Ia-nuJ"/>
+                        <outlet property="loginActivityBackground" destination="thm-TZ-bGw" id="puw-jH-V6U"/>
                         <outlet property="loginActivityIndicator" destination="6mD-b0-tBK" id="R6Q-17-eVi"/>
                         <outlet property="passwordInput" destination="Lrf-BE-dCf" id="smZ-ZF-7MS"/>
                         <outlet property="toSignupButton" destination="XdO-Vj-Ksh" id="8OA-ju-ZH9"/>
@@ -235,23 +250,38 @@
                                     <segue destination="ZZk-BB-2gw" kind="modal" id="NCL-sR-0nS"/>
                                 </connections>
                             </button>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="L6r-hk-EWR">
-                                <rect key="frame" x="150" y="50" width="20" height="20"/>
-                            </activityIndicatorView>
+                            <view alpha="0.69999999999999996" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Frg-kz-fIE">
+                                <rect key="frame" x="105" y="246" width="110" height="75"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Signing up..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1Ug-8Y-mOt">
+                                        <rect key="frame" x="7" y="41" width="97" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="L6r-hk-EWR">
+                                        <rect key="frame" x="45" y="13" width="20" height="20"/>
+                                    </activityIndicatorView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="L6r-hk-EWR" firstAttribute="leading" secondItem="P8X-dI-hJw" secondAttribute="leading" constant="105" id="3Lb-UW-Xqi"/>
-                            <constraint firstItem="L6r-hk-EWR" firstAttribute="trailing" secondItem="P8X-dI-hJw" secondAttribute="trailing" constant="-105" id="FnQ-EP-J15"/>
                             <constraint firstAttribute="centerX" secondItem="P8X-dI-hJw" secondAttribute="centerX" id="apr-Ea-L5Q"/>
                             <constraint firstItem="FGo-va-ED7" firstAttribute="top" secondItem="P8X-dI-hJw" secondAttribute="bottom" constant="15" id="bzT-cQ-xrv"/>
                             <constraint firstItem="P8X-dI-hJw" firstAttribute="top" secondItem="JUv-ME-nBy" secondAttribute="bottom" constant="90" id="lO9-dy-AFT"/>
                             <constraint firstItem="P8X-dI-hJw" firstAttribute="trailing" secondItem="FGo-va-ED7" secondAttribute="trailing" id="uKB-n8-DMf"/>
-                            <constraint firstItem="P8X-dI-hJw" firstAttribute="top" secondItem="L6r-hk-EWR" secondAttribute="bottom" constant="40" id="zZk-Ky-Rlf"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Ird-El-uMT"/>
                     <connections>
+                        <outlet property="signupActivityBackground" destination="Frg-kz-fIE" id="Dc7-et-R1h"/>
                         <outlet property="signupActivityIndicator" destination="L6r-hk-EWR" id="BU7-c1-pCZ"/>
                         <outlet property="signupEmail" destination="bvS-c4-3C1" id="MdD-9o-JnP"/>
                         <outlet property="signupPassword" destination="CpG-vv-7Xg" id="BQV-FP-0oa"/>

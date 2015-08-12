@@ -83,13 +83,14 @@
     _signupPasswordC.delegate = self;
     _signupEmail.delegate = self;
     
-    _loginActivityIndicator.hidden = YES;
-    _signupActivityIndicator.hidden = YES;
+    _loginActivityIndicator.hidden = NO;
+    _signupActivityIndicator.hidden = NO;
+    _loginActivityBackground.hidden = YES;
+    _signupActivityBackground.hidden = YES;
     
     if([CLLocationManager locationServicesEnabled]){
         _currentLocation = APPDELEGATE.locationManager.location;
     }
-    
 }
 
 #pragma mark - Logins and Signups -
@@ -115,9 +116,9 @@
 }
 
 - (IBAction)signUp:(id)sender {
-    [self startSignupActivityIndicator];
-    [self setButtonsDisable];
-    [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
+    [self startSignupActivityView];
+    [self disableButtons];
+    [self performSelector:@selector(enableButtons) withObject:nil afterDelay:2.0];
     [self requestSignUp];
 }
 
@@ -132,10 +133,10 @@
         [self showAlertWithTitle:@"Location Service disabled"
                          message:@"Please turn on Location Services in your device settings."];
     } else {
-        [self startLoginActivityIndicator];
-        [self setButtonsDisable];
+        [self startLoginActivityView];
+        [self disableButtons];
         loginAttemptSuccess = false;
-        [self performSelector:@selector(setButtonsEnable) withObject:nil afterDelay:2.0];
+        [self performSelector:@selector(enableButtons) withObject:nil afterDelay:2.0];
         [self performSelector:requestSelector withObject:objectOne withObject:objectTwo];
     }
 }
@@ -150,7 +151,7 @@
 
 - (void) autoLogin
 {
-    [self startLoginActivityIndicator];
+    [self startLoginActivityView];
     [self performSelector:@selector(autoLoginFail) withObject:nil afterDelay:5.0];
     NSString *savedEmail = [[NSUserDefaults standardUserDefaults] objectForKey:@"email"];
     NSString *savedPassword = [[NSUserDefaults standardUserDefaults] objectForKey:@"password"];
@@ -167,13 +168,13 @@
             }
         }
     }];
-    [self stopLoginActivityIndicator];
+    [self stopLoginActivityView];
 }
 
 - (void) autoLoginFail
 {
     if(loginAttemptSuccess == false){
-        [self showAlertWithTitle:@"Login Fail" message:@"Connection Timeout"];
+        [self showAlertWithTitle:@"Login Fail" message:@"The connection timed out."];
     }
     [self.view sendSubviewToBack:backgroundIV];
 }
@@ -183,13 +184,13 @@
 -(BOOL) checkSingupConstraints: (NSString *)email :(NSString *)pssd :(NSString *)pssdc
 {
     if (pssd.length < 5){
-        [self showAlertWithTitle:@"Signup Fail" message:@"Password less than 5 characters"];
+        [self showAlertWithTitle:@"Signup Failed" message:@"Your password is less than 5 characters."];
         return FALSE;
     } else if (![pssd isEqualToString:pssdc]){
-        [self showAlertWithTitle:@"Signup Fail" message:@"Confrimed password does not match password"];
+        [self showAlertWithTitle:@"Signup Failed" message:@"Confrimed password doesn't match password."];
         return FALSE;
     } else if (![self isValidEmail:email]){
-        [self showAlertWithTitle:@"Signup Fail" message:@"Invalid email"];
+        [self showAlertWithTitle:@"Signup Failed" message:@"Invalid email."];
         return FALSE;
     }
     return TRUE;
@@ -219,38 +220,42 @@
 
 #pragma mark Custom
 
-- (void) setButtonsDisable
+- (void) disableButtons
 {
     [_toSignupButton setEnabled:FALSE];
     [_toLoginButton setEnabled:FALSE];
     [_anonLoginButton setEnabled:FALSE];
 }
 
-- (void) setButtonsEnable
+- (void) enableButtons
 {
     [_toSignupButton setEnabled:TRUE];
     [_toLoginButton setEnabled:TRUE];
     [_anonLoginButton setEnabled:TRUE];
 }
 
-- (void)startLoginActivityIndicator {
+- (void)startLoginActivityView {
     _loginActivityIndicator.hidden = NO;
     [_loginActivityIndicator startAnimating];
+    _loginActivityBackground.hidden = NO;
 }
 
-- (void)stopLoginActivityIndicator {
+- (void)stopLoginActivityView {
     _loginActivityIndicator.hidden = YES;
     [_loginActivityIndicator stopAnimating];
+    _loginActivityBackground.hidden = YES;
 }
 
-- (void)startSignupActivityIndicator {
+- (void)startSignupActivityView {
     _signupActivityIndicator.hidden = NO;
     [_signupActivityIndicator startAnimating];
+    _signupActivityBackground.hidden = NO;
 }
 
-- (void)stopSignupActivityIndicator {
+- (void)stopSignupActivityView {
     _signupActivityIndicator.hidden = YES;
     [_signupActivityIndicator stopAnimating];
+    _signupActivityBackground.hidden = YES;
 }
 
 - (void)showAlertWithTitle:(NSString*) title message:(NSString*) message
@@ -272,7 +277,6 @@
     loginEmail = self.signupEmail.text;
     loginPassword = self.signupPassword.text;
     NSString *passwordConfirm = self.signupPasswordC.text;
-    NSString *email = self.signupEmail.text;
     if([self checkSingupConstraints:loginEmail:loginPassword:passwordConfirm]){
         NSDictionary* signupData = @{@"uid" : loginEmail,
                                      @"version": [APPDELEGATE version],
@@ -281,6 +285,8 @@
                                      @"lat" : APPDELEGATE.lat
                                      };
         [socketIO emit:@"signup" withItems:@[signupData]];
+    } else {
+        [self stopSignupActivityView];
     }
 }
 
@@ -396,11 +402,11 @@
         [[NSUserDefaults standardUserDefaults] setObject:loginEmail forKey:@"email"];
         [[NSUserDefaults standardUserDefaults] setObject:loginPassword forKey:@"password"];
         [_toLoginButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-        [self showAlertWithTitle:@"Signup Succeed" message:[data objectForKey:@"displayMessage"]];
+        [self showAlertWithTitle:@"Signup Succeeded" message:[data objectForKey:@"displayMessage"]];
     } else{
         [self showAlertWithTitle:@"Signup Failed" message:[data objectForKey:@"displayMessage"]];
     }
-    [self stopSignupActivityIndicator];
+    [self stopSignupActivityView];
 }
 
 - (void) receiveLoginResponse:(NSDictionary *)data
@@ -428,13 +434,13 @@
         [self showAlertWithTitle:@"Login Failed" message:[data objectForKey:@"displayMessage"]];
         [self.view sendSubviewToBack:backgroundIV];
     }
-    [self stopLoginActivityIndicator];
+    [self stopLoginActivityView];
 }
 
 #pragma mark Server Alert
 
 - (void)showDefaultServerErrorAlert{
-    [self showAlertWithTitle:@"Server Error" message:@"Whoops, something is wrong with our server"];
+    [self showAlertWithTitle:@"Server Error" message:@"Whoops, something is wrong with our server!"];
 }
 
 @end
