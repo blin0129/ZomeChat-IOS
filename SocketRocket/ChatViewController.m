@@ -11,7 +11,10 @@
 #import "UIImage+ProportionalFill.h"
 #import "ChatImageViewController.h"
 
-@implementation ChatViewController
+@implementation ChatViewController{
+    UIBarButtonItem *saveBtn;
+    UIBarButtonItem *settingsBtn;
+}
 
 @synthesize roomKey;
 @synthesize roomName;
@@ -51,11 +54,23 @@
     [cameraButton setImage:[UIImage imageNamed:@"btn_cam"] forState:UIControlStateNormal];
     self.inputToolbar.contentView.leftBarButtonItem = cameraButton;
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"bar_icon_group"]
-                                                                              style:UIBarButtonItemStyleBordered
-                                                                             target:self
-                                                                             action:@selector(receiveMessagePressed:)];
-//    self.messages = [[NSMutableArray alloc] init];
+    // Nav Bar Buttons
+    saveBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"bar_icon_like"]
+                                                                style:UIBarButtonItemStylePlain
+                                                               target:self
+                                                               action:nil];
+    UIBarButtonItem *negativeSpacer = [[UIBarButtonItem alloc]
+                                       initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
+                                       target:nil action:nil];
+    negativeSpacer.width = -10;
+    
+    settingsBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"bar_icon_group"]
+                                                                 style:UIBarButtonItemStyleBordered
+                                                                target:self
+                                                                action:@selector(receiveMessagePressed:)];
+    
+    self.navigationItem.rightBarButtonItems = @[negativeSpacer, settingsBtn, saveBtn];
+    
     self.chatData = [[ChatroomData alloc] init];
     
     self.collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeMake(50, 50);
