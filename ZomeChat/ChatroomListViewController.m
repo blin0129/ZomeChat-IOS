@@ -33,6 +33,8 @@
     return self;
 }
 
+#pragma mark - UIViewController
+
 - (void)viewDidLoad
 {
 //    APPDELEGATE.chatroomListVC = self;
@@ -40,6 +42,7 @@
     [self customNavBar];
     [self loadMap];
     [APPDELEGATE.mainVC requestChatroomList];
+    [APPDELEGATE.mainVC requestSavedChatrooms];
         [self.view setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"background-babyblue"]]];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
@@ -110,6 +113,11 @@
     if (receiveList.count == 1) {
         [self performSelector:@selector(suggestCreateNewRoom) withObject:self afterDelay:0.5];
     }
+}
+
+- (void) updateSavedChatrooms:(NSDictionary *)data
+{
+    NSLog([data description]);
 }
 
 -(void)suggestCreateNewRoom

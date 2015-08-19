@@ -58,7 +58,7 @@
     saveBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"bar_icon_like"]
                                                                 style:UIBarButtonItemStylePlain
                                                                target:self
-                                                               action:nil];
+                                                               action:@selector(saveChatroom)];
     UIBarButtonItem *negativeSpacer = [[UIBarButtonItem alloc]
                                        initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
                                        target:nil action:nil];
@@ -81,6 +81,11 @@
     [self.view addGestureRecognizer: tapRec];
     
 
+}
+
+- (void)saveChatroom
+{
+    NSLog(@"Trying to save a chatroom.");
 }
 
 - (void)viewWillAppear:(BOOL)animated

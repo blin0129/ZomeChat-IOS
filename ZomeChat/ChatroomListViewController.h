@@ -18,5 +18,6 @@
 @property (strong, nonatomic) NSString *reportChatroomId;
 
 -(void) updateChatroomList:(NSDictionary *)packet;
+-(void) updateSavedChatrooms:(NSDictionary *)packet;
 
 @end

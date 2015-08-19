@@ -268,11 +268,21 @@
     [socketIO emit:@"requestUserSaveChatroom" withItems:@[requestUserSaveChatroomData]];
 }
 
+- (void) requestSavedChatrooms {
+    NSDictionary* requestSavedChatroomsData = @{@"uid" : APPDELEGATE.uid};
+    [socketIO emit:@"requestSavedChatrooms" withItems:@[requestSavedChatroomsData]];
+}
+
 #pragma mark - Chatroom Recieved Information
 
 -(void) receiveChatroomList:(NSDictionary *)packet
 {
     [APPDELEGATE.chatroomListVC updateChatroomList:packet];
+}
+
+-(void) recieveSavedChatrooms:(NSDictionary *)packet
+{
+    [APPDELEGATE.chatroomListVC updateSavedChatrooms:packet];
 }
 
 - (void) receiveAssignChatroom:(NSDictionary *)packet
@@ -361,6 +371,9 @@
             
         } else if([event isEqual:@"error"]){
             [self showAlertWithTitle:@"Server Error" message:[data objectForKey:@"message"]];
+            
+        } else if([event isEqual:@"savedChatrooms"]){
+            [self recieveSavedChatrooms:data];
         }
     }];
 }

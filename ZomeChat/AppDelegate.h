@@ -58,7 +58,7 @@
 @property float postingFeedTimerOffset; //(BulletinPageViewCOntroller)Alert
 @property float creatingChatroomTimerOffset; //(ChatroomListViewController) Alert
 
-@property BOOL saveChatroom; //(ChatViewController) Alert when click 'save' button
+@property BOOL canSaveChatroom; //(ChatViewController) Alert when click 'save' button
 
 @property int usernameMaxLength;
 @property int postContentMaxChars;
@@ -87,6 +87,9 @@
 @property (strong, nonatomic) NSString *firstPostAlertMessage;
 @property (strong, nonatomic) NSString *noTaggedFeedAlertTitle;
 @property (strong, nonatomic) NSString *noTaggedFeedAlertMessage;
+
+@property (strong, nonatomic) NSString *savePostAlertTitle;
+@property (strong, nonatomic) NSString *savePostAlertMessage;
 
 - (void) updateLocationCalled;
 - (void) connectServer;

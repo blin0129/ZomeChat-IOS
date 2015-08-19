@@ -218,6 +218,9 @@
     
     self.noTaggedFeedAlertTitle = @"No Match Found";
     self.noTaggedFeedAlertMessage = @"No tagged post around your area";
+    
+    self.savePostAlertTitle = @"You are in \"Browse Mode\"";
+    self.savePostAlertMessage = @"Please log in to save this chatroom";
 }
 
 #pragma mark Constraints
@@ -233,7 +236,7 @@
     self.chatroomSendImage = NO;
     self.changeUsername = NO;
     
-    self.saveChatroom = NO;
+    self.canSaveChatroom = NO;
     
     self.postingFeedTimerOffset = 0;
     self.creatingChatroomTimerOffset = 120;
@@ -250,7 +253,7 @@
     self.chatroomSendImage = YES;
     self.changeUsername = YES;
     
-    self.saveChatroom = YES;
+    self.canSaveChatroom = YES;
 }
 
 - (void)setRegularUserConstrains{
@@ -264,7 +267,7 @@
     self.chatroomSendImage = YES;
     self.changeUsername = YES;
     
-    self.saveChatroom = YES;
+    self.canSaveChatroom = YES;
 }
 
 - (void)setAnonymouseUserConstrains{
@@ -278,7 +281,7 @@
     self.chatroomSendImage = NO;
     self.changeUsername = NO;
     
-    self.saveChatroom = NO;
+    self.canSaveChatroom = NO;
 }
 
 @end
