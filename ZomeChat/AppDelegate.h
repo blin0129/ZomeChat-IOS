@@ -52,11 +52,13 @@
 @property BOOL likePost; //(PostViewController) Alert when click 'like' button
 @property BOOL postFeed; //(BulletinPageViewController) Aleart when click 'plus' button
 @property BOOL postFeedImage; //(NewPostViewController) Alert when click 'camera' button
-@property BOOL createChatroom; //(ChatroomListViewController) Alerat when click 'plus' button
+@property BOOL createChatroom; //(ChatroomListViewController) Alert when click 'plus' button
 @property BOOL chatroomConversation; //(ChatViewController) Alert when click 'send' button
 @property BOOL chatroomSendImage; //(ChatViewController) Alert when click 'camera' button
 @property float postingFeedTimerOffset; //(BulletinPageViewCOntroller)Alert
 @property float creatingChatroomTimerOffset; //(ChatroomListViewController) Alert
+
+@property BOOL saveChatroom; //(ChatViewController) Alert when click 'save' button
 
 @property int usernameMaxLength;
 @property int postContentMaxChars;

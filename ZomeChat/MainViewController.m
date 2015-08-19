@@ -122,6 +122,8 @@
     self.selectedViewController = [self.viewControllers objectAtIndex:2];
 }
 
+#pragma mark - Request Actions or Information
+
 -(void) requestEnterChatroom: (NSString *) roomKey
 {
     NSDictionary* requestEnterRoomData = @{@"uid" : APPDELEGATE.uid,
@@ -257,6 +259,13 @@
                                         @"reportReason":reason
                                         };
     [socketIO emit:@"requestReport" withItems:@[requestReportData]];
+}
+
+- (void) requestUserSaveChatroom: (NSString *)roomKey {
+    NSDictionary* requestUserSaveChatroomData = @{@"uid" : APPDELEGATE.uid,
+                                                  @"roomkey" : roomKey
+                                                  };
+    [socketIO emit:@"requestUserSaveChatroom" withItems:@[requestUserSaveChatroomData]];
 }
 
 #pragma mark - Chatroom Recieved Information

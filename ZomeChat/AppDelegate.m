@@ -233,6 +233,8 @@
     self.chatroomSendImage = NO;
     self.changeUsername = NO;
     
+    self.saveChatroom = NO;
+    
     self.postingFeedTimerOffset = 0;
     self.creatingChatroomTimerOffset = 120;
 }
@@ -247,6 +249,8 @@
     self.chatroomConversation = YES;
     self.chatroomSendImage = YES;
     self.changeUsername = YES;
+    
+    self.saveChatroom = YES;
 }
 
 - (void)setRegularUserConstrains{
@@ -259,6 +263,8 @@
     self.chatroomConversation = YES;
     self.chatroomSendImage = YES;
     self.changeUsername = YES;
+    
+    self.saveChatroom = YES;
 }
 
 - (void)setAnonymouseUserConstrains{
@@ -271,6 +277,8 @@
     self.chatroomConversation = NO;
     self.chatroomSendImage = NO;
     self.changeUsername = NO;
+    
+    self.saveChatroom = NO;
 }
 
 @end
