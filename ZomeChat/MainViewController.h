@@ -23,6 +23,8 @@
 @property (strong, nonatomic) GMSMarker *myLocationMarker;
 @property (nonatomic, strong) SocketIOClient *socketIO;
 
+@property (strong, nonatomic) NSMutableArray *savedRoomList;
+
 
 - (float) getLatitude;
 - (float) getLongitude;

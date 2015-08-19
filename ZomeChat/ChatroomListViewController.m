@@ -153,7 +153,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 2;
+    return 3;
 }
 
 
@@ -165,6 +165,9 @@
             break;
         case 1:
             return APPDELEGATE.mainVC.customRoomList.count;
+            break;
+        case 2:
+            return APPDELEGATE.mainVC.savedRoomList.count;
             break;
         default:
             return 0;
@@ -189,6 +192,9 @@
             break;
         case 1:
             titleLabel.text = @"Other Local Chatrooms";
+            break;
+        case 2:
+            titleLabel.text = @"Your Saved Chatrooms";
             break;
         default:
             titleLabel.text = @"";
