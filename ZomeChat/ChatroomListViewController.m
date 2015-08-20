@@ -272,8 +272,12 @@
         userCountLabel.text = userCountString;
         [userCountLabel sizeToFit];
         cell.textLabel.text = [[APPDELEGATE.mainVC.customRoomList objectAtIndex:indexPath.row] objectForKey:@"roomName"];
+    } else if (indexPath.section == 2){
+        NSString *userCountString = [NSString stringWithFormat:@"%@ users",[[APPDELEGATE.mainVC.customRoomList objectAtIndex:indexPath.row] objectForKey:@"userCount"]];
+        userCountLabel.text = userCountString;
+        [userCountLabel sizeToFit];
+        cell.textLabel.text = [[APPDELEGATE.mainVC.customRoomList objectAtIndex:indexPath.row] objectForKey:@"roomName"];
     }
-    
     
     return cell;
 }
@@ -286,6 +290,8 @@
         list = APPDELEGATE.mainVC.defaultRoomList;
     } else if(indexPath.section == 1){
         list = APPDELEGATE.mainVC.customRoomList;
+    } else if(indexPath.section == 2){
+        list = APPDELEGATE.mainVC.savedRoomList;
     }
     choosedRoomName = [[list objectAtIndex:indexPath.row] objectForKey:@"roomName"];
     choosedRoomKey = [[list objectAtIndex:indexPath.row] objectForKey:@"roomKey"];
