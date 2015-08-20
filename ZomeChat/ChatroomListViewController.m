@@ -117,7 +117,17 @@
 
 - (void) updateSavedChatrooms:(NSDictionary *)data
 {
-    NSLog([data description]);
+    APPDELEGATE.mainVC.savedRoomList = [[NSMutableArray alloc] initWithObjects: nil];
+    
+    NSArray *receiveList = [data objectForKey:@"chatrooms"];
+    for (NSDictionary *roomInfo in receiveList) {
+        [APPDELEGATE.mainVC.savedRoomList addObject:roomInfo];
+        float lng = [[roomInfo objectForKey:@"lng"] floatValue];
+        float lat = [[roomInfo objectForKey:@"lat"] floatValue];
+        [APPDELEGATE.mainVC addMapMarkerWithLongitude:lng latitude:lat roomName:[roomInfo objectForKey:@"roomName"]];
+    }
+    
+    [self.tableView reloadData];
 }
 
 -(void)suggestCreateNewRoom
