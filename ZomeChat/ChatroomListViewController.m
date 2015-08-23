@@ -82,6 +82,7 @@
 - (void) requestChatroomListUpdate
 {
     [APPDELEGATE.mainVC requestChatroomList];
+    [APPDELEGATE.mainVC requestSavedChatrooms];
 }
 
 - (void) updateChatroomList:(NSDictionary *)data
@@ -276,7 +277,7 @@
         NSString *userCountString = [NSString stringWithFormat:@"%@ users",[[APPDELEGATE.mainVC.customRoomList objectAtIndex:indexPath.row] objectForKey:@"userCount"]];
         userCountLabel.text = userCountString;
         [userCountLabel sizeToFit];
-        cell.textLabel.text = [[APPDELEGATE.mainVC.customRoomList objectAtIndex:indexPath.row] objectForKey:@"roomName"];
+        cell.textLabel.text = [[APPDELEGATE.mainVC.savedRoomList objectAtIndex:indexPath.row] objectForKey:@"roomName"];
     }
     
     return cell;

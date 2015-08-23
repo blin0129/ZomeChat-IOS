@@ -47,6 +47,7 @@
 - (void) requestFeedDetail: (NSString *)feedId;
 - (void) requestReportViolationOf:(NSString *)object withId:(NSString *)objectId andReason:(NSString *)reason;
 
+- (void) requestUserSaveChatroom:(NSString *)roomKey;
 - (void) requestSavedChatrooms;
 
 

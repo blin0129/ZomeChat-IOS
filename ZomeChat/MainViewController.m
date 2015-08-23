@@ -263,7 +263,7 @@
 
 - (void) requestUserSaveChatroom: (NSString *)roomKey {
     NSDictionary* requestUserSaveChatroomData = @{@"uid" : APPDELEGATE.uid,
-                                                  @"roomkey" : roomKey
+                                                  @"roomKey" : roomKey
                                                   };
     [socketIO emit:@"requestUserSaveChatroom" withItems:@[requestUserSaveChatroomData]];
 }
@@ -300,6 +300,11 @@
 - (void) receivedChatroomMessage: (NSDictionary *)packet
 {
     [APPDELEGATE.chatVC receiveMessage:packet];
+}
+
+- (void) recieveNewSave:(NSDictionary *)packet
+{
+    [APPDELEGATE.chatroomListVC updateSavedChatrooms:packet];
 }
 
 
@@ -374,6 +379,9 @@
             
         } else if([event isEqual:@"savedChatrooms"]){
             [self recieveSavedChatrooms:data];
+            
+        } else if([event isEqual:@"userSaveChatroomResponse"]){
+            [self recieveNewSave:data];
         }
     }];
 }

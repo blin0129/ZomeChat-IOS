@@ -85,7 +85,26 @@
 
 - (void)saveChatroom
 {
-    NSLog(@"Trying to save a chatroom.");
+    if ([self.roomName isEqualToString:@"Local Room"]) {
+        NSLog(@"Cannot do.");
+        return;
+    }
+    if (APPDELEGATE.canSaveChatroom) {
+        for (NSDictionary *chatroomDict in APPDELEGATE.mainVC.savedRoomList) {
+            if ([[chatroomDict objectForKey:@"roomKey"] isEqual:self.roomKey]) {
+                [self showAlertBox:@"Danger!"
+                           message:@"You saved this room before."
+                            button:@"OK"];
+                return;
+            }
+        }
+        [APPDELEGATE.mainVC requestUserSaveChatroom:self.roomKey];
+        [saveBtn setImage:[UIImage imageNamed:@"bar_icon_like_filled"]];
+    } else {
+        [self showAlertBox:APPDELEGATE.savePostAlertTitle
+                   message:APPDELEGATE.savePostAlertMessage
+                    button:@"OK"];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
