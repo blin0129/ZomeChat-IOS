@@ -86,7 +86,9 @@
 - (void)saveChatroom
 {
     if ([self.roomName isEqualToString:@"Local Room"]) {
-        NSLog(@"Cannot do.");
+        [self showAlertBox:@"What's local is local."
+                   message:@"You can't save the local chatroom."
+                    button:@"OK"];
         return;
     }
     if (APPDELEGATE.canSaveChatroom) {
