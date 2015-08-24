@@ -39,6 +39,8 @@
 @property (nonatomic, retain) NSString *reportMessageId;
 @property int userCount;
 
+@property int roomIndex;
+
 - (void)receiveMessagePressed:(UIBarButtonItem *)sender;
 - (void)closePressed:(UIBarButtonItem *)sender;
 
@@ -47,6 +49,7 @@
 -(void) updateChatroomUserList:(NSDictionary *)packet;
 
 //-(void) receivedImage:(NSString *)imageString inRoom:(NSString *)roomKey fromSender:(NSString *)sender;
+- (void)appendToSavedChatroomsList;
 
 
 @end

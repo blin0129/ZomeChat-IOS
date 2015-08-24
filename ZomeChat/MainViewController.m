@@ -304,7 +304,7 @@
 
 - (void) recieveNewSave:(NSDictionary *)packet
 {
-    [APPDELEGATE.chatroomListVC updateSavedChatrooms:packet];
+    [APPDELEGATE.chatVC appendToSavedChatroomsList];
 }
 
 

@@ -55,10 +55,15 @@
     self.inputToolbar.contentView.leftBarButtonItem = cameraButton;
     
     // Nav Bar Buttons
-    saveBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"bar_icon_like"]
-                                                                style:UIBarButtonItemStylePlain
-                                                               target:self
-                                                               action:@selector(saveChatroom)];
+    UIImage *saveIcon;
+    if ([self hasBeenSavedBefore]) saveIcon = [UIImage imageNamed:@"bar_icon_like_filled"];
+    else saveIcon = [UIImage imageNamed:@"bar_icon_like"];
+    
+    saveBtn = [[UIBarButtonItem alloc] initWithImage:saveIcon
+                                               style:UIBarButtonItemStylePlain
+                                              target:self
+                                              action:@selector(saveChatroom)];
+    
     UIBarButtonItem *negativeSpacer = [[UIBarButtonItem alloc]
                                        initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
                                        target:nil action:nil];
@@ -92,13 +97,11 @@
         return;
     }
     if (APPDELEGATE.canSaveChatroom) {
-        for (NSDictionary *chatroomDict in APPDELEGATE.mainVC.savedRoomList) {
-            if ([[chatroomDict objectForKey:@"roomKey"] isEqual:self.roomKey]) {
-                [self showAlertBox:@"Danger!"
-                           message:@"You saved this room before."
-                            button:@"OK"];
-                return;
-            }
+        if ([self hasBeenSavedBefore]) {
+            [self showAlertBox:@"Danger!"
+                       message:@"You saved this room before."
+                        button:@"OK"];
+            return;
         }
         [APPDELEGATE.mainVC requestUserSaveChatroom:self.roomKey];
         [saveBtn setImage:[UIImage imageNamed:@"bar_icon_like_filled"]];
@@ -107,6 +110,21 @@
                    message:APPDELEGATE.savePostAlertMessage
                     button:@"OK"];
     }
+}
+
+- (BOOL)hasBeenSavedBefore {
+    for (NSDictionary *chatroomDict in APPDELEGATE.mainVC.savedRoomList) {
+        if ([[chatroomDict objectForKey:@"roomKey"] isEqual:self.roomKey]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)appendToSavedChatroomsList
+{
+    [APPDELEGATE.mainVC.savedRoomList addObject:[APPDELEGATE.mainVC.customRoomList objectAtIndex:self.roomIndex]];
+    [APPDELEGATE.chatroomListVC.tableView reloadData];
 }
 
 - (void)viewWillAppear:(BOOL)animated

@@ -127,7 +127,6 @@
         float lat = [[roomInfo objectForKey:@"lat"] floatValue];
         [APPDELEGATE.mainVC addMapMarkerWithLongitude:lng latitude:lat roomName:[roomInfo objectForKey:@"roomName"]];
     }
-    
     [self.tableView reloadData];
 }
 
@@ -300,6 +299,7 @@
     [APPDELEGATE.mainVC requestEnterChatroom:choosedRoomKey];
     
     ChatViewController *vc = [ChatViewController messagesViewController];
+    vc.roomIndex = indexPath.row;
     [self.navigationController pushViewController:vc animated:YES];
     
 }
