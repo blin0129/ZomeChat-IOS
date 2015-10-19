@@ -88,6 +88,12 @@
     _loginActivityBackground.hidden = YES;
     _signupActivityBackground.hidden = YES;
     
+    emailInput.tintColor = [UIColor blueColor];
+    passwordInput.tintColor = [UIColor blueColor];
+    _signupEmail.tintColor = [UIColor blueColor];
+    _signupPassword.tintColor = [UIColor blueColor];
+    _signupPasswordC.tintColor = [UIColor blueColor];
+    
     if([CLLocationManager locationServicesEnabled]){
         _currentLocation = APPDELEGATE.locationManager.location;
     }
@@ -155,7 +161,7 @@
     [self performSelector:@selector(autoLoginFail) withObject:nil afterDelay:5.0];
     NSString *savedEmail = [[NSUserDefaults standardUserDefaults] objectForKey:@"email"];
     NSString *savedPassword = [[NSUserDefaults standardUserDefaults] objectForKey:@"password"];
-    [socketIO on: @"connect" callback: ^(NSArray* data, void (^ack)(NSArray*)) {
+    [socketIO on: @"connect" callback:^(NSArray * data, SocketAckEmitter *items) {
         NSLog(@"server connected, now try auto login");
         previousLogin = [[NSUserDefaults standardUserDefaults] objectForKey:@"loginType"];
         if(previousLogin != nil){
