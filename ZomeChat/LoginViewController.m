@@ -88,11 +88,11 @@
     _loginActivityBackground.hidden = YES;
     _signupActivityBackground.hidden = YES;
     
-    emailInput.tintColor = [UIColor blueColor];
-    passwordInput.tintColor = [UIColor blueColor];
-    _signupEmail.tintColor = [UIColor blueColor];
-    _signupPassword.tintColor = [UIColor blueColor];
-    _signupPasswordC.tintColor = [UIColor blueColor];
+    emailInput.tintColor = IOS_BLUE;
+    passwordInput.tintColor = IOS_BLUE;
+    _signupEmail.tintColor = IOS_BLUE;
+    _signupPassword.tintColor = IOS_BLUE;
+    _signupPasswordC.tintColor = IOS_BLUE;
     
     if([CLLocationManager locationServicesEnabled]){
         _currentLocation = APPDELEGATE.locationManager.location;
@@ -388,7 +388,7 @@
 {
     [socketIO onAny:^(SocketAnyEvent* respond) {
         NSString *event = respond.event;
-        if([event isEqual:@"disconnect"] || [event isEqual:@"reconnect"] || [event isEqual:@"reconnectAttempt"]){
+        if([event isEqual:@"disconnect"] || [event isEqual:@"reconnect"] || [event isEqual:@"reconnectAttempt"] || [event isEqual:@"connect"]){
             return;
         }
         NSDictionary *data = [respond.items objectAtIndex:0];

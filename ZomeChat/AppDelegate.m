@@ -126,7 +126,7 @@
 - (void) disconnectServer
 {
     NSLog(@"Reconnect server");
-    [socketIO closeWithFast:@true];
+    [socketIO close];
     [socketIO connect];
 }
 
