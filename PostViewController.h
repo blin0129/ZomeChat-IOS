@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "JSQMessagesKeyboardController.h"
 
-@interface PostViewController : UIViewController <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface PostViewController : UIViewController <UITextFieldDelegate, UITextViewDelegate, UITableViewDelegate, UITableViewDataSource>
 
 @property (strong, nonatomic) NSDictionary *postData;
 @property (weak, nonatomic) IBOutlet UIButton *replyBtn; 

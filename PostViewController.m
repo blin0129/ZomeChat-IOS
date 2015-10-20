@@ -317,7 +317,6 @@
     CGRect theSize = [content boundingRectWithSize:CGSizeMake(viewWidth, CGFLOAT_MAX)
                                            options:(NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading)
                                            context:nil];
-    
     cellHeight += theSize.size.height + imageHeight;
     
 #if PERFORMANCE_ENABLE_HEIGHT_CACHE
@@ -344,7 +343,7 @@
          NSString * timeString = [dateFormat stringFromDate:[NSDate dateWithTimeIntervalSince1970:time]];
          cell.timeLabel.text = timeString;
          cell.postContent.text = [self.postData objectForKey:@"content"];
-//         [cell.postContent sizeToFit];
+         [cell.postContent sizeToFit];
          [self hashtagColor:cell.postContent];
          
          NSString *thumbnailURL =[self.postData objectForKey:@"ownerImageURL"];
@@ -462,5 +461,8 @@
     }
 }
 
+-(void)textViewDidBeginEditing:(UITextView *)textView {
+    textView.tintColor = IOS_BLUE;
+}
 
 @end
