@@ -409,12 +409,30 @@
 
 - (CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView
                    layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForCellTopLabelAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (indexPath.item % 3 == 0) {
-        return kJSQMessagesCollectionViewCellLabelHeightDefault;
+{    
+    CGFloat topLabelHeight = 0;
+    
+    id<JSQMessageData> messageData = [self.collectionView.dataSource
+                                      collectionView:self.collectionView
+                                      messageDataForItemAtIndexPath:indexPath];
+    NSString *messageSender = [messageData senderId];
+    
+    CGSize avatarSize = CGSizeMake(0, 0);
+    if ([messageSender isEqualToString:[self.collectionView.dataSource senderId]]) {
+        avatarSize = collectionViewLayout.outgoingAvatarViewSize;
+    } else {
+        avatarSize = collectionViewLayout.incomingAvatarViewSize;
     }
     
-    return 0.0f;
+    CGFloat bubbleTopLabelHeight = [self collectionView:collectionView
+                                                 layout:collectionViewLayout
+              heightForMessageBubbleTopLabelAtIndexPath:indexPath];
+    
+    CGSize bubbleSize = [collectionViewLayout messageBubbleSizeForItemAtIndexPath:indexPath];
+    if (bubbleSize.height + topLabelHeight + bubbleTopLabelHeight < avatarSize.height){
+        return avatarSize.height + topLabelHeight - bubbleSize.height;
+    }
+    return topLabelHeight;
 }
 
 - (CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView
@@ -535,6 +553,12 @@
         }
         _popupType = @"";
     }
+}
+
+- (void)textViewDidBeginEditing:(UITextView *)textView
+{
+    [super textViewDidBeginEditing:textView];
+    textView.tintColor = IOS_BLUE;
 }
 
 

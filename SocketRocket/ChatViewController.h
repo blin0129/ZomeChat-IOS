@@ -19,7 +19,7 @@
 
 @end
 
-@interface ChatViewController : JSQMessagesViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate, JSQMessagesCollectionViewCellDelegate>
+@interface ChatViewController : JSQMessagesViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate, JSQMessagesCollectionViewCellDelegate, UITextViewDelegate>
 
 @property (weak, nonatomic) id<JSQDemoViewControllerDelegate> delegateModal;
 @property (copy, nonatomic) NSDictionary *avatars;
