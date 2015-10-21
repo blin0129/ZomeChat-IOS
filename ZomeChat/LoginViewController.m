@@ -19,6 +19,7 @@
     SocketIOClient *socketIO;
     NSString *previousLogin;
     BOOL loginAttemptSuccess;
+    BOOL sawServerError;
 }
 @end
 
@@ -32,6 +33,7 @@
 {
     [super viewDidLoad];
     loginAttemptSuccess = true;
+    sawServerError = NO;
     
     //Set socketIO listener
     socketIO = APPDELEGATE.socketIO;
@@ -290,6 +292,7 @@
                                      @"lng" : APPDELEGATE.lng,
                                      @"lat" : APPDELEGATE.lat
                                      };
+        sawServerError = NO;
         [socketIO emit:@"signup" withItems:@[signupData]];
     } else {
         [self stopSignupActivityView];
@@ -305,6 +308,7 @@
                                  @"lng" : APPDELEGATE.lng,
                                  @"lat" : APPDELEGATE.lat
                                  };
+    sawServerError = NO;
     [socketIO emit:@"login" withItems:@[singinData]];
     APPDELEGATE.loginType = @"ANONYMOUS";
 }
@@ -320,6 +324,7 @@
                                  @"lng" : APPDELEGATE.lng,
                                  @"lat" : APPDELEGATE.lat
                                  };
+    sawServerError = NO;
     [socketIO emit:@"login" withItems:@[singinData]];
     APPDELEGATE.loginType = @"REGISTER";
 }
@@ -348,6 +353,7 @@
                                      @"lng" : APPDELEGATE.lng,
                                      @"lat" : APPDELEGATE.lat
                                      };
+        sawServerError = NO;
         [socketIO emit:@"login" withItems:@[singinData]];
         APPDELEGATE.loginType = @"FACEBOOK";
     }
@@ -396,8 +402,9 @@
             [self receiveSignupResponse:data];
         } else if([event isEqual:@"login_response"]){
             [self receiveLoginResponse:data];
-        } else if([event isEqual:@"error"]){
-            [self showAlertWithTitle:@"Server Error" message:[data objectForKey:@"message"]];
+        } else if([event isEqual:@"error"] && !sawServerError){
+            [self showDefaultServerErrorAlert];
+            sawServerError = YES;
         }
     }];
 }
@@ -446,7 +453,7 @@
 #pragma mark Server Alert
 
 - (void)showDefaultServerErrorAlert{
-    [self showAlertWithTitle:@"Server Error" message:@"Whoops, something is wrong with our server!"];
+    [self showAlertWithTitle:@"Server Error" message:@"Cannot connect to the server; please update to the newest version and try again later."];
 }
 
 @end

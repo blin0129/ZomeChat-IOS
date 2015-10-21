@@ -320,9 +320,8 @@
             return;
         }
         NSDictionary *data = [respond.items objectAtIndex:0];
-        if([[data objectForKey:@"respond"] isEqualToString:@"RESPOND_FAIL"]){
+        if([event isEqual:@"error"]){
             [self showDefaultServerErrorAlert];
-            
         } else if([event isEqual:@"chatroomList"]){
             [self receiveChatroomList:data];
             
@@ -349,15 +348,14 @@
             
         } else if([event isEqual:@"feedDetail"]){
             [self receiveFeedDetail:data];
-            
-        } else if([event isEqual:@"error"]){
-            [self showAlertWithTitle:@"Server Error" message:[data objectForKey:@"message"]];
+        } else if([[data objectForKey:@"respond"] isEqualToString:@"RESPOND_FAIL"]){
+            [self showDefaultServerErrorAlert];
         }
     }];
 }
 
 - (void)showDefaultServerErrorAlert{
-    [self showAlertWithTitle:@"Server Error" message:@"Woop, something is wrong with our server"];
+    [self showAlertWithTitle:@"Server Error" message:@"Cannot connect to the server; please update to the newest version and try again later."];
 }
 
 - (void)showAlertWithTitle:(NSString*) title message:(NSString*) message
