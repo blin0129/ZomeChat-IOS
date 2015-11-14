@@ -453,7 +453,7 @@
 #pragma mark Server Alert
 
 - (void)showDefaultServerErrorAlert{
-    [self showAlertWithTitle:@"Server Error" message:@"Cannot connect to the server; please update to the newest version and try again later."];
+    [self showAlertWithTitle:@"Server Error" message:@"Please try restarting the app and ensure you have updated to the latest version."];
 }
 
 @end
