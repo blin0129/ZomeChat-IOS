@@ -49,7 +49,34 @@
     [self initLocationManager];
     [self connectServer];
     [GMSServices provideAPIKey:@"AIzaSyD_K5ZnON6GNk1KsNROdG3oI0NpDCj0MRc"];
+    
+    if ([application respondsToSelector:@selector(registerUserNotificationSettings:)])
+    {
+        UIUserNotificationType userNotificationTypes = (UIUserNotificationTypeAlert |
+                                                        UIUserNotificationTypeBadge |
+                                                        UIUserNotificationTypeSound);
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:userNotificationTypes
+                                                                                 categories:nil];
+        [application registerUserNotificationSettings:settings];
+        [application registerForRemoteNotifications];
+    }
+    
     return YES;
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    NSLog(@"My token is: %@", deviceToken);
+    
+    NSString *devToken = [[[[deviceToken description]
+                            stringByReplacingOccurrencesOfString:@"<"withString:@""]
+                            stringByReplacingOccurrencesOfString:@">" withString:@""]
+                            stringByReplacingOccurrencesOfString: @" " withString: @""];
+    
+    NSLog(@"My Device token is: %@", devToken);
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    NSLog(@"Failed to get a token! %@", error);
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
