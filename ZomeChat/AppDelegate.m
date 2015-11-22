@@ -42,8 +42,8 @@
     //SF
     lng = @"-122.408225";
     lat = @"37.7873560";
-//    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com:1442";
-    serverURL = @"localhost:1442";
+    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com:1442";
+//    serverURL = @"localhost:1442";
     
     [self initAppSettings];
     [self initLocationManager];
@@ -77,6 +77,25 @@
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
     NSLog(@"Failed to get a token! %@", error);
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
+    NSLog(@"Recieved notification: %@", [userInfo description]);
+    if ([application applicationState] == UIApplicationStateActive)
+    {
+        NSDictionary *aps = [NSDictionary dictionaryWithDictionary:(NSDictionary*) [userInfo objectForKey:@"aps"]];
+        id alert = [aps objectForKey:@"alert"];
+        // Other possibility: alert is an NSDictionary.
+        if ([alert isKindOfClass:[NSString class]])
+        {
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"ZomeChat"
+                                                                message:alert
+                                                               delegate:self
+                                                      cancelButtonTitle:@"Okay"
+                                                      otherButtonTitles:nil];
+            [alertView show];
+        }
+    }
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
