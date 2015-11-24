@@ -45,6 +45,8 @@
 - (void) requestFeedDetail: (NSString *)feedId;
 - (void) requestReportViolationOf:(NSString *)object withId:(NSString *)objectId andReason:(NSString *)reason;
 
+- (void) registerForNotificationsWithDeviceToken: (NSString *)deviceToken;
+
 
 - (void) updateLocationOnMap;
 - (void) cleanAllMarkerFromMap;

@@ -42,24 +42,13 @@
     //SF
     lng = @"-122.408225";
     lat = @"37.7873560";
-    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com:1442";
+//    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com:1442";
 //    serverURL = @"localhost:1442";
     
     [self initAppSettings];
     [self initLocationManager];
     [self connectServer];
     [GMSServices provideAPIKey:@"AIzaSyD_K5ZnON6GNk1KsNROdG3oI0NpDCj0MRc"];
-    
-    if ([application respondsToSelector:@selector(registerUserNotificationSettings:)])
-    {
-        UIUserNotificationType userNotificationTypes = (UIUserNotificationTypeAlert |
-                                                        UIUserNotificationTypeBadge |
-                                                        UIUserNotificationTypeSound);
-        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:userNotificationTypes
-                                                                                 categories:nil];
-        [application registerUserNotificationSettings:settings];
-        [application registerForRemoteNotifications];
-    }
     
     return YES;
 }
@@ -71,8 +60,8 @@
                             stringByReplacingOccurrencesOfString:@"<"withString:@""]
                             stringByReplacingOccurrencesOfString:@">" withString:@""]
                             stringByReplacingOccurrencesOfString: @" " withString: @""];
-    
-    NSLog(@"My Device token is: %@", devToken);
+
+    [self.mainVC registerForNotificationsWithDeviceToken:devToken];
 }
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {

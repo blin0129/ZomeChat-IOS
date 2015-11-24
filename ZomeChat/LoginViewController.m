@@ -433,9 +433,11 @@
             [[NSUserDefaults standardUserDefaults] setObject:loginPassword forKey:@"password"];
             [[NSUserDefaults standardUserDefaults] setObject:@"REGISTER" forKey:@"loginType"];
             [APPDELEGATE setRegularUserConstrains];
+            [self registerForNotifications];
         }else if([[data objectForKey:@"userType"] isEqualToString:@"FACEBOOK"]){
             [APPDELEGATE setFacebookUserConstrains];
             [[NSUserDefaults standardUserDefaults] setObject:@"FACEBOOK" forKey:@"loginType"];
+            [self registerForNotifications];
         }else{
             [APPDELEGATE setAnonymouseUserConstrains];
             [[NSUserDefaults standardUserDefaults] setObject:@"ANONYMOUS" forKey:@"loginType"];
@@ -448,6 +450,21 @@
         [self.view sendSubviewToBack:backgroundIV];
     }
     [self stopLoginActivityView];
+}
+
+- (void)registerForNotifications
+{
+    UIApplication *application = [UIApplication sharedApplication];
+    if ([application respondsToSelector:@selector(registerUserNotificationSettings:)])
+    {
+        UIUserNotificationType userNotificationTypes = (UIUserNotificationTypeAlert |
+                                                        UIUserNotificationTypeBadge |
+                                                        UIUserNotificationTypeSound);
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:userNotificationTypes
+                                                                                 categories:nil];
+        [application registerUserNotificationSettings:settings];
+        [application registerForRemoteNotifications];
+    }
 }
 
 #pragma mark Server Alert

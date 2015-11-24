@@ -259,6 +259,13 @@
     [socketIO emit:@"requestReport" withItems:@[requestReportData]];
 }
 
+- (void) registerForNotificationsWithDeviceToken:(NSString *)deviceToken {
+    NSDictionary *registerDeviceData = @{@"uid": APPDELEGATE.uid,
+                                         @"deviceToken": deviceToken
+                                         };
+    [socketIO emit:@"registerForNotifications" withItems:@[registerDeviceData]];
+}
+
 #pragma mark - Chatroom Recieved Information
 
 -(void) receiveChatroomList:(NSDictionary *)packet
