@@ -11,6 +11,7 @@
 
 @implementation AppDelegate {
     BOOL manuelLocationUpdate;
+    BOOL didTransitionFromBackground;
 }
 
 #pragma mark - Variables
@@ -43,7 +44,7 @@
     lng = @"-122.408225";
     lat = @"37.7873560";
 //    serverURL = @"ec2-54-205-59-87.compute-1.amazonaws.com:1442";
-//    serverURL = @"localhost:1442";
+    serverURL = @"localhost:1442";
     
     [self initAppSettings];
     [self initLocationManager];
@@ -70,20 +71,13 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
     NSLog(@"Recieved notification: %@", [userInfo description]);
-    if ([application applicationState] == UIApplicationStateActive)
-    {
-        NSDictionary *aps = [NSDictionary dictionaryWithDictionary:(NSDictionary*) [userInfo objectForKey:@"aps"]];
-        id alert = [aps objectForKey:@"alert"];
-        // Other possibility: alert is an NSDictionary.
-        if ([alert isKindOfClass:[NSString class]])
-        {
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"ZomeChat"
-                                                                message:alert
-                                                               delegate:self
-                                                      cancelButtonTitle:@"Okay"
-                                                      otherButtonTitles:nil];
-            [alertView show];
+    if (didTransitionFromBackground) {
+        if ([userInfo objectForKey:@"isForPost"]) {
+            self.mainVC.selectedViewController = [self.mainVC.viewControllers objectAtIndex:0];
+        } else if ([userInfo objectForKey:@"roomKey"]) {
+            self.mainVC.selectedViewController = [self.mainVC.viewControllers objectAtIndex:1];
         }
+        didTransitionFromBackground = NO;
     }
 }
 
@@ -96,6 +90,7 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+    didTransitionFromBackground = YES;
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
